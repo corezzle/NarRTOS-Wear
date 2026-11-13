@@ -2014,7 +2014,7 @@ static void build_io_control_layer(void)
         io_toggle_apply_visual(i);
     }
 
-    /* İlk açılış için saat/tarih label'larını doldur */
+    /* İlk açılış için watch/tarih label'larını doldur */
     time_t now; time(&now);
     struct tm ti; localtime_r(&now, &ti);
     update_io_control_labels(&ti);
@@ -2867,7 +2867,7 @@ static void draw_digital_thumb(lv_layer_t* layer,
 
     // ── Dikey ortalama: font'un gerçek line_height'ına göre hesapla ──────────
     int32_t lh      = (int32_t)font->line_height;   // gerçek piksel yüksekliği
-    int32_t row_gap = 10;                            // saat/dakika arası boşluk (canvas piksel)
+    int32_t row_gap = 10;                            // watch/dakika arası boşluk (canvas piksel)
     int32_t total_h = lh * 2 + row_gap;
     int32_t row1_y  = oy + (oh - total_h) / 2;      // dikey olarak tam ortalı
     int32_t row2_y  = row1_y + lh + row_gap;

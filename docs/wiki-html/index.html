@@ -30,7 +30,7 @@
   </div>
 
   <figure class="hero-media">
-    <img src="assets/gif/hero-cihazlar.gif" alt="Telefondan BLE ile gönderilen komut, NarRTOS'un iki board varyantında da aynı ekranı açıyor" />
+    <img src="assets/gif/hero-devices.gif" alt="Telefondan BLE ile gönderilen komut, NarRTOS'un iki board varyantında da aynı ekranı açıyor" />
   </figure>
 
   <div class="stats">
@@ -65,19 +65,19 @@
     </div>
   </div>
 
-  <h2 id="hizli-baslangic">Hızlı başlangıç</h2>
+  <h2 id="quick-start">Hızlı başlangıç</h2>
   <div class="note">
     <div class="note-t">Kod derlemeden, hazır sürümü yüklemek isteyenler</div>
     <p><strong>Corezzle Imager</strong> masaüstü uygulaması NarRTOS'un hazır sürümünü karta yazar:
     kartı tak, kartını seç, düğmeye bas. Adım adım anlatım:
-    <a href="imager-ile-yukleme.html">Corezzle Imager ile Yükleme</a>. Aşağıdaki adımlar yalnız
+    <a href="imager-install.html">Corezzle Imager ile Yükleme</a>. Aşağıdaki adımlar yalnız
     kodu kendisi derleyip değiştirmek isteyenler için.</p>
   </div>
   <div class="note">
     <div class="note-t">Kuruluma başlamadan önce</div>
     <p>Bilgisayarınızda VS Code yüklü değilse önce onu kurun:
     <a href="vs-code.html">VS Code Kurulumu</a>. VS Code kurulu ama projeyi içinde nasıl
-    indirip açacağınızı bilmiyorsanız <a href="vscode-kurulumu.html">NarRTOS için VS Code
+    indirip açacağınızı bilmiyorsanız <a href="vscode-setup.html">NarRTOS için VS Code
     Kurulumu</a> sayfası, aşağıdaki ilk komutu nereye yapıştıracağınızı adım adım gösterir.
     Sonra buraya dönün.</p>
   </div>
@@ -88,7 +88,7 @@ pio run -e esp32s3_wearable -t upload
 pio device monitor</code></pre>
   <p>Sırasıyla: projeyi indirir, klasörüne girer, derleyip karta yükler, cihazın
   çıktısını dinler.</p>
-  <figure class="terminal"><img src="assets/gif/terminal-hizli-baslangic.gif" alt="Dört komutun terminaldeki akışı" />
+  <figure class="terminal"><img src="assets/gif/terminal-quick-start.gif" alt="Dört komutun terminaldeki akışı" />
     <figcaption>Dört komut uçtan uca: indirme, klasöre giriş, derleyip yükleme, açılış kaydı. Çıktılar kısaltıldı.</figcaption></figure>
   <div class="note">
     <div class="note-t">İlk kez mi kuruyorsunuz?</div>
@@ -98,7 +98,7 @@ pio device monitor</code></pre>
   </div>
 
 <!-- WIKI:BASLA -->
-      <h2 id="baslarken">Başlarken</h2>
+      <h2 id="getting-started">Başlarken</h2>
       <p>Bu sayfa daha önce hiç gömülü yazılım derlememiş biri için yazıldı. Sırayla takip ederseniz elinizdeki karta NarRTOS kurulmuş olur. İlk seferinde 20-30 dakika sürer; bunun büyük kısmı bir kereye mahsus program kurulumlarıdır. İkinci seferde iki komutla bitirirsiniz.</p>
       <h3>Neye ihtiyacınız var</h3>
       <div class="tablewrap"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>Bir kart</strong></td><td>Desteklenen ESP32-S3 kartlarından biri (bkz. Donanım ve Board Varyantları)</td></tr><tr><td><strong>USB kablosu</strong></td><td>Karta uygun uçta ve <strong>veri aktaran</strong> bir kablo</td></tr><tr><td><strong>Bilgisayar</strong></td><td>Windows, macOS ya da Linux; üçü de olur</td></tr></tbody></table></div>
@@ -109,7 +109,7 @@ pio device monitor</code></pre>
       <p>Açılan siyah (ya da beyaz) pencereye komutları tek tek yazıp her birinin sonunda Enter&#x27;a basacaksınız. Bir komut çalışırken bekleyin, iş bitince satır başına geri döner.</p>
             <figure><img src="assets/img/spotlight-terminal.png" alt="Spotlight'ta Terminal" />
         <figcaption>macOS: Spotlight'a <code>Terminal</code> yazın; ilk sonuç Terminal uygulamasıdır.</figcaption></figure>
-      <figure><img src="assets/img/windows-baslat-powershell.png" alt="Windows Başlat aramasında PowerShell" />
+      <figure><img src="assets/img/windows-start-powershell.png" alt="Windows Başlat aramasında PowerShell" />
         <figcaption>Windows: Başlat menüsüne <code>PowerShell</code> yazın; ilk sonuç Windows PowerShell (çizim).</figcaption></figure>
       <h3>2. Python kurulu mu, kontrol edin</h3>
       <p>Kullanacağımız derleme aracı Python ile yazılmış, o yüzden önce Python lazım. Terminale şunu yazın:</p>
@@ -124,7 +124,7 @@ pio device monitor</code></pre>
       <pre><code>pio --version</code></pre>
       <p><code>PlatformIO Core, version 6.x.x</code> gibi bir çıktı görmelisiniz.</p>
       <div class="note"><div class="note-t"><code>pio: command not found</code> diyorsa</div><p>program kurulmuştur ama terminal nereye kurulduğunu bilmiyordur. Tam yoluyla çağırarak devam edebilirsiniz: macOS ve Linux&#x27;ta <code>~/.platformio/penv/bin/pio</code>, Windows&#x27;ta <code>%USERPROFILE%\.platformio\penv\Scripts\pio.exe</code>. Bundan sonraki her komutta <code>pio</code> yerine bu yolu yazın.</p></div>
-            <figure class="terminal"><img src="assets/gif/terminal-kurulum.gif" alt="Python kontrolü ve PlatformIO kurulumu" />
+            <figure class="terminal"><img src="assets/gif/terminal-setup.gif" alt="Python kontrolü ve PlatformIO kurulumu" />
         <figcaption>2. ve 3. adım terminalde: Python sürümü, PlatformIO kurulumu ve doğrulama. Sürüm numaraları sizde farklı olabilir.</figcaption></figure>
       <h3>4. USB sürücüsünü kurun</h3>
       <p>Kartın üzerinde, USB&#x27;yi kartın anlayacağı sinyale çeviren küçük bir yonga vardır. Bilgisayarın bu yongayla konuşabilmesi için bir sürücü gerekir.</p>
@@ -140,7 +140,7 @@ cd NarRTOS-Wear</code></pre>
       <pre><code>pio device list</code></pre>
       <p>Çıktıda <code>/dev/cu.usbserial-...</code> (macOS), <code>/dev/ttyUSB0</code> (Linux) ya da <code>COM3</code> (Windows) gibi bir satır görmelisiniz. Bu, kartın adresidir.</p>
       <p>Hiçbir şey çıkmıyorsa sırayla deneyin: <strong>başka bir USB kablosu</strong> (en sık sebep), başka bir USB portu, 4. adımdaki sürücü kurulumu.</p>
-            <figure class="terminal"><img src="assets/gif/terminal-cihaz-listesi.gif" alt="pio device list çıktısı" />
+            <figure class="terminal"><img src="assets/gif/terminal-device-list.gif" alt="pio device list çıktısı" />
         <figcaption>Kart görünüyorsa <code>pio device list</code> böyle bir satır verir. Adres (<code>/dev/cu.usbserial-…</code>, <code>COM3</code>) sizde farklı olur.</figcaption></figure>
       <h3>7. Derleyin ve karta yükleyin</h3>
       <p>Tek komut hem derler hem yükler:</p>
@@ -154,7 +154,7 @@ pio run -e esp32s3_wearable -t upload</code></pre>
       <p>Kartınız 1.28 inç yuvarlak ekranlıysa komutun ortasındaki ortam adını değiştirin:</p>
       <pre><code>pio run -e esp32s3_lcd128 -t upload</code></pre>
       <p>Hangi kartın hangi ada karşılık geldiği Donanım ve Board Varyantları sayfasındadır.</p>
-            <figure class="terminal"><img src="assets/gif/terminal-derleme.gif" alt="Derleme ve karta yükleme" />
+            <figure class="terminal"><img src="assets/gif/terminal-build.gif" alt="Derleme ve karta yükleme" />
         <figcaption>Derleme ve yükleme akışı. Uzun satırlar akar, sonda <code>SUCCESS</code> görünür ve kart yeniden başlar.</figcaption></figure>
       <h3>8. Çalıştığını görün</h3>
       <p>Ekranda saat kadranı belirmelidir. Parmağınızı ekranda sağa kaydırırsanız uygulama menüsü açılır.</p>
@@ -181,7 +181,7 @@ pio run -e esp32s3_wearable -t upload</code></pre>
       <h3>Sonraki adımlar</h3>
       <ul><li>Sistemin nasıl çalıştığını anlamak → Mimari</li><li>Kendi uygulamanızı yazmak → Uygulama Geliştirme</li><li>Cihazı uzaktan sürmek → Komut Arayüzü</li><li>Takıldıysanız → Sorun Giderme</li></ul>
 
-      <h2 id="mimari">Mimari</h2>
+      <h2 id="architecture">Mimari</h2>
       <h3>Katmanlar</h3>
       <pre><code>+--------------------------------------------------------------+
 |  UYGULAMALAR (apps/)     watchface, launcher, settings, ...   |
@@ -252,12 +252,12 @@ uint32_t next = ui_service_tick();        // mutex içinde lv_timer_handler</cod
 │   ├── apps/                   # uygulama katmanı
 │   └── assets/  fonts/  utils/
 └── docs/                       # dokümantasyon</code></pre>
-      <figure><img src="assets/img/mimari-katmanlar.png" alt="Katmanlı mimari" />
+      <figure><img src="assets/img/architecture-layers.png" alt="Katmanlı mimari" />
         <figcaption>Beş katman — yukarı katman aşağıyı çağırır, aşağıdan yukarı iletişim olay veriyolu ile olur</figcaption></figure>
-      <figure><img src="assets/img/cift-cekirdek.png" alt="Çift çekirdekli görev dağılımı" />
+      <figure><img src="assets/img/dual-core.png" alt="Çift çekirdekli görev dağılımı" />
         <figcaption>Görevlerin çekirdeklere ve önceliklere dağılımı</figcaption></figure>
 
-      <h2 id="cekirdek-ve-servisler">Çekirdek ve Servisler</h2>
+      <h2 id="core-and-services">Çekirdek ve Servisler</h2>
       <h3>Çekirdek bileşenler (<code>src/core/</code>)</h3>
       <h4>event_bus — pub/sub olay veriyolu</h4>
       <p>Görevler arası iletişimin tek yolu. Her abone kendi FreeRTOS kuyruğuna sahiptir; yayınlanan olay tüm abone kuyruklarına dağıtılır ve <strong>abonenin kendi görev bağlamında</strong> işlenir (ISR-güvenli yayın).</p>
@@ -305,12 +305,12 @@ esp_err_t my_service_init(void) {
     return ESP_OK;
 }</code></pre>
       <div class="screen-row">
-        <figure class="gif-cell"><img src="assets/gif/guc-raylari.gif" alt="Güç rayları toggle kontrolü" />
+        <figure class="gif-cell"><img src="assets/gif/power-rails.gif" alt="Güç rayları toggle kontrolü" />
           <figcaption>Ayarlar → Power Rails</figcaption></figure>
         <div class="screen-txt"><p><code>power_service</code>, AXP2101 PMIC raylarını çalışma anında tek tek açıp kapatabilir. Ayarlardaki bu sayfa <strong>dokuz rayı</strong> ayrı anahtarlara bağlar; en altta saati tamamen kapatan <em>Soft Power Off</em> eylemi onay dialog'u arkasındadır.</p><p>Etiketler cihaz üstünde fiziksel testle doğrulanmıştır — örneğin ALDO1 ses değil <strong>sensör</strong> rayıdır (kapatınca dokunmatik ölür), ALDO2 ve DCDC2 ekranı besler.</p><div class="note warn"><div class="note-t">DCDC1 listelenmez</div><p>Sistem 3.3V rayıdır; kapatılması ESP32'yi öldürür — bunu zaten Soft Power Off yapar, iki ayrı kontrol kafa karıştırıcı olurdu.</p></div></div>
       </div>
 
-      <h2 id="donanim-ve-board-varyantlari">Donanım ve Board Varyantları</h2>
+      <h2 id="hardware-and-board-variants">Donanım ve Board Varyantları</h2>
       <h3>Desteklenen board&#x27;lar</h3>
       <div class="tablewrap"><table><thead><tr><th>Özellik</th><th><code>esp32s3_wearable</code> (varsayılan)</th><th><code>esp32s3_lcd128</code></th><th><code>nar_esp32s3</code></th></tr></thead><tbody><tr><td>MCU</td><td>ESP32-S3R8 (çift çekirdek, 240 MHz)</td><td>ESP32-S3 (240×240 yuvarlak LCD kartı)</td><td>ESP32-S3R16V SiP (240 MHz, 16 MB PSRAM dahili)</td></tr><tr><td>Flash / PSRAM</td><td>8 MB QIO / 8 MB Octal PSRAM</td><td>16 MB / 2 MB Quad PSRAM</td><td>32 MB / 16 MB Octal PSRAM</td></tr><tr><td>Ekran</td><td>CO5300 AMOLED, QSPI, 410×502</td><td>GC9A01A LCD, SPI, 240×240 yuvarlak</td><td>CO5300 AMOLED, QSPI, 410×502</td></tr><tr><td>Dokunmatik</td><td>FT3168 (I2C)</td><td>CST816S (I2C)</td><td>CST820 (I2C)</td></tr><tr><td>PMIC</td><td>AXP2101</td><td>yok (3V3 doğrudan)</td><td>AXP2101 (0x47 lineer varyant)</td></tr><tr><td>RTC / IMU</td><td>PCF85063 / ICM42670</td><td>board&#x27;a göre</td><td>PCF85063 (SiP içinde) / ICM42670</td></tr><tr><td>Ek</td><td>—</td><td>—</td><td>ES8311/ES7210 ses, <strong>nRF9151 hücresel</strong> (GSM/LTE-M/NB-IoT + GNSS)</td></tr></tbody></table></div>
       <h3>NAR-ESP32S3: ses ve hücresel (nRF9151)</h3>
@@ -318,7 +318,7 @@ esp_err_t my_service_init(void) {
       <ul><li><strong>AT arayüzü:</strong> nRF9151 UART ile ESP&#x27;ye bağlı (nRF P0.11 TX → GPIO43, P0.12 RX → GPIO44). AT için nRF&#x27;e Nordic SLM yazılımı yüklenir; <code>AT → OK</code> doğrulandı. (GPIO43/44 = ESP U0TXD/U0RXD; kullanmadan önce ROM&#x27;un UART0 ikincil çıkışı pinlerden koparılmalı.)</li><li><strong>Modem firmware:</strong> SiP fabrikadan test görüntüsüyle (PTI) gelir ve şebeke/CFUN desteklemez; tam sürüm (<code>mfw_nrf91x1_2.0.4</code>) yüklenir, sonra <code>AT+CFUN=1 → OK</code>. J-Link yoksa ESP, SWD köprüsü (pyocd) + seri fmfu aracı olarak kullanılır.</li><li><strong>eSIM:</strong> gömülü <strong>ST4SIM</strong> (MFF2) 1GLOBAL profiliyle gelir; ICCID okunup operatör portalında aktive edilir (ST AN5740). Entegrasyon sürüyor.</li><li><strong>PMIC 0x47:</strong> NAR&#x27;ın AXP2101&#x27;i lineer şarj varyantıdır; LDO&#x27;lar kapalı açılır, I2C kilidi kör-yazma ile açılır, sürücü her açılışta rayları yazar.</li></ul>
       <h3>Açılış donanım self-test&#x27;i</h3>
       <p>Soğuk açılışta (deep-sleep uyanışı hariç) OS, çevrebirimleri sırayla sınayıp <strong>seri monitöre</strong> bir checklist tablosu basar (<code>selftest_service</code>) — ekrana çizmez, launcher normal açılır. Test edilenler: PSRAM/flash, I2C taraması, PMIC, güç rayları, USB/pil, IMU, sıcaklık, RTC, dokunmatik çip, kodek, ekran, SD. NAR varyantında ek olarak ses loopback, Wi-Fi, titreşim motoru ve <strong>GSM/nRF9151 (AT → IMEI)</strong>. Her satır PASS / FAIL / UYARI / ATLA döner; donanımı/derlemesi olmayan satırlar ATLA görünür. Aynı test motoru (<code>selftest_ext</code>) narrtos-board-selftest ve narrtos-lte-test ile birebir ortaktır.</p>
-            <figure><img src="assets/img/acilis-selftest.svg" alt="Açılış donanım self-test'i seri monitör çıktısı" />
+            <figure><img src="assets/img/boot-selftest.svg" alt="Açılış donanım self-test'i seri monitör çıktısı" />
         <figcaption>Soğuk açılışta seri monitöre basılan self-test tablosu — sağlam bir kartta tüm satırlar PASS döner (eksik/derlenmemiş çevrebirim olursa o satır FAIL yerine ATLA/UYARI).</figcaption></figure>
       <h3>Pin haritası (varsayılan board)</h3>
       <p>Pin tanımları kodda tek yerde yaşar (<code>core/os_config.h</code>) ve tüm sürücüler buradan okur:</p>
@@ -373,37 +373,37 @@ build_flags =
         <p>204 px genişliğindeki satır ancak <strong>y ≈ 180</strong>'e kadar daire içinde kalır; altına inen satırlar kırpılır. Bu yüzden ana listede aynı anda iki satır tam görünür, güç rayları satırları 180 px'e daraltılır.</p>
       </div>
       <div class="device-gifs">
-        <figure><img src="assets/gif/lcd128-tur.gif" alt="240×240 panel turu" />
+        <figure><img src="assets/gif/lcd128-tour.gif" alt="240×240 panel turu" />
           <figcaption>Yuvarlak panelde ekranlar arası geçiş</figcaption></figure>
       </div>
       <div class="screens">
         <figure class="screen round">
-          <img src="assets/saat-240/kadran-dijital.png" alt="Dijital kadran" />
+          <img src="assets/watch-240/watchface-digital.png" alt="Dijital kadran" />
           <b>Dijital kadran</b><span>Rubik Black 100</span>
         </figure>
         <figure class="screen round">
-          <img src="assets/saat-240/launcher.png" alt="Ana ekran" />
+          <img src="assets/watch-240/launcher.png" alt="Ana ekran" />
           <b>Ana ekran</b><span>hücre 88×92, ikon 64</span>
         </figure>
         <figure class="screen round">
-          <img src="assets/saat-240/ayarlar.png" alt="Ayarlar" />
+          <img src="assets/watch-240/settings.png" alt="Ayarlar" />
           <b>Ayarlar</b><span>içerik 204 px, STEP 60</span>
         </figure>
         <figure class="screen round">
-          <img src="assets/saat-240/guc-raylari.png" alt="Güç rayları" />
+          <img src="assets/watch-240/power-rails.png" alt="Güç rayları" />
           <b>Güç rayları</b><span>STEP 50</span>
         </figure>
         <figure class="screen round">
-          <img src="assets/saat-240/adim-sayar.png" alt="Adım sayar" />
+          <img src="assets/watch-240/step-counter.png" alt="Adım sayar" />
           <b>Adım sayar</b><span>hedef halkası</span>
         </figure>
         <figure class="screen round">
-          <img src="assets/saat-240/hava-durumu.png" alt="Hava durumu" />
+          <img src="assets/watch-240/weather.png" alt="Hava durumu" />
           <b>Hava durumu</b><span>çoklu şehir</span>
         </figure>
       </div>
 
-      <h2 id="uygulama-gelistirme">Uygulama Geliştirme</h2>
+      <h2 id="app-development">Uygulama Geliştirme</h2>
       <p>Sisteme yeni bir uygulama eklemek <strong>4 adımdır</strong>. Aşağıdaki örnek &quot;MyApp&quot; adında boş bir uygulamayı uçtan uca ekler.</p>
       <h3>Adım 1 — Uygulama dosyalarını yaz: <code>src/apps/myapp/</code></h3>
       <p>Her uygulama iki dosyadan oluşur ve dışarıya tek bir fonksiyon verir: <code>*_get_interface()</code> (yerleşik uygulamaların tamamı bu kalıptadır).</p>
@@ -511,7 +511,7 @@ lv_obj_set_size(sbox, LV_PCT(100), VIEW_SCR_H);</code></pre>
       <h4>Küçük ekran için pratik notlar</h4>
       <ul><li>İkon/daire oranını koru (ör. 40 px dairede 24 px sembol → 26 px dairede 16 px).</li><li>Liste satır aralığını (<code>STEP</code>) satır yüksekliği + ~8 px olarak kur; AMOLED değerini olduğu gibi taşımak devasa boşluklar üretir.</li><li>Yuvarlak ekranda üst/alt kenarlarda görünür genişlik daralır — başlık ve saat gibi öğeleri yan yana değil, <strong>alt alta</strong> yerleştirmek gerekebilir.</li></ul>
 
-      <h2 id="kullanici-arayuzu">Kullanıcı Arayüzü</h2>
+      <h2 id="user-interface">Kullanıcı Arayüzü</h2>
       <p>NarRTOS&#x27;un kullanıcı etkileşimi üç girdiye dayanır: <strong>dokunmatik jestler</strong>, <strong>iki fiziksel buton</strong> ve <strong>hareket</strong> (bilek kaldırma).</p>
       <h3>Jest (swipe) sistemi</h3>
       <p>Dokunmatik denetleyici donanımsal jest verisi göndermediği için swipe algılama <strong>yazılımda</strong> yapılır: dokunma okuma geri çağrısı parmak izini takip edip yön çıkarır ve global <code>g_swipe_dir</code> değişkenine yazar (-1 sol, +1 sağ, -2 yukarı, +2 aşağı). <code>app_manager</code>&#x27;ın 50 ms&#x27;lik olay zamanlayıcısı bu değeri okuyup navigasyona çevirir.</p>
@@ -555,79 +555,79 @@ DISPLAY_OFF --(10 dk hareketsizlik)--&gt; DEEP_SLEEP
       <div class="tablewrap"><table><thead><tr><th>Uygulama</th><th>APP_ID</th><th>Ne yapar / kullandığı servisler</th></tr></thead><tbody><tr><td>WatchFace</td><td>0</td><td>Varsayılan ana ekran: saat, tarih, batarya, adım. Olaylarla canlı güncellenir</td></tr><tr><td>StepCounter</td><td>1</td><td>Adım sayar ekranı — <code>sensor_service</code>&#x27;in IMU verisi</td></tr><tr><td>Settings</td><td>2</td><td>Çok sayfalı ayarlar: WiFi (tarama + el yazısı/klavye şifre girişi), ekran, OTA, sistem bilgisi</td></tr><tr><td>Launcher</td><td>3</td><td>3×3 grid uygulama menüsü (kadrandan sağa swipe)</td></tr><tr><td>HeartRate</td><td>5</td><td>İskelet (gelecek uygulama)</td></tr><tr><td>Weather</td><td>6</td><td>Şehir + sıcaklık + UV/rüzgâr/nem halkaları; <code>weather_service</code> (WiFi gerekir)</td></tr><tr><td>Timer</td><td>7</td><td>İskelet (gelecek uygulama)</td></tr><tr><td>Notifications</td><td>8</td><td>Telefon bildirimleri (BLE/ANCS): liste + detay + dismiss</td></tr><tr><td>Gallery</td><td>9</td><td>Cihaz depolamasındaki görseller; WiFi üzerinden yükleme sayfası</td></tr><tr><td>Alarm</td><td>10</td><td>Alarm listesi + kurma ekranı; <code>alarm_service</code> + <code>audio_service</code></td></tr><tr><td>Store</td><td>11</td><td>Uygulama kataloğu (metadata-only mimari)</td></tr></tbody></table></div>
       <div class="note"><div class="note-t">Tasarım notu</div><p>Uygulamalar ekran ölçülerini sabit yazmaz; ölçü sabitleri board varyantına göre seçilir. Bkz. Uygulama Geliştirme › Çözünürlük uyumu.</p></div>
       <div class="device-gifs">
-        <figure><img src="assets/gif/kadran-secici.gif" alt="Kadran seçici" />
+        <figure><img src="assets/gif/watchface-selector.gif" alt="Kadran seçici" />
           <figcaption>Kadranlar arasında yatay kaydırma</figcaption></figure>
-        <figure><img src="assets/gif/uygulama-acilis.gif" alt="Uygulama açılışı" />
+        <figure><img src="assets/gif/app-launch.gif" alt="Uygulama açılışı" />
           <figcaption>Ana ekrandan uygulamaya ve geri</figcaption></figure>
       </div>
       <div class="screens">
         <figure class="screen">
-          <img src="assets/saat/kadran-analog.png" alt="Analog kadran" />
+          <img src="assets/watch/watchface-analog.png" alt="Analog kadran" />
           <b>Analog kadran</b><span>FACE_ANALOG</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/kadran-dijital.png" alt="Dijital kadran" />
+          <img src="assets/watch/watchface-digital.png" alt="Dijital kadran" />
           <b>Dijital kadran</b><span>FACE_DIGITAL</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/kadran-activity.png" alt="Activity kadranı" />
+          <img src="assets/watch/watchface-activity.png" alt="Activity kadranı" />
           <b>Activity kadranı</b><span>FACE_ACTIVITY</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/kadran-io-control.png" alt="Çıkış kontrolü" />
+          <img src="assets/watch/watchface-io-control.png" alt="Çıkış kontrolü" />
           <b>Çıkış kontrolü</b><span>FACE_IO_CONTROL</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/launcher.png" alt="Ana ekran" />
+          <img src="assets/watch/launcher.png" alt="Ana ekran" />
           <b>Ana ekran</b><span>3×3 launcher</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/adim-sayar.png" alt="Adım sayar" />
+          <img src="assets/watch/step-counter.png" alt="Adım sayar" />
           <b>Adım sayar</b><span>günlük hedef halkası</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/hava-durumu.png" alt="Hava durumu" />
+          <img src="assets/watch/weather.png" alt="Hava durumu" />
           <b>Hava durumu</b><span>çoklu şehir, canlı veri</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/galeri.png" alt="Galeri" />
+          <img src="assets/watch/gallery.png" alt="Galeri" />
           <b>Galeri</b><span>fotoğraf tarayıcı</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/alarm.png" alt="Alarmlar" />
+          <img src="assets/watch/alarm.png" alt="Alarmlar" />
           <b>Alarmlar</b><span>kurma ekranı</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/bildirimler.png" alt="Bildirimler" />
+          <img src="assets/watch/notifications.png" alt="Bildirimler" />
           <b>Bildirimler</b><span>ANCS listesi</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/bildirim-detay.png" alt="Bildirim detayı" />
+          <img src="assets/watch/notification-detail.png" alt="Bildirim detayı" />
           <b>Bildirim detayı</b><span>gövde + kapat</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/store-apps.png" alt="Mağaza" />
+          <img src="assets/watch/store-apps.png" alt="Mağaza" />
           <b>Mağaza</b><span>Apps sekmesi</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/store-detay.png" alt="Mağaza detayı" />
+          <img src="assets/watch/store-detail.png" alt="Mağaza detayı" />
           <b>Mağaza detayı</b><span>uygulama kartı</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/ayarlar.png" alt="Ayarlar" />
+          <img src="assets/watch/settings.png" alt="Ayarlar" />
           <b>Ayarlar</b><span>kök menü</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/guc-raylari.png" alt="Güç rayları" />
+          <img src="assets/watch/power-rails.png" alt="Güç rayları" />
           <b>Güç rayları</b><span>9 toggle + kapat</span>
         </figure>
         <figure class="screen">
-          <img src="assets/saat/ota.png" alt="Yazılım güncelleme" />
+          <img src="assets/watch/ota.png" alt="Yazılım güncelleme" />
           <b>Yazılım güncelleme</b><span>OTA akışı</span>
         </figure>
       </div>
 
-      <h2 id="komut-arayuzu">Komut Arayüzü</h2>
+      <h2 id="command-interface">Komut Arayüzü</h2>
       <p>Cihaz, dışarıdan metin komutlarıyla yönetilebilir — test, demo, otomasyon ve uzaktan kontrol için. Tek bir <strong>taşıyıcı-bağımsız parser çekirdeği</strong> iki kanaldan beslenir; komutlar yeni ekran kodu içermez, mevcut iç API&#x27;lere köprüdür.</p>
       <pre><code>USB seri (UART0 RX) ──┐        yanıtlar reply-sink ile geri döner:
 BLE <span class="c-str">&quot;NarRTOS CMD&quot;</span>   ──┴─► parser ──► USB&#x27;den gelen -&gt; seriye (printf)
@@ -672,7 +672,7 @@ brightness 30</code></pre>
       </p>
 
       <div class="cards">
-        <a class="card" href="telemetri-ve-konumlandirma.html">
+        <a class="card" href="telemetry-and-positioning.html">
           <span class="k">Cihaz tarafı</span>
           <h4>Telemetri ve Konumlandırma →</h4>
           <p>
@@ -680,7 +680,7 @@ brightness 30</code></pre>
             veri dürüstlüğü kuralı ve maliyet koruması.
           </p>
         </a>
-        <a class="card" href="sunucu-kurulumu.html">
+        <a class="card" href="server-setup.html">
           <span class="k">Sunucu tarafı</span>
           <h4>Sunucu Kurulumu →</h4>
           <p>
@@ -691,15 +691,15 @@ brightness 30</code></pre>
       </div>
 
       <figure>
-        <img src="assets/gif/tarama-dongusu.gif" alt="Tarama ve rapor döngüsü" />
+        <img src="assets/gif/scan-cycle.gif" alt="Tarama ve rapor döngüsü" />
         <figcaption>
           Tarama ve rapor neden ayrı turlarda? —
-          <a href="telemetri-ve-konumlandirma.html#dongu">ayrıntılı anlatım</a>
+          <a href="telemetry-and-positioning.html#dongu">ayrıntılı anlatım</a>
         </figcaption>
       </figure>
 
 
-      <h2 id="ota-guncelleme">OTA Güncelleme</h2>
+      <h2 id="ota-updates">OTA Güncelleme</h2>
       <p>NarRTOS cihazları yeni yazılımı <strong>kablosuz olarak</strong> indirip kendilerini güncelleyebilir — fiziksel müdahale gerekmez.</p>
       <h3>Akış</h3>
       <pre><code>1. Manifest sorgusu  -&gt;  sunucudaki güncel sürüm nedir?
@@ -739,11 +739,11 @@ build_flags =
       <h3>Güvenlik notu</h3>
       <p>Üretim ortamında manifest ve imaj dağıtımı <strong>HTTPS</strong> üzerinden yapılmalıdır. Geliştirme sırasında HTTP&#x27;ye izin veren yapılandırma kullanılır; sertifika sabitleme (pinning) yol haritasındadır.</p>
       <div class="screen-row">
-        <figure class="screen"><img src="assets/saat/ota.png" alt="Yazılım güncelleme" /><b>Yazılım güncelleme</b><span>Ayarlar → Software Update</span></figure>
-        <div class="screen-txt"><p>Cihaz manifest'i sorgular, yeni sürüm varsa boyutuyla birlikte gösterir. İndirme yedek partisyona yazılır; doğrulama başarılıysa bir sonraki açılışta yeni imaj devreye girer.</p><figure><img src="assets/img/02-admin-cihazlar.png" alt="Admin paneli cihaz listesi" /><figcaption>Panelden hedef sürüm atama — <em>Push Update</em> ile cihaza zorunlu sürüm işaretlenir</figcaption></figure></div>
+        <figure class="screen"><img src="assets/watch/ota.png" alt="Yazılım güncelleme" /><b>Yazılım güncelleme</b><span>Ayarlar → Software Update</span></figure>
+        <div class="screen-txt"><p>Cihaz manifest'i sorgular, yeni sürüm varsa boyutuyla birlikte gösterir. İndirme yedek partisyona yazılır; doğrulama başarılıysa bir sonraki açılışta yeni imaj devreye girer.</p><figure><img src="assets/img/02-admin-devices.png" alt="Admin paneli cihaz listesi" /><figcaption>Panelden hedef sürüm atama — <em>Push Update</em> ile cihaza zorunlu sürüm işaretlenir</figcaption></figure></div>
       </div>
 
-      <h2 id="sorun-giderme">Sorun Giderme</h2>
+      <h2 id="troubleshooting">Sorun Giderme</h2>
       <h3>Derleme ve yükleme</h3>
       <div class="tablewrap"><table><thead><tr><th>Belirti</th><th>Neden / Çözüm</th></tr></thead><tbody><tr><td>Yükleme sırasında checksum hatası (<code>Failed to write to target RAM</code>)</td><td>Bazı USB-seri köprüler 921600&#x27;de kararsızdır → <code>upload_speed</code>&#x27;i <strong>460800</strong>&#x27;e düşürün</td></tr><tr><td><code>pio</code> bulunamıyor</td><td>PlatformIO Core kurulu değil: <code>pip install platformio</code></td></tr><tr><td>Port bulunamıyor</td><td>USB-seri sürücüsü (ör. CH34x) kurulu mu? <code>ls /dev/cu.*</code> ile kontrol edin</td></tr><tr><td>Yanlış board derleniyor</td><td><code>-e &lt;env&gt;</code> parametresini verin: <code>pio run -e esp32s3_lcd128</code></td></tr><tr><td>Yaptığım değişiklik cihaza yansımıyor</td><td>Önce temizleyin, sonra derleyin: <code>pio run -e esp32s3_wearable -t clean</code>, ardından aynı komutun <code>-t upload</code> hali</td></tr></tbody></table></div>
       <h3>Seri monitör</h3>

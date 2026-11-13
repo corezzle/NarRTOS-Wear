@@ -926,7 +926,7 @@ esp_err_t mic_service_clock_test(void (*emit)(const char*))
         }
     }
     /* SDOUT canlı mı? Saatler çalışırken DIN'e yalnız pull-up / yalnız pull-down tak ve 2000 örnek say.
-     *   pu≈2000 & pd≈0  → hat Hi-Z: kodek SDOUT'u SÜRMÜYOR (saat/besleme/bağlantı sorunu)
+     *   pu≈2000 & pd≈0  → hat Hi-Z: kodek SDOUT'u SÜRMÜYOR (watch/besleme/bağlantı sorunu)
      *   pu≈0   & pd≈0  → kodek sürekli 0 sürüyor (veri yolu çalışıyor, ADC sessiz)
      *   karışık         → gerçek veri akıyor */
     {

@@ -23,7 +23,7 @@
     {
       "step": "1",
       "title": "İndirin",
-      "image": "assets/vscode-indirme.png",
+      "image": "assets/vscode-download.png",
       "captions": [
         "code.visualstudio.com adresine gidin. Büyük Download düğmesi işletim sisteminizi kendisi tanır.",
         "Düğmede sizde Windows ya da Linux yazabilir; bu görüntüde macOS görünüyor."
@@ -88,7 +88,7 @@
     {
       "step": "3",
       "title": "Dili değiştirin",
-      "image": "assets/vscode-dil-degistir.png",
+      "image": "assets/vscode-change-language.png",
       "captions": [
         "Sağ altta dil değişikliği sorusu çıkar. Change Language and Restart deyin; VS Code Türkçe açılır.",
         "Soru çıkmadıysa Ctrl, Shift ve P ile komut paletini açın, Configure Display Language yazın ve Türkçe'yi seçin."
@@ -97,7 +97,7 @@
     {
       "step": "4",
       "title": "Pencereyi tanıyın",
-      "image": "assets/vscode-pencere.png",
+      "image": "assets/vscode-window.png",
       "captions": [
         "1 numaralı Activity Bar görünümler arasında geçiş sağlar. 2 numaralı Sidebar seçili görünümün içeriğini, Explorer'da dosya ağacını gösterir.",
         "3 numaralı Editor dosyaları sekmeler halinde açar. 4 numaralı Panel terminali, hataları ve çıktıları barındırır.",
@@ -143,7 +143,7 @@
     {
       "step": "7",
       "title": "Eklentiler",
-      "image": "assets/vscode-eklenti-onerisi.png",
+      "image": "assets/vscode-extension-prompt.png",
       "captions": [
         "Dil desteği, tema ve araç entegrasyonu gibi her şey eklentiyle gelir. Extensions görünümünde arayıp Install deyin.",
         "Kullandığınız dilin resmi eklentisi başlangıç için yeter. Diğerlerini ihtiyaç doğduğunda kurun.",

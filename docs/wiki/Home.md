@@ -41,7 +41,7 @@ Sırasıyla: projeyi indirir, klasörüne girer, derleyip karta yükler, cihazı
 çıktısını dinler.
 
 > **İlk kez mi kuruyorsunuz?** Bu dört komut, gerekli programların zaten kurulu
-> olduğunu varsayar. Hiç yapmadıysanız [[Başlarken]] sayfasından gidin. Python
+> olduğunu varsayar. Hiç yapmadıysanız [[Başlarken|getting-started]] sayfasından gidin. Python
 > ve PlatformIO kurulumundan kabloyu takmaya kadar her adım tek tek anlatılıyor.
 
 ---
@@ -49,24 +49,24 @@ Sırasıyla: projeyi indirir, klasörüne girer, derleyip karta yükler, cihazı
 ## Dokümantasyon haritası
 
 **Temeller**
-- [[Başlarken]] — gereksinimler, derleme, yükleme, ilk açılış
-- [[Mimari]] — katmanlar, görev dağılımı, boot akışı, LVGL eşzamanlılık
-- [[Çekirdek ve Servisler]] — event bus, app manager, servis katmanı
+- [[Başlarken|getting-started]] — gereksinimler, derleme, yükleme, ilk açılış
+- [[Mimari|architecture]] — katmanlar, görev dağılımı, boot akışı, LVGL eşzamanlılık
+- [[Çekirdek ve Servisler|core-and-services]] — event bus, app manager, servis katmanı
 
 **Donanım**
-- [[Donanım ve Board Varyantları]] — desteklenen board'lar, pin haritası, yeni board'a taşıma
+- [[Donanım ve Board Varyantları|hardware-and-board-variants]] — desteklenen board'lar, pin haritası, yeni board'a taşıma
 
 **Geliştirme**
-- [[Uygulama Geliştirme]] — 4 adımda yeni uygulama, kurallar, çözünürlük uyumu
-- [[Kullanıcı Arayüzü]] — jestler, Control Center, güç durumları, yerleşik uygulamalar
+- [[Uygulama Geliştirme|app-development]] — 4 adımda yeni uygulama, kurallar, çözünürlük uyumu
+- [[Kullanıcı Arayüzü|user-interface]] — jestler, Control Center, güç durumları, yerleşik uygulamalar
 
 **Yetenekler**
-- [[Komut Arayüzü]] — USB + BLE ile uzaktan kontrol
-- [[Telemetri ve Konumlandırma]] — cihaz sağlığı + WiFi konumlandırma
-- [[OTA Güncelleme]] — manifest, A/B akışı
+- [[Komut Arayüzü|command-interface]] — USB + BLE ile uzaktan kontrol
+- [[Telemetri ve Konumlandırma|telemetry-and-positioning]] — cihaz sağlığı + WiFi konumlandırma
+- [[OTA Güncelleme|ota-updates]] — manifest, A/B akışı
 
 **Yardım**
-- [[Sorun Giderme]] — sık karşılaşılan sorunlar ve çözümleri
+- [[Sorun Giderme|troubleshooting]] — sık karşılaşılan sorunlar ve çözümleri
 
 ---
 

@@ -18,6 +18,19 @@ OUT = HERE / "index.html"
 
 # _sidebar.md sırası. "Telemetri ve Konumlandırma" bilinçli olarak yok —
 # yerine DERIN_BLOK giriyor.
+TITLE_FILE = {  # wiki sayfa başlığı → docs/wiki/<dosya>.md
+    "Donanım ve Board Varyantları": "hardware-and-board-variants",
+    "Telemetri ve Konumlandırma": "telemetry-and-positioning",
+    "Çekirdek ve Servisler": "core-and-services",
+    "Uygulama Geliştirme": "app-development",
+    "Kullanıcı Arayüzü": "user-interface",
+    "Komut Arayüzü": "command-interface",
+    "OTA Güncelleme": "ota-updates",
+    "Sorun Giderme": "troubleshooting",
+    "Başlarken": "getting-started",
+    "Mimari": "architecture",
+}
+
 PAGES = [
     ("Başlarken", "Başlangıç"),
     ("Mimari", "Sistem"),
@@ -39,7 +52,7 @@ DERIN_BLOK = """
       </p>
 
       <div class="cards">
-        <a class="card" href="telemetri-ve-konumlandirma.html">
+        <a class="card" href="telemetry-and-positioning.html">
           <span class="k">Cihaz tarafı</span>
           <h4>Telemetri ve Konumlandırma →</h4>
           <p>
@@ -47,7 +60,7 @@ DERIN_BLOK = """
             veri dürüstlüğü kuralı ve maliyet koruması.
           </p>
         </a>
-        <a class="card" href="sunucu-kurulumu.html">
+        <a class="card" href="server-setup.html">
           <span class="k">Sunucu tarafı</span>
           <h4>Sunucu Kurulumu →</h4>
           <p>
@@ -58,10 +71,10 @@ DERIN_BLOK = """
       </div>
 
       <figure>
-        <img src="assets/gif/tarama-dongusu.gif" alt="Tarama ve rapor döngüsü" />
+        <img src="assets/gif/scan-cycle.gif" alt="Tarama ve rapor döngüsü" />
         <figcaption>
           Tarama ve rapor neden ayrı turlarda? —
-          <a href="telemetri-ve-konumlandirma.html#dongu">ayrıntılı anlatım</a>
+          <a href="telemetry-and-positioning.html#dongu">ayrıntılı anlatım</a>
         </figcaption>
       </figure>
 """
@@ -73,21 +86,21 @@ BLOCK_START = re.compile(r"^(\s*[-*] |\s*\d+\. |#|>|\||```|---\s*$)")
 
 
 SCREENS = [
-    ("kadran-analog", "Analog kadran", "FACE_ANALOG"),
-    ("kadran-dijital", "Dijital kadran", "FACE_DIGITAL"),
-    ("kadran-activity", "Activity kadranı", "FACE_ACTIVITY"),
-    ("kadran-io-control", "Çıkış kontrolü", "FACE_IO_CONTROL"),
+    ("watchface-analog", "Analog kadran", "FACE_ANALOG"),
+    ("watchface-digital", "Dijital kadran", "FACE_DIGITAL"),
+    ("watchface-activity", "Activity kadranı", "FACE_ACTIVITY"),
+    ("watchface-io-control", "Çıkış kontrolü", "FACE_IO_CONTROL"),
     ("launcher", "Ana ekran", "3×3 launcher"),
-    ("adim-sayar", "Adım sayar", "günlük hedef halkası"),
-    ("hava-durumu", "Hava durumu", "çoklu şehir, canlı veri"),
-    ("galeri", "Galeri", "fotoğraf tarayıcı"),
+    ("step-counter", "Adım sayar", "günlük hedef halkası"),
+    ("weather", "Hava durumu", "çoklu şehir, canlı veri"),
+    ("gallery", "Galeri", "fotoğraf tarayıcı"),
     ("alarm", "Alarmlar", "kurma ekranı"),
-    ("bildirimler", "Bildirimler", "ANCS listesi"),
-    ("bildirim-detay", "Bildirim detayı", "gövde + kapat"),
+    ("notifications", "Bildirimler", "ANCS listesi"),
+    ("notification-detail", "Bildirim detayı", "gövde + kapat"),
     ("store-apps", "Mağaza", "Apps sekmesi"),
-    ("store-detay", "Mağaza detayı", "uygulama kartı"),
-    ("ayarlar", "Ayarlar", "kök menü"),
-    ("guc-raylari", "Güç rayları", "9 toggle + kapat"),
+    ("store-detail", "Mağaza detayı", "uygulama kartı"),
+    ("settings", "Ayarlar", "kök menü"),
+    ("power-rails", "Güç rayları", "9 toggle + kapat"),
     ("ota", "Yazılım güncelleme", "OTA akışı"),
 ]
 
@@ -95,16 +108,16 @@ SCREENS = [
 def screens_gallery():
     cells = "\n".join(
         f'        <figure class="screen">\n'
-        f'          <img src="assets/saat/{f}.png" alt="{t}" />\n'
+        f'          <img src="assets/watch/{f}.png" alt="{t}" />\n'
         f'          <b>{t}</b><span>{s}</span>\n'
         f'        </figure>'
         for f, t, s in SCREENS
     )
     return (
         '      <div class="device-gifs">\n'
-        '        <figure><img src="assets/gif/kadran-secici.gif" alt="Kadran seçici" />\n'
+        '        <figure><img src="assets/gif/watchface-selector.gif" alt="Kadran seçici" />\n'
         '          <figcaption>Kadranlar arasında yatay kaydırma</figcaption></figure>\n'
-        '        <figure><img src="assets/gif/uygulama-acilis.gif" alt="Uygulama açılışı" />\n'
+        '        <figure><img src="assets/gif/app-launch.gif" alt="Uygulama açılışı" />\n'
         '          <figcaption>Ana ekrandan uygulamaya ve geri</figcaption></figure>\n'
         '      </div>\n'
         f'      <div class="screens">\n{cells}\n      </div>'
@@ -112,19 +125,19 @@ def screens_gallery():
 
 
 SCREENS_240 = [
-    ("kadran-dijital", "Dijital kadran", "Rubik Black 100"),
+    ("watchface-digital", "Dijital kadran", "Rubik Black 100"),
     ("launcher", "Ana ekran", "hücre 88×92, ikon 64"),
-    ("ayarlar", "Ayarlar", "içerik 204 px, STEP 60"),
-    ("guc-raylari", "Güç rayları", "STEP 50"),
-    ("adim-sayar", "Adım sayar", "hedef halkası"),
-    ("hava-durumu", "Hava durumu", "çoklu şehir"),
+    ("settings", "Ayarlar", "içerik 204 px, STEP 60"),
+    ("power-rails", "Güç rayları", "STEP 50"),
+    ("step-counter", "Adım sayar", "hedef halkası"),
+    ("weather", "Hava durumu", "çoklu şehir"),
 ]
 
 
 def screens_gallery_240():
     cells = "\n".join(
         f'        <figure class="screen round">\n'
-        f'          <img src="assets/saat-240/{f}.png" alt="{t}" />\n'
+        f'          <img src="assets/watch-240/{f}.png" alt="{t}" />\n'
         f'          <b>{t}</b><span>{s}</span>\n'
         f'        </figure>'
         for f, t, s in SCREENS_240
@@ -142,7 +155,7 @@ def screens_gallery_240():
         'tam görünür, güç rayları satırları 180 px\'e daraltılır.</p>\n'
         '      </div>\n'
         '      <div class="device-gifs">\n'
-        '        <figure><img src="assets/gif/lcd128-tur.gif" alt="240×240 panel turu" />\n'
+        '        <figure><img src="assets/gif/lcd128-tour.gif" alt="240×240 panel turu" />\n'
         '          <figcaption>Yuvarlak panelde ekranlar arası geçiş</figcaption></figure>\n'
         '      </div>\n'
         f'      <div class="screens">\n{cells}\n      </div>'
@@ -152,7 +165,7 @@ def screens_gallery_240():
 def screen_row(img, title, sub, body):
     return (
         '      <div class="screen-row">\n'
-        f'        <figure class="screen"><img src="assets/saat/{img}.png" alt="{title}" />'
+        f'        <figure class="screen"><img src="assets/watch/{img}.png" alt="{title}" />'
         f'<b>{title}</b><span>{sub}</span></figure>\n'
         f'        <div class="screen-txt">{body}</div>\n'
         "      </div>"
@@ -185,18 +198,18 @@ ONCESI = {
         "2. Python kurulu mu, kontrol edin": (
             '      <figure><img src="assets/img/spotlight-terminal.png" alt="Spotlight\'ta Terminal" />\n'
             '        <figcaption>macOS: Spotlight\'a <code>Terminal</code> yazın; ilk sonuç Terminal uygulamasıdır.</figcaption></figure>\n'
-            '      <figure><img src="assets/img/windows-baslat-powershell.png" alt="Windows Başlat aramasında PowerShell" />\n'
+            '      <figure><img src="assets/img/windows-start-powershell.png" alt="Windows Başlat aramasında PowerShell" />\n'
             '        <figcaption>Windows: Başlat menüsüne <code>PowerShell</code> yazın; ilk sonuç Windows PowerShell (çizim).</figcaption></figure>'),
         "4. USB sürücüsünü kurun": terminal_gif(
-            "terminal-kurulum", "Python kontrolü ve PlatformIO kurulumu",
+            "terminal-setup", "Python kontrolü ve PlatformIO kurulumu",
             "2. ve 3. adım terminalde: Python sürümü, PlatformIO kurulumu ve doğrulama. "
             "Sürüm numaraları sizde farklı olabilir."),
         "7. Derleyin ve karta yükleyin": terminal_gif(
-            "terminal-cihaz-listesi", "pio device list çıktısı",
+            "terminal-device-list", "pio device list çıktısı",
             "Kart görünüyorsa <code>pio device list</code> böyle bir satır verir. "
             "Adres (<code>/dev/cu.usbserial-…</code>, <code>COM3</code>) sizde farklı olur."),
         "8. Çalıştığını görün": terminal_gif(
-            "terminal-derleme", "Derleme ve karta yükleme",
+            "terminal-build", "Derleme ve karta yükleme",
             "Derleme ve yükleme akışı. Uzun satırlar akar, sonda <code>SUCCESS</code> "
             "görünür ve kart yeniden başlar."),
         "İlk denemede en sık takılınan yerler": terminal_gif(
@@ -206,7 +219,7 @@ ONCESI = {
     },
     "Donanım ve Board Varyantları": {
         "Pin haritası (varsayılan board)": (
-            '      <figure><img src="assets/img/acilis-selftest.svg" alt="Açılış donanım self-test\'i seri monitör çıktısı" />\n'
+            '      <figure><img src="assets/img/boot-selftest.svg" alt="Açılış donanım self-test\'i seri monitör çıktısı" />\n'
             '        <figcaption>Soğuk açılışta seri monitöre basılan self-test tablosu — sağlam bir kartta tüm satırlar PASS döner (eksik/derlenmemiş çevrebirim olursa o satır FAIL yerine ATLA/UYARI).</figcaption></figure>'),
     },
 }
@@ -215,16 +228,16 @@ ONCESI = {
 # Bölüm başlıklarından sonra eklenen görsel bloklar.
 EXTRAS = {
     "Mimari": (
-        '      <figure><img src="assets/img/mimari-katmanlar.png" alt="Katmanlı mimari" />\n'
+        '      <figure><img src="assets/img/architecture-layers.png" alt="Katmanlı mimari" />\n'
         '        <figcaption>Beş katman — yukarı katman aşağıyı çağırır, aşağıdan yukarı '
         'iletişim olay veriyolu ile olur</figcaption></figure>\n'
-        '      <figure><img src="assets/img/cift-cekirdek.png" alt="Çift çekirdekli görev dağılımı" />\n'
+        '      <figure><img src="assets/img/dual-core.png" alt="Çift çekirdekli görev dağılımı" />\n'
         '        <figcaption>Görevlerin çekirdeklere ve önceliklere dağılımı</figcaption></figure>'
     ),
     "Kullanıcı Arayüzü": screens_gallery(),
     "Donanım ve Board Varyantları": screens_gallery_240(),
     "Çekirdek ve Servisler": gif_row(
-        "guc-raylari", "Güç rayları toggle kontrolü", "Ayarlar → Power Rails",
+        "power-rails", "Güç rayları toggle kontrolü", "Ayarlar → Power Rails",
         "<p><code>power_service</code>, AXP2101 PMIC raylarını çalışma anında tek tek "
         "açıp kapatabilir. Ayarlardaki bu sayfa <strong>dokuz rayı</strong> ayrı anahtarlara "
         "bağlar; en altta saati tamamen kapatan <em>Soft Power Off</em> eylemi onay "
@@ -241,7 +254,7 @@ EXTRAS = {
         "<p>Cihaz manifest'i sorgular, yeni sürüm varsa boyutuyla birlikte gösterir. "
         "İndirme yedek partisyona yazılır; doğrulama başarılıysa bir sonraki açılışta "
         "yeni imaj devreye girer.</p>"
-        '<figure><img src="assets/img/02-admin-cihazlar.png" alt="Admin paneli cihaz listesi" />'
+        '<figure><img src="assets/img/02-admin-devices.png" alt="Admin paneli cihaz listesi" />'
         "<figcaption>Panelden hedef sürüm atama — <em>Push Update</em> ile cihaza "
         "zorunlu sürüm işaretlenir</figcaption></figure>",
     ),
@@ -271,7 +284,7 @@ def inline(s):
         return text
     s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", link, s)
     # [[Sayfa Adı]] — GitLab wiki söz dizimi; burada hedefi yok, düz metne indir
-    s = re.sub(r"\[\[([^\]]+)\]\]", r"\1", s)
+    s = re.sub(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\]", r"\1", s)   # [[Başlık|dosya]] → Başlık
     return s
 
 
@@ -418,7 +431,7 @@ def main():
             parts.append(DERIN_BLOK)
             toc_groups.append(("Telemetri, Konum ve Sunucu", "derinlemesine"))
             continue
-        path = WIKI / f"{name}.md"
+        path = WIKI / f"{TITLE_FILE.get(name, name)}.md"
         if not path.exists():
             print(f"!! bulunamadı: {path}")
             continue

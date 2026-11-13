@@ -5,7 +5,7 @@
 > Projeyi ilk kez kullanacaksanız oradan ilerleyin; bu README yalnız kısa bir özettir.
 >
 > 📖 **Before you start:** installation, build, flashing, architecture and troubleshooting are covered step by step in the
-> **[NarRTOS Wear Wiki](https://www.corezzle.com/document-content/narrtos-wear-6)** (Turkish, with English pages under `docs/panel-icerik/en/`).
+> **[NarRTOS Wear Wiki](https://www.corezzle.com/document-content/narrtos-wear-6)** (Turkish, with English pages under `docs/panel-content/en/`).
 
 **ESP32-S3 için açık kaynak gömülü işletim sistemi.** FreeRTOS çekirdeği üzerinde,
 LVGL 9 grafik kütüphanesiyle dokunmatik ekranlı akıllı cihazlar (giyilebilir cihazlar,
@@ -13,8 +13,8 @@ izleme cihazları, kontrol panelleri) için eksiksiz bir çalışma ortamı.
 
 *NarRTOS Wear is an open-source embedded OS for ESP32-S3 wearables: dual-core FreeRTOS,
 LVGL 9 UI, modular app framework, OTA updates, telemetry, BLE/USB command interface.
-Documentation is in Turkish (`docs/panel-icerik/`) with English versions under
-`docs/panel-icerik/en/`.*
+Documentation is in Turkish (`docs/panel-content/`) with English versions under
+`docs/panel-content/en/`.*
 
 Kardeş proje: [NarRTOS Drive](https://github.com/corezzle/NarRTOS-Drive) (ekransız araç takip cihazı).
 
@@ -41,7 +41,7 @@ Kardeş proje: [NarRTOS Drive](https://github.com/corezzle/NarRTOS-Drive) (ekran
 | `nar_esp32s3` | NAR-ESP32S3 geliştirme kartı (ekransız; IMU, mikrofon, CAN, hücresel modül) |
 
 Pin haritaları `src/core/os_config.h` ve `pin.md` içinde; yeni bir karta taşıma
-`docs/panel-icerik/06-donanim-ve-board-varyantlari.md` sayfasında anlatılıyor.
+`docs/panel-content/06-hardware-and-board-variants.md` sayfasında anlatılıyor.
 
 ## Hızlı başlangıç
 
@@ -54,7 +54,7 @@ pio run -e esp32s3_wearable -t upload
 pio device monitor
 ```
 
-İlk kez kuruyorsanız `docs/panel-icerik/03-baslarken.md` (Python, PlatformIO ve VS Code
+İlk kez kuruyorsanız `docs/panel-content/03-getting-started.md` (Python, PlatformIO ve VS Code
 kurulumundan ilk açılışa kadar adım adım). Tarayıcıdan, hiçbir program kurmadan yükleme
 için `docs/web-install/`.
 
@@ -66,7 +66,7 @@ cihazda `set backend http://<ip>:3001` komutuyla kalıcı olarak ayarlayın.
 
 Wiki'nin kaynak dosyaları depoda:
 
-- `docs/panel-icerik/` — tam belge seti (TR), `docs/panel-icerik/en/` (EN)
+- `docs/panel-content/` — tam belge seti (TR), `docs/panel-content/en/` (EN)
 - `docs/wiki/` — aynı içeriğin wiki biçimi; `docs/wiki-html/` tek dosya HTML sürüm
 - `docs/video/` — tanıtım ve eğitim videolarının kaynakları
 - `pin.md`, `esp32s3_power_map.md` — donanım referansı

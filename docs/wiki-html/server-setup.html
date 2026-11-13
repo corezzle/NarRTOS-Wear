@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sunucu Kurulumu · NarRTOS Wiki</title>
+<link rel="stylesheet" href="assets/css/wiki.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brand">NarRTOS <span>Wiki</span></div>
+    <a class="back" href="index.html">← Wiki ana sayfası</a>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="layout">
+<main>
+
+  <div class="hero">
+    <div class="eyebrow">Sunucu Tarafı</div>
+    <h1>Sunucu Kurulumu</h1>
+    <p class="lede">
+      Saatlerin gönderdiği telemetri raporlarını toplayan, konumu çözen ve dış sistemlere
+      yayan sunucu programının sıfırdan kurulumu. Aynı program yazılım güncellemelerini
+      (OTA) de dağıtır.
+    </p>
+  </div>
+
+  <div class="note">
+    <div class="note-t">Cihaz tarafını arıyorsanız</div>
+    <p>
+      Raporun nasıl üretildiği, BSSID taraması ve veri dürüstlüğü kuralı için
+      <a href="telemetry-and-positioning.html">Telemetri ve Konumlandırma</a> sayfasına bakın.
+    </p>
+  </div>
+
+  <p>
+    Bu sayfa daha önce hiç sunucu kurmamış biri için yazıldı. Sırayla takip ederseniz
+    sunucu kendi bilgisayarınızda çalışır hale gelir ve yönetim panelini tarayıcıda
+    açabilirsiniz. İlk seferinde 30-40 dakika sürer; bunun büyük kısmı iki programın
+    (Node.js ve PostgreSQL) bir kereye mahsus kurulumudur. İkinci seferde tek komutla başlar.
+  </p>
+
+  <h2 id="ne-is-yapar">Sunucu ne iş yapar?</h2>
+  <p>
+    Saatler internet üzerinden bu programa düzenli rapor gönderir: pil durumu, sinyal,
+    çevredeki WiFi ağları, çalışan yazılım sürümü. Program bu raporları bir veritabanına
+    yazar, WiFi ağlarından cihazın konumunu çözer ve hepsini bir yönetim panelinde gösterir.
+    Yeni bir yazılım sürümü çıkardığınızda saatlere de bu program üzerinden dağıtırsınız.
+  </p>
+  <p>
+    Bu yüzden iki parça gerekir: programın kendisini çalıştıran <strong>Node.js</strong> ve
+    raporların saklandığı <strong>PostgreSQL</strong> veritabanı. İkisi de ücretsizdir ve
+    bilgisayarınıza kurulur.
+  </p>
+
+  <h2 id="gereksinimler">Neye ihtiyacınız var</h2>
+  <div class="cards">
+    <div class="card">
+      <span class="k">Program ortamı</span>
+      <h4>Node.js (LTS sürümü)</h4>
+      <p>Sunucu programını çalıştırır. nodejs.org'dan indirilir; 2. adımda kuracaksınız.</p>
+    </div>
+    <div class="card">
+      <span class="k">Veritabanı</span>
+      <h4>PostgreSQL</h4>
+      <p>Raporların saklandığı yer. Kendi <code>wear_os</code> şemasında çalışır, başka verilere dokunmaz. 3. adımda kuracaksınız.</p>
+    </div>
+    <div class="card">
+      <span class="k">Şimdilik gerekmez</span>
+      <h4>RabbitMQ</h4>
+      <p>Raporları dış sistemlere iletmek için. Kurulu değilken program yine çalışır, yalnız iletim kapalı kalır.</p>
+    </div>
+  </div>
+
+  <h2 id="kurulum">Kurulum</h2>
+
+  <h3>1. Terminali açın</h3>
+  <p>Kurulum yazıyla komut girilen bir pencereden yapılır; buna terminal denir.</p>
+  <ul>
+    <li><strong>macOS:</strong> Spotlight'ı açın (⌘ + boşluk), <code>Terminal</code> yazıp Enter</li>
+    <li><strong>Windows:</strong> Başlat menüsüne <code>PowerShell</code> yazıp Enter</li>
+    <li><strong>Linux:</strong> Ctrl + Alt + T</li>
+  </ul>
+  <p>
+    Komutları tek tek yazıp her birinin sonunda Enter'a basacaksınız. Bir komut çalışırken
+    bekleyin; iş bitince satır başına geri döner.
+  </p>
+
+  <h3>2. Node.js'i kurun</h3>
+  <p>
+    <a href="https://nodejs.org">nodejs.org</a> adresine gidin ve <strong>LTS</strong> yazan
+    sürümü indirin. Kurulum sihirbazında hiçbir ayarı değiştirmeden ilerleyin. Windows'ta
+    kurulum bitince terminali kapatıp yeniden açın; yoksa yeni programı tanımaz.
+  </p>
+  <p>Kurulduğunu doğrulayın:</p>
+  <pre><code>node --version
+npm --version</code></pre>
+  <p>
+    İlki <code>v20</code> ya da daha yüksek bir sürüm numarası, ikincisi de bir numara
+    vermelidir. <code>npm</code>, Node.js ile birlikte gelir; programın ihtiyaç duyduğu
+    paketleri indirmek için kullanacaksınız.
+  </p>
+
+  <h3>3. PostgreSQL'i kurun</h3>
+  <p>
+    PostgreSQL, raporların yazılacağı veritabanıdır. Kurulum işletim sistemine göre değişir;
+    yalnız kendi sisteminizin bölümünü uygulayın. Üçünde de sonunda elinizde bir
+    <strong>kullanıcı adı</strong> ve <strong>şifre</strong> olacak. Bunları not edin,
+    6. adımda yazacaksınız.
+  </p>
+
+  <p><strong>Windows</strong></p>
+  <p>
+    <a href="https://www.postgresql.org/download/windows/">postgresql.org/download/windows</a>
+    sayfasındaki kurulum dosyasını indirip çalıştırın. Sihirbaz sırasında:
+  </p>
+  <ul>
+    <li><code>postgres</code> kullanıcısı için bir <strong>şifre</strong> ister. Belirleyin ve not edin.</li>
+    <li>Port sorusunu <code>5432</code> olarak bırakın.</li>
+    <li>Sonunda "Stack Builder" penceresi açılırsa kapatın; gerekmez.</li>
+  </ul>
+  <p>Not edin: kullanıcı adı <code>postgres</code>, şifre az önce belirlediğiniz.</p>
+
+  <p><strong>macOS</strong></p>
+  <p>
+    <a href="https://postgresapp.com">postgresapp.com</a> adresinden Postgres.app'i indirin,
+    Uygulamalar klasörüne sürükleyin ve açın. Pencerede <strong>Initialize</strong> düğmesine
+    basın; birkaç saniye sonra yeşil "Running" yazısı görünür. Uygulama açık olduğu sürece
+    veritabanı çalışır; bilgisayarı yeniden başlattığınızda uygulamayı tekrar açmanız gerekir.
+  </p>
+  <p>
+    Not edin: kullanıcı adı Mac oturum adınızdır (terminalde <code>whoami</code> yazınca
+    çıkan ad), şifre yoktur.
+  </p>
+
+  <p><strong>Linux (Ubuntu / Debian)</strong></p>
+  <pre><code>sudo apt update
+sudo apt install postgresql</code></pre>
+  <p>
+    Kurulum bittiğinde veritabanı kendiliğinden çalışır. <code>postgres</code> kullanıcısına
+    bir şifre vermeniz gerekir:
+  </p>
+  <pre><code>sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'buraya-bir-sifre';"</code></pre>
+  <p>Not edin: kullanıcı adı <code>postgres</code>, şifre az önce yazdığınız.</p>
+
+  <h3>4. Veritabanını oluşturun</h3>
+  <p>
+    PostgreSQL kuruldu ama içinde henüz bizim veritabanımız yok. Program tabloları kendisi
+    oluşturur, fakat <code>corezzle</code> adlı veritabanının önceden var olmasını bekler.
+    Bunun için PostgreSQL'in komut satırını (psql) açın:
+  </p>
+  <ul>
+    <li><strong>Windows:</strong> Başlat menüsünden <strong>SQL Shell (psql)</strong> uygulamasını açın. Server, Database, Port ve Username sorularında hiçbir şey yazmadan Enter'a basın; şifre sorusuna 3. adımdaki şifreyi yazın (yazarken ekranda görünmez, normaldir).</li>
+    <li><strong>macOS:</strong> Postgres.app penceresinde adınızı taşıyan veritabanı simgesine çift tıklayın; Terminal'de psql açılır.</li>
+    <li><strong>Linux:</strong> terminale <code>sudo -u postgres psql</code> yazın.</li>
+  </ul>
+  <p>Açılan satır <code>=#</code> ile biter. Şu komutu yazın (sondaki noktalı virgül dahil):</p>
+  <pre><code>CREATE DATABASE corezzle;</code></pre>
+  <p>
+    Karşılık olarak <code>CREATE DATABASE</code> yazısını görürseniz olmuştur. <code>\q</code>
+    yazıp Enter ile çıkın.
+  </p>
+
+  <h3>5. Sunucu dosyalarını indirin</h3>
+  <pre><code>git clone DEPO-ADRESİ
+cd corezzle-wearos-backend</code></pre>
+  <p>
+    İlk satır dosyaları bilgisayarınıza kopyalar, ikincisi o klasöre girer. Bundan sonraki
+    bütün komutları bu klasörün içindeyken çalıştıracaksınız.
+  </p>
+  <p>
+    <code>git: command not found</code> hatası alırsanız git kurulu değildir. Kurmak
+    istemiyorsanız depo sayfasındaki <strong>Code → Download ZIP</strong> bağlantısından
+    indirip klasörü açabilir, sonra terminalde <code>cd</code> ile o klasöre girebilirsiniz.
+  </p>
+
+  <h3>6. Ayar dosyasını oluşturun</h3>
+  <p>
+    Program ayarlarını klasördeki <code>.env</code> adlı dosyadan okur: veritabanına hangi
+    kullanıcı ve şifreyle bağlanacağı, yönetim panelinin şifresi gibi. Bu dosya henüz yok;
+    örnek dosyayı kopyalayarak oluşturun:
+  </p>
+  <pre><code><span class="c-cmt"># macOS / Linux</span>
+cp .env.sample .env
+
+<span class="c-cmt"># Windows</span>
+copy .env.sample .env</code></pre>
+  <p>
+    Şimdi dosyayı bir metin düzenleyiciyle açın. Adı noktayla başladığı için dosya
+    yöneticileri onu genelde gizler; terminalden açmak daha kolaydır:
+  </p>
+  <pre><code><span class="c-cmt"># Windows</span>
+notepad .env
+
+<span class="c-cmt"># macOS</span>
+open -e .env
+
+<span class="c-cmt"># Linux</span>
+nano .env</code></pre>
+  <p>İçinde yalnız üç satırı değiştireceksiniz:</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Satır</th><th>Ne yazacaksınız</th></tr></thead>
+    <tbody>
+      <tr><td><code>DB_USER=</code></td><td>3. adımda not ettiğiniz kullanıcı adı (Windows ve Linux'ta <code>postgres</code>, macOS'ta Mac oturum adınız)</td></tr>
+      <tr><td><code>DB_PASSWORD=</code></td><td>3. adımda not ettiğiniz şifre. macOS'ta Postgres.app şifre kullanmaz; eşittir işaretinden sonrasını boş bırakın</td></tr>
+      <tr><td><code>ADMIN_TOKEN=</code></td><td>Yönetim panelinin şifresi. Aşağıdaki komutla üretip yapıştırın</td></tr>
+    </tbody>
+  </table></div>
+  <p>Diğer satırlara dokunmayın; varsayılanlar kendi bilgisayarınızdaki kurulum için doğrudur.</p>
+  <p>
+    <code>ADMIN_TOKEN</code> için tahmin edilemez, uzun bir değer gerekir. Kendiniz uydurmayın;
+    terminalde şunu çalıştırın ve çıkan 64 karakterlik yazıyı kopyalayın:
+  </p>
+  <pre><code>node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"</code></pre>
+  <p>Dosyayı kaydedin. Bitmiş bir <code>.env</code> dosyasının üst kısmı şuna benzer (alttaki araç takip köprüsü satırları, VTS_*, olduğu gibi kalır):</p>
+  <pre><code>PORT=3001
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=corezzle
+DB_USER=postgres
+DB_PASSWORD=3-adimda-belirlediginiz-sifre
+DB_SCHEMA=wear_os
+ADMIN_TOKEN=9f2c...(64 karakter)...a71e</code></pre>
+  <div class="note warn">
+    <div class="note-t">Windows'ta dosya adı tuzağı</div>
+    <p>
+      Notepad "Farklı kaydet" ile kaydederken adın sonuna <code>.txt</code> ekleyebilir; dosya
+      <code>.env.txt</code> olur ve program onu görmez. Kaydettikten sonra terminalde
+      <code>dir</code> yazıp dosyanın adının tam olarak <code>.env</code> olduğunu kontrol edin.
+    </p>
+  </div>
+
+  <h3>7. Programın paketlerini indirin</h3>
+  <pre><code>npm install</code></pre>
+  <p>
+    Sunucu programı hazır kütüphaneler kullanır; bu komut onları internetten indirip klasöre
+    <code>node_modules</code> adıyla koyar. Bir iki dakika sürer. Sonunda "added ... packages"
+    gibi bir özet görürsünüz. Arada sarı <code>warn</code> satırları çıkması normaldir; kırmızı
+    <code>ERR!</code> çıkmadıysa sorun yok.
+  </p>
+
+  <h3>8. Veritabanı tablolarını oluşturun</h3>
+  <pre><code>npm run migration:up</code></pre>
+  <p>
+    Bu komut 4. adımda açtığınız <code>corezzle</code> veritabanına bağlanır, içinde
+    <code>wear_os</code> adlı bir bölme (şema) açar ve programın ihtiyaç duyduğu tabloları
+    oluşturur. İlk satırda <code>schema "wear_os" ensured</code>, ardından birkaç migration
+    satırı görmelisiniz. Hata almadan bittiyse tablolar hazır.
+  </p>
+  <p>
+    Burada hata alırsanız sebep neredeyse her zaman 3, 4 ya da 6. adımdadır; aşağıdaki
+    "en sık takılınan yerler" tablosuna bakın.
+  </p>
+
+  <h3>9. Sunucuyu başlatın</h3>
+  <pre><code>npm start</code></pre>
+  <p>Şu satırı görünce sunucu çalışıyor demektir:</p>
+  <pre><code>corezzle-wearos-backend running on port 3001</code></pre>
+  <p>
+    Bu terminal penceresini açık bırakın; kapatırsanız sunucu da durur. Durdurmak için
+    Ctrl + C. İkinci seferden itibaren yalnız klasöre girip <code>npm start</code> demeniz
+    yeter (PostgreSQL'in çalışıyor olması şartıyla).
+  </p>
+
+  <h3>10. Çalıştığını görün</h3>
+  <p>
+    Tarayıcıda <a href="http://localhost:3001/admin/">http://localhost:3001/admin/</a>
+    adresini açın; yönetim paneli gelir. Üstteki alana <code>.env</code> dosyasına yazdığınız
+    <code>ADMIN_TOKEN</code> değerini yapıştırıp <em>Bağlan</em> deyin. Listelerin boş olması
+    normaldir; henüz hiçbir saat rapor göndermedi.
+  </p>
+  <p>
+    Sahte bir rapor gönderip boru hattının uçtan uca çalıştığını görmek için sayfanın
+    sonundaki <strong>Kurulumu doğrulama</strong> bölümündeki komutları kullanın.
+  </p>
+
+  <h2 id="takilinan-yerler">İlk denemede en sık takılınan yerler</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Gördüğünüz</th><th>Sebebi ve çözümü</th></tr></thead>
+    <tbody>
+      <tr><td><code>node: command not found</code></td><td>Node.js kurulmadı ya da kurulumdan sonra terminal yeniden açılmadı (2. adım)</td></tr>
+      <tr><td><code>database "corezzle" does not exist</code></td><td>4. adım atlandı; veritabanını oluşturun</td></tr>
+      <tr><td><code>password authentication failed for user "postgres"</code></td><td><code>.env</code> içindeki <code>DB_PASSWORD</code>, PostgreSQL kurulumunda belirlediğinizle aynı değil (6. adım)</td></tr>
+      <tr><td><code>role "postgres" does not exist</code></td><td>macOS'ta Postgres.app kullanıyorsunuz; <code>DB_USER</code> Mac oturum adınız olmalı</td></tr>
+      <tr><td><code>connect ECONNREFUSED 127.0.0.1:5432</code></td><td>PostgreSQL çalışmıyor. macOS'ta Postgres.app'i açın; Windows'ta Hizmetler'den <code>postgresql</code> servisini başlatın</td></tr>
+      <tr><td><code>EADDRINUSE ... :3001</code></td><td>3001 portunu başka bir program kullanıyor; büyük ihtimalle önceki bir sunucu kopyası. Diğer terminali Ctrl + C ile kapatın ya da <code>.env</code>'de <code>PORT</code> değiştirin</td></tr>
+      <tr><td>Panel açılıyor ama "Bağlan" yetkisiz diyor</td><td>Yapıştırdığınız token <code>.env</code>'dekiyle aynı değil. Kopyalarken başında ya da sonunda boşluk kalmış olabilir</td></tr>
+      <tr><td><code>.env</code>'i değiştirdim, etkisi olmadı</td><td>Dosya yalnız başlangıçta okunur. Sunucuyu Ctrl + C ile durdurup <code>npm start</code> ile yeniden başlatın</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note warn">
+    <div class="note-t">Paylaşılan bir veritabanına kuruyorsanız</div>
+    <p>
+      Servis yalnızca <code>DB_SCHEMA</code> ile verilen şemada çalışır (varsayılan
+      <code>wear_os</code>) ve tabloları oraya oluşturur. Veritabanını başka sistemlerle
+      paylaşıyorsanız bu şemanın size ait olduğundan emin olun; diğer şemalara dokunulmaz.
+    </p>
+  </div>
+  <p>
+    Docker kullananlar için: <code>docker compose up</code> yalnız sunucu programını kaldırır,
+    PostgreSQL'i içermez. Veritabanı ayrıca çalışıyor olmalıdır ve konteyner içinden
+    <code>localhost</code> sizin bilgisayarınız değildir; Mac ve Windows'ta
+    <code>DB_HOST=host.docker.internal</code> kullanın.
+  </p>
+
+  <h2 id="ortam-degiskenleri">Ortam değişkenleri</h2>
+  <p>
+    6. adımda yalnız üç değişkeni değiştirdiniz. Programın tanıdığı değişkenlerin tamamı
+    aşağıdadır; hepsinin varsayılanı kendi bilgisayarınızdaki kurulum için uygundur.
+  </p>
+
+  <div class="tabs">
+    <div class="tabbar">
+      <button type="button">Temel</button>
+      <button type="button">Konum sağlayıcısı</button>
+      <button type="button">OTA</button>
+      <button type="button">Kuyruk / köprü</button>
+    </div>
+
+    <div class="tabpanel">
+      <div class="tablewrap"><table>
+        <thead><tr><th>Değişken</th><th>Varsayılan</th><th>Açıklama</th></tr></thead>
+        <tbody>
+          <tr><td><code>PORT</code></td><td>3001</td><td>HTTP portu</td></tr>
+          <tr><td><code>NODE_ENV</code></td><td>development</td><td><code>production</code> dışında SQL debug logu açıktır</td></tr>
+          <tr><td><code>ADMIN_TOKEN</code></td><td>(yok)</td><td>Admin uçlarının Bearer anahtarı. <strong>Uzun ve rastgele olmalı.</strong></td></tr>
+          <tr><td><code>DB_HOST</code> / <code>DB_PORT</code></td><td>localhost / 5432</td><td>PostgreSQL adresi</td></tr>
+          <tr><td><code>DB_NAME</code> / <code>DB_USER</code> / <code>DB_PASSWORD</code></td><td>corezzle / postgres / postgres</td><td>Bağlantı bilgileri</td></tr>
+          <tr><td><code>DB_SCHEMA</code></td><td>wear_os</td><td>Servisin kullandığı şema</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="tabpanel">
+      <div class="tablewrap"><table>
+        <thead><tr><th>Değişken</th><th>Varsayılan</th><th>Açıklama</th></tr></thead>
+        <tbody>
+          <tr><td><code>GEOLOCATE_URL</code></td><td>api.beacondb.net/v1/geolocate</td><td>Ichnaea uyumlu uç</td></tr>
+          <tr><td><code>GEOLOCATE_KEY</code></td><td>boş</td><td>Doluysa <code>?key=</code> olarak eklenir</td></tr>
+          <tr><td><code>GEOLOCATE_TIMEOUT_MS</code></td><td>4000</td><td>Zaman aşımı</td></tr>
+          <tr><td><code>GEOLOCATE_CACHE_TTL_MS</code></td><td>600000</td><td>Önbellek ömrü (10 dakika)</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        İstek/yanıt formatı <strong>Ichnaea</strong> standardıdır, Google Geolocation API ile
+        birebir aynıdır. Sağlayıcı değiştirmek yalnızca bu iki değişkeni değiştirmektir:
+      </p>
+      <pre><code>GEOLOCATE_URL=https://www.googleapis.com/geolocation/v1/geolocate
+GEOLOCATE_KEY=&lt;api-key&gt;</code></pre>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Sağlayıcı</th><th>Sonuç</th></tr></thead>
+        <tbody>
+          <tr><td>beaconDB (açık, anahtarsız)</td><td>Boru hattı çalışır; bölgesel kapsama zayıfsa IP fallback döner</td></tr>
+          <tr><td>Google Geolocation API</td><td>Gerçek çözüm: <strong>±19 m</strong> (doğrulandı)</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note warn">
+        <div class="note-t">Ücretlendirme</div>
+        <p>
+          Google tarafında ayda 10.000 istek ücretsiz, sonrası 1.000 istekte 5 USD.
+          Konum önbelleği bu maliyeti cihaz başına ayda birkaç yüz çağrıya indirir;
+          detay için <a href="telemetry-and-positioning.html#maliyet">maliyet koruması</a>.
+        </p>
+      </div>
+    </div>
+
+    <div class="tabpanel">
+      <div class="tablewrap"><table>
+        <thead><tr><th>Değişken</th><th>Açıklama</th></tr></thead>
+        <tbody>
+          <tr><td><code>OTA_SERVE_DIR</code></td><td>Admin panelinden yüklenen binary'lerin yazıldığı klasör</td></tr>
+          <tr><td><code>BINARY_BASE_URL</code></td><td><code>binary_url</code> bu tabandan üretilir: <code>{BINARY_BASE_URL}/firmware-{version}.bin</code></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="tabpanel">
+      <div class="tablewrap"><table>
+        <thead><tr><th>Değişken</th><th>Varsayılan</th><th>Açıklama</th></tr></thead>
+        <tbody>
+          <tr><td><code>VTS_ENABLED</code></td><td>false</td><td><code>true</code> olana kadar iletim dry-run çalışır</td></tr>
+          <tr><td><code>VTS_TRANSPORT</code></td><td>http</td><td><code>rabbitmq</code> gerçek transport; <code>http</code>/<code>tcp</code> eski protobuf yolu</td></tr>
+          <tr><td><code>RABBITMQ_URI</code></td><td>amqp://127.0.0.1</td><td>Broker adresi</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <h2 id="kuyruklar">Mesaj kuyrukları</h2>
+  <p>
+    Backend raporu <code>amq.direct</code> exchange üzerinden durable kuyruklara publish eder.
+    İki kuyruk vardır ve <strong>koşulları farklıdır</strong>:
+  </p>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Kuyruk</th><th>Ne zaman</th></tr></thead>
+      <tbody>
+        <tr><td><code>live-data-queue</code></td><td>Her raporda (cihaz sağlığı verisi)</td></tr>
+        <tr><td><code>location-data-queue</code></td><td><strong>Yalnızca</strong> gerçek konum çözümü varsa (fallback'siz)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note stop">
+    <div class="note-t">Bu ayrım bir tercih değil, kuraldır</div>
+    <p>
+      IP tabanlı kaba tahmin konum kuyruğuna asla basılmaz. Nedenini ve etkileşimli örneğini
+      <a href="telemetry-and-positioning.html#veri-durustlugu">veri dürüstlüğü kuralı</a>
+      bölümünde görebilirsiniz.
+    </p>
+  </div>
+
+  <details>
+    <summary>Yayınlanan mesaj formatı</summary>
+<pre><code>{
+  <span class="c-key">"deviceType"</span>: <span class="c-str">"TRACKER"</span>,              <span class="c-cmt">// genel izleme cihazı tipi</span>
+  <span class="c-key">"imei"</span>: <span class="c-str">"E4B063A764CC"</span>,
+  <span class="c-key">"dateTime"</span>: <span class="c-str">"2026-07-21T01:46:48Z"</span>,
+  <span class="c-key">"latitude"</span>: <span class="c-num">41.0289898</span>,               <span class="c-cmt">// yalnızca gerçek çözüm; yoksa 0</span>
+  <span class="c-key">"longitude"</span>: <span class="c-num">29.2229154</span>,
+  <span class="c-key">"locationAccuracy"</span>: <span class="c-num">18.9</span>,
+  <span class="c-key">"gsmSignalQuality"</span>: <span class="c-num">20</span>,
+  <span class="c-key">"wifi"</span>: [ {<span class="c-key">"mac"</span>: <span class="c-str">"..."</span>, <span class="c-key">"dbms"</span>: <span class="c-num">-53</span>}, ... ],
+  <span class="c-key">"softwareVersion"</span>: <span class="c-str">"1.4.81"</span>,
+  <span class="c-key">"battery"</span>: <span class="c-key">null</span>
+}</code></pre>
+    <p>
+      Araç-özel alanlar (CAN, lastik basıncı, kontak, yakıt) bilinçli olarak <strong>yoktur</strong>.
+      Bu format giyilebilir cihaz, hayvan, yaşlı ve eşya takibi gibi tüm GPS'siz senaryolar için ortaktır.
+    </p>
+  </details>
+
+  <h2 id="admin-paneli">Admin paneli</h2>
+  <p>
+    Servis ayaktayken panel <code>/admin/</code> adresinde açılır. Üstteki alana
+    <code>ADMIN_TOKEN</code> değerini girip <em>Bağlan</em> deyin; token tarayıcıda saklanır.
+  </p>
+
+  <figure>
+    <img src="assets/img/03-admin-releases.png" alt="Admin paneli sürümler sekmesi" />
+    <figcaption>Sürümler sekmesi: kanal, boyut, aktiflik ve yayın durumu</figcaption>
+  </figure>
+
+  <figure>
+    <img src="assets/img/02-admin-devices.png" alt="Admin paneli cihazlar sekmesi" />
+    <figcaption>Cihazlar sekmesi: son görülme, mevcut sürüm ve hedef sürüm atama</figcaption>
+  </figure>
+
+  <h2 id="uclar">API uçları</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Uç</th><th>Erişim</th><th>Açıklama</th></tr></thead>
+      <tbody>
+        <tr><td><code>/api/wear-os/manifest</code></td><td>Açık</td><td>Cihaz sürüm sorgusu</td></tr>
+        <tr><td><code>/api/wear-os/events</code></td><td>Açık</td><td>Güncelleme olayları</td></tr>
+        <tr><td><code>/api/wear-os/telemetry</code></td><td>POST açık · GET admin</td><td>Rapor gönderimi ve listeleme</td></tr>
+        <tr><td><code>/api/wear-os/releases</code></td><td>Admin</td><td>Sürüm yönetimi</td></tr>
+        <tr><td><code>/api/wear-os/devices</code></td><td>Admin</td><td>Cihaz yönetimi</td></tr>
+        <tr><td><code>/admin/</code></td><td>Statik</td><td>Panel arayüzü (uçlar token ister)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="dogrulama">Kurulumu doğrulama</h2>
+  <p>Servis ayağa kalktıktan sonra telemetri akışını uçtan uca sınayın:</p>
+
+  <pre><code><span class="c-cmt"># 1) Panel açılıyor mu</span>
+curl -s -o /dev/null -w <span class="c-str">"%{http_code}\n"</span> http://localhost:3001/admin/
+
+<span class="c-cmt"># 2) Admin yetkisi çalışıyor mu (boş liste de olsa 200 dönmeli)</span>
+curl -s -H <span class="c-str">"Authorization: Bearer $ADMIN_TOKEN"</span> \
+     http://localhost:3001/api/wear-os/telemetry
+
+<span class="c-cmt"># 3) Sahte bir rapor gönderin; cihaz beklemeden boru hattını test eder</span>
+curl -s -X POST http://localhost:3001/api/wear-os/telemetry \
+  -H <span class="c-str">"Content-Type: application/json"</span> \
+  -d <span class="c-str">'{"device_id":"E4B063A764CC","wifi_rssi":-53,
+       "wifi":[{"mac":"A4:B1:C2:D3:E4:F5","rssi":-53}],
+       "uptime_s":887,"firmware_version":"1.4.81","heap_free":970288}'</span></code></pre>
+
+  <p>
+    Üçüncü adımdan sonra panelin <strong>Telemetri</strong> sekmesinde yeni satır görünmelidir.
+    Konum sütunu boşsa sağlayıcı erişim noktalarını tanımamıştır; gri bir koordinat görüyorsanız
+    IP fallback dönmüştür.
+  </p>
+
+  <a class="next" href="telemetry-and-positioning.html">
+    <div>
+      <div class="next-k">Geri dön</div>
+      <div class="next-t">Telemetri ve Konumlandırma</div>
+      <div class="next-s">Cihaz tarafı: tarama döngüsü, BSSID, veri dürüstlüğü kuralı</div>
+    </div>
+    <div class="next-a">→</div>
+  </a>
+
+  <footer>
+    <div>NarRTOS · Corezzle Electronics</div>
+    <div class="sp">Kaynak: <code>corezzle-wearos-backend</code></div>
+  </footer>
+
+</main>
+
+<aside class="toc">
+  <div class="toc-h">Bu sayfada</div>
+  <nav class="toc-list"></nav>
+</aside>
+</div>
+</div>
+
+<script src="assets/js/wiki.js"></script>
+</body>
+</html>

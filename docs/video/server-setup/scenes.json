@@ -1,0 +1,171 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "Sunucu Kurulumu",
+  "title": "Sunucu Kurulumu",
+  "subtitle": "Telemetri raporlarını toplayan, konumu çözen ve OTA dağıtan sunucuyu sıfırdan kuruyoruz. İlk seferinde 30-40 dakika sürer.",
+  "end_title": "Sunucu kendi bilgisayarınızda çalışıyor.",
+  "end_subtitle": "Cihaz tarafı için Telemetri ve Konumlandırma dökümanına bakın. corezzle.com",
+  "scenes": [
+    {
+      "step": "0",
+      "title": "Sunucu ne iş yapar",
+      "items": [
+        "Saatler düzenli aralıklarla rapor gönderir: pil, sinyal, çevredeki WiFi ağları ve yazılım sürümü.",
+        "Sunucu programı raporları veritabanına yazar, WiFi ağlarından konumu çözer ve yönetim panelinde gösterir.",
+        "Yeni bir yazılım sürümü çıkınca aynı program bunu cihazlara kablosuz dağıtır.",
+        "İki parçadan oluşur: programı çalıştıran Node.js ve raporların saklandığı PostgreSQL. İkisi de ücretsizdir."
+      ],
+      "captions": [
+        "RabbitMQ şimdilik gerekmez. Kurulu değilken program yine çalışır; yalnızca dış sistemlere iletim kapalı kalır."
+      ]
+    },
+    {
+      "step": "1",
+      "title": "Terminali açın (macOS)",
+      "image": "assets/spotlight-terminal.png",
+      "captions": [
+        "Kurulum, yazıyla komut girilen bir pencereden yapılır. macOS'ta ⌘ ve boşluk ile Spotlight'ı açın, Terminal yazın ve Enter'a basın."
+      ]
+    },
+    {
+      "step": "1",
+      "title": "Terminali açın (Windows / Linux)",
+      "image": "assets/windows-start-powershell.png",
+      "captions": [
+        "Windows'ta Başlat menüsüne PowerShell yazıp Enter'a basın. Linux'ta Ctrl, Alt ve T tuşlarına birlikte basın.",
+        "Komutları tek tek yazıp Enter'a basacaksınız. Komut çalışırken bekleyin."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Node.js'i kurun",
+      "code": "node --version     # v20 ya da daha yüksek\nnpm --version      # bir numara vermeli",
+      "captions": [
+        "nodejs.org adresinden LTS sürümünü indirin. Kurulum sihirbazında hiçbir ayarı değiştirmeyin.",
+        "Windows'ta kurulum bitince terminali kapatıp yeniden açın; aksi halde yeni programı tanımaz. npm, Node.js ile birlikte gelir."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "PostgreSQL'i kurun",
+      "items": [
+        "Windows'ta postgresql.org/download/windows adresinden kurulum dosyasını indirin. postgres kullanıcısı için bir şifre belirleyip not edin, portu 5432 bırakın, Stack Builder çıkarsa kapatın.",
+        "macOS'ta postgresapp.com adresinden Postgres.app'i indirin, Uygulamalar klasörüne sürükleyip açın ve Initialize deyin. Kullanıcı adı Mac oturum adınızdır (whoami), şifre yoktur.",
+        "Linux'ta sudo apt install postgresql ile kurun; sonra postgres kullanıcısına ALTER USER ile bir şifre verin.",
+        "Üçünde de sonunda elinizde bir kullanıcı adı ve şifre olur. Bunları altıncı adımda yazacaksınız."
+      ],
+      "captions": [
+        "Yalnızca kendi işletim sisteminizin bölümünü uygulayın."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Veritabanını oluşturun",
+      "code": "# Linux (Ubuntu / Debian)\nsudo apt update\nsudo apt install postgresql\nsudo -u postgres psql -c \"ALTER USER postgres PASSWORD 'buraya-bir-sifre';\"\n\n# Sonra (her sistemde) psql içinde, sondaki noktalı virgül dahil:\nCREATE DATABASE corezzle;\n\\q",
+      "captions": [
+        "Program tabloları kendisi oluşturur ama corezzle adlı veritabanının önceden var olmasını bekler.",
+        "psql'i Windows'ta Başlat menüsündeki SQL Shell ile, macOS'ta Postgres.app'te veritabanı simgesine çift tıklayarak, Linux'ta sudo -u postgres psql komutuyla açarsınız."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Dosyaları indirin, ayar dosyasını oluşturun",
+      "code": "git clone DEPO-ADRESİ\ncd corezzle-wearos-backend\n\n# macOS / Linux              # Windows\ncp .env.sample .env          copy .env.sample .env\nopen -e .env                 notepad .env",
+      "captions": [
+        "git clone komutu dosyaları kopyalar, cd komutu klasöre girer. Bundan sonraki bütün komutlar bu klasörde çalıştırılır.",
+        ".env dosyasının adı noktayla başladığı için dosya yöneticileri onu gizler. Terminalden açmak daha kolaydır."
+      ]
+    },
+    {
+      "step": "6",
+      "title": ".env: yalnız üç satır",
+      "code": "PORT=3001\nDB_HOST=localhost\nDB_PORT=5432\nDB_NAME=corezzle\nDB_USER=postgres                 # macOS'ta Mac oturum adınız\nDB_PASSWORD=3-adimda-belirlediginiz-sifre\nDB_SCHEMA=wear_os\nADMIN_TOKEN=9f2c...(64 karakter)...a71e\n\n# ADMIN_TOKEN üretmek için:\nnode -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"",
+      "captions": [
+        "DB_USER ve DB_PASSWORD alanlarına üçüncü adımda not ettiklerinizi yazın; macOS'ta şifre boş kalır. ADMIN_TOKEN'ı aşağıdaki komutla üretip yapıştırın.",
+        "Windows tuzağı: Notepad dosyayı .env.txt olarak kaydedebilir. dir komutuyla adının tam olarak .env olduğunu kontrol edin."
+      ]
+    },
+    {
+      "step": "7",
+      "title": "Kur, tabloları oluştur, başlat",
+      "code": "npm install              # paketleri indirir (1-2 dk; sarı warn normal)\nnpm run migration:up     # wear_os şeması + tablolar\nnpm start                # -> corezzle-wearos-backend running on port 3001\n\n# Tarayıcıda: http://localhost:3001/admin/  → ADMIN_TOKEN yapıştır → Bağlan",
+      "captions": [
+        "npm install kütüphaneleri indirir. migration:up, corezzle veritabanında wear_os şemasını ve tabloları oluşturur. npm start sunucuyu başlatır.",
+        "Terminal penceresini açık bırakın; kapatırsanız sunucu durur. İkinci seferden itibaren yalnızca npm start yeter."
+      ]
+    },
+    {
+      "step": "8",
+      "title": "Çalıştığını görün",
+      "image": "assets/03-admin-releases.png",
+      "captions": [
+        "Tarayıcıda localhost:3001/admin/ adresini açın. Üstteki alana ADMIN_TOKEN'ı yapıştırıp Bağlan deyin. Listelerin boş olması normaldir; henüz rapor gelmedi."
+      ]
+    },
+    {
+      "step": "!",
+      "title": "İlk denemede en sık takılınan yerler (1/2)",
+      "items": [
+        "node: command not found hatası, Node.js'in kurulmadığını ya da terminalin yeniden açılmadığını gösterir (ikinci adım).",
+        "database \"corezzle\" does not exist hatası, dördüncü adımın atlandığını gösterir.",
+        "password authentication failed hatası, .env'deki DB_PASSWORD değerinin kurulumda belirlediğinizle aynı olmadığını gösterir.",
+        "role \"postgres\" does not exist hatası macOS'ta Postgres.app kullandığınızı gösterir. DB_USER, Mac oturum adınız olmalıdır."
+      ],
+      "captions": [
+        "Hata mesajı hangi adımı atladığınızı söyler. O adıma dönüp yeniden yapın."
+      ]
+    },
+    {
+      "step": "!",
+      "title": "İlk denemede en sık takılınan yerler (2/2)",
+      "items": [
+        "connect ECONNREFUSED :5432 hatası PostgreSQL'in çalışmadığını gösterir. Postgres.app'i açın ya da Windows'ta servisi başlatın.",
+        "EADDRINUSE :3001 hatası, sunucunun önceki bir kopyasının hâlâ açık olduğunu gösterir. Diğer terminali Ctrl ve C ile kapatın.",
+        "Panel Bağlan düğmesinde yetkisiz diyorsa token .env'dekiyle aynı değildir. Başında ya da sonunda boşluk kalmış olabilir.",
+        ".env dosyasını değiştirdiniz ama etkisi yoksa unutmayın: dosya yalnızca başlangıçta okunur. Sunucuyu yeniden başlatın."
+      ],
+      "captions": [
+        "Docker kullanıyorsanız docker compose up yalnızca programı başlatır, PostgreSQL'i içermez. Mac ve Windows'ta DB_HOST değeri host.docker.internal olmalıdır."
+      ]
+    },
+    {
+      "step": "9",
+      "title": "Konum sağlayıcısı",
+      "items": [
+        "GEOLOCATE_URL varsayılan olarak api.beacondb.net/v1/geolocate adresidir; açık ve anahtarsızdır. GEOLOCATE_KEY doluysa adrese key parametresi eklenir.",
+        "İstek biçimi Ichnaea standardıdır ve Google Geolocation API ile birebir aynıdır. Sağlayıcı değiştirmek için iki değişken yeter.",
+        "beaconDB ile boru hattı çalışır ama bölgesel kapsama zayıfsa IP tahminine düşer. Google ile yaklaşık 19 metrelik gerçek çözüm alınır; bu doğrulandı.",
+        "Google'da ayda 10 bin istek ücretsizdir. Konum önbelleği, maliyeti cihaz başına ayda birkaç yüz çağrıya indirir."
+      ],
+      "captions": [
+        "Zaman aşımı GEOLOCATE_TIMEOUT_MS ile 4 saniye, önbellek süresi GEOLOCATE_CACHE_TTL_MS ile 10 dakikadır."
+      ]
+    },
+    {
+      "step": "10",
+      "title": "Mesaj kuyrukları",
+      "code": "{\n  \"deviceType\": \"TRACKER\",\n  \"imei\": \"E4B063A764CC\",\n  \"dateTime\": \"2026-07-21T01:46:48Z\",\n  \"latitude\": 41.0289898,        // yalnızca gerçek çözüm; yoksa 0\n  \"longitude\": 29.2229154,\n  \"locationAccuracy\": 18.9,\n  \"gsmSignalQuality\": 20,\n  \"wifi\": [ {\"mac\": \"...\", \"dbms\": -53}, ... ],\n  \"softwareVersion\": \"1.4.81\",\n  \"battery\": null\n}",
+      "captions": [
+        "amq.direct üzerinden iki kalıcı kuyruk beslenir. live-data-queue her raporda, location-data-queue yalnızca gerçek bir konum çözümü olduğunda mesaj alır.",
+        "VTS_ENABLED değeri true olmadıkça iletim deneme modunda çalışır. Araca özgü alanlar (CAN, yakıt) bilinçli olarak yoktur."
+      ]
+    },
+    {
+      "step": "11",
+      "title": "Cihazlar sekmesi",
+      "image": "assets/02-admin-devices.png",
+      "captions": [
+        "Cihazlar sekmesinde son görülme zamanı, mevcut sürüm ve hedef sürüm ataması yer alır. Manifest ve events uçları açıktır; telemetry POST açık, GET yönetici yetkisi ister; releases ve devices uçları yöneticiye özeldir."
+      ]
+    },
+    {
+      "step": "12",
+      "title": "Kurulumu doğrulama",
+      "code": "# 1) Panel açılıyor mu\ncurl -s -o /dev/null -w \"%{http_code}\\n\" http://localhost:3001/admin/\n# 2) Admin yetkisi çalışıyor mu (boş liste de olsa 200)\ncurl -s -H \"Authorization: Bearer $ADMIN_TOKEN\" \\\n     http://localhost:3001/api/wear-os/telemetry\n# 3) Sahte bir rapor gönderin; cihaz beklemeden boru hattını test eder\ncurl -s -X POST http://localhost:3001/api/wear-os/telemetry \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"device_id\":\"E4B063A764CC\",\"wifi_rssi\":-53,\n       \"wifi\":[{\"mac\":\"A4:B1:C2:D3:E4:F5\",\"rssi\":-53}],\n       \"uptime_s\":887,\"firmware_version\":\"1.4.81\",\"heap_free\":970288}'",
+      "captions": [
+        "Üçüncü komuttan sonra panelin Telemetri sekmesinde yeni bir satır görünmelidir.",
+        "Konum sütunu boşsa sağlayıcı erişim noktalarını tanımamıştır. Gri koordinat, IP tahmini demektir."
+      ]
+    }
+  ]
+}

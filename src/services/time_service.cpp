@@ -290,7 +290,7 @@ void time_service_update(void)
      * (saniyede 60 sample → minute crossing'de bir kez) NVS yazılır.
      * Olası power-loss'ta saat en fazla 1 dakika geride kalır (öncesi 2 dak).
      *
-     * NVS endurance: günlük 8 saat aktif × 60 yazma/saat = 480 yazma/gün
+     * NVS endurance: günlük 8 saat aktif × 60 yazma/watch = 480 yazma/gün
      * = 175K/yıl. Wear-leveling ile partition endurance ~600K toplam,
      * yaklaşık 3.5 yıl dayanır. Kabul edilebilir. */
     if (sync_ok && epoch > 0) {

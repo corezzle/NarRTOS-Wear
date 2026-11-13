@@ -1,0 +1,68 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "architecture",
+  "title": "architecture",
+  "subtitle": "Katmanlar, görev dağılımı, LVGL eşzamanlılık modeli, açılış akışı ve proje yapısı.",
+  "end_title": "Servisler birbirini doğrudan çağırmaz.",
+  "end_subtitle": "Olay veriyolu ve uygulama çatısının ayrıntısı Çekirdek ve Servisler dökümanında. corezzle.com",
+  "scenes": [
+    {
+      "step": "1",
+      "title": "Katmanlar",
+      "image": "assets/architecture-layers.png",
+      "captions": [
+        "Sistem beş katmandan oluşur: uygulamalar, çekirdek, servisler, sürücüler ve en altta FreeRTOS, ESP-IDF ve LVGL 9.",
+        "Üst katman alt katmanı doğrudan çağırır. Alttan üste iletişim ise olay veriyolu üzerinden gerçekleşir.",
+        "Servisler birbirine doğrudan bağımlı değildir; bir servis tek başına çıkarılabilir ya da değiştirilebilir."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Görev (task) dağılımı",
+      "image": "assets/dual-core.png",
+      "captions": [
+        "Arayüz görevi sıfırıncı çekirdekte, beş önceliğinde çalışır ve LVGL çizim döngüsünü yürütür.",
+        "Sensör görevi birinci çekirdekte dört önceliğinde çalışır. WiFi, OTA, telemetri ve komut arayüzü gibi servis görevleri de birinci çekirdekte, üç önceliğindedir.",
+        "Güç görevi altı önceliğiyle en yüksek öncelikli görevdir; bataryayı izler ve ekranın uyku ve uyanma akışını yönetir.",
+        "Arayüz çizimi ile ağ işleri farklı çekirdeklerde çalıştığı için ağır bir ağ işlemi arayüzü donduramaz."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "LVGL eşzamanlılık modeli",
+      "code": "ui_service_lock();               // LVGL mutex'ini al\nlv_label_set_text(lbl, \"merhaba\");\nui_service_unlock();             // bırak\n\n// UI görevi kendi döngüsünde:\nuint32_t next = ui_service_tick(); // mutex içinde lv_timer_handler",
+      "captions": [
+        "LVGL kütüphanesi birden fazla görevden aynı anda çağrılmaya uygun değildir. NarRTOS'ta LVGL kilidinin sahibi ui_service'tir.",
+        "Arayüz görevinin dışından yapılacak her LVGL çağrısı ui_service_lock ile unlock arasında yer almak zorundadır.",
+        "Diğer güvenli yol, işi lv_async_call ile LVGL görevine devretmektir."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Boot akışı (1/2)",
+      "code": " 1. nvs_flash_init()        // kalıcı ayar deposu (NVS)\n 2. i2c_bus_init()          // paylaşımlı I2C veriyolu\n 3. axp2101_init()          // PMIC: güç raylarını aç (varsa)\n 4. event_bus_init()        // pub/sub altyapısı\n 5. button_handler_init()   // fiziksel butonlar\n 6. pcf85063_init()         // RTC oku -> sistem saati\n    time_service_init()     // NTP senkron daemon'u\n 7. wifi_service_init()     // WiFi (tercih NVS'ten okunur)\n 8. co5300_init()           // ekran (parlaklık 0'da başlar)\n 9. ui_service_init()       // LVGL + display driver + mutex",
+      "captions": [
+        "main.cpp içindeki app_main fonksiyonu sistemi katman katman ayağa kaldırır.",
+        "Sıra önemlidir; her adım bir öncekinin kurduğu altyapıya dayanır. Önce depolama, olay veriyolu ve güç kurulur; sonra olay altyapısı ve ekran gelir."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Boot akışı (2/2)",
+      "code": "10. ft3168_init()           // dokunmatik -> LVGL input device\n11. app_manager_init()      // uygulama çatısı + kayıtlar\n12. alarm_service_init()    // LVGL timer tabanlı zamanlayıcı\n13. audio_service_init()    // buzzer/ses\n14. app_manager_launch(...) // ilk ekran devralınır\n    -> parlaklık ramp ile açılır (görsel \"açılış\" anı)\n15. icm42670_init()         // IMU\n    sensor_service_init()   // sensör görevi (Core 1)\n16. power_service_init()    // güç/uyku yönetimi\n17. ota_service_init()      // güncelleme denetleyicisi",
+      "captions": [
+        "İlk ekran devralındığında parlaklık kademeli olarak artar. Kullanıcının gördüğü açılış anı budur.",
+        "Hata toleransı ilkesi gereği dokunmatik, RTC, IMU ya da PMIC başlatılamasa bile açılış devam eder. İlgili özellik devre dışı kalır ama cihaz açılır."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Proje yapısı",
+      "code": "NarRTOS-Wear/\n├── platformio.ini          # build ortamları (env'ler)\n├── partitions_custom.csv   # A/B OTA partisyon düzeni\n├── sdkconfig.*             # ESP-IDF konfigürasyonları\n├── src/\n│   ├── main.cpp            # boot akışı (app_main)\n│   ├── core/               # app_manager, event_bus,\n│   │                       # button_handler, os_config.h\n│   ├── services/           # ui, power, time, wifi, ble, ...\n│   ├── drivers/            # display, touch, power, rtc, imu\n│   ├── hal/                # donanım soyutlama (I2C bus)\n│   ├── apps/               # uygulama katmanı\n│   └── assets/ fonts/ utils/\n└── docs/                   # dokümantasyon",
+      "captions": [
+        "Çekirdek dosyaları core klasöründedir. os_config.h sürümü, pin haritasını ve görev ayarlarını tutar; yanında app_manager, event_bus ve button_handler bulunur.",
+        "Servisler, sürücüler ve uygulamalar ayrı klasörlerdedir. Katman sınırları dosya yapısında da görünür."
+      ]
+    }
+  ]
+}

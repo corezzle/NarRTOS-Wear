@@ -1,0 +1,85 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "Komut Arayüzü",
+  "title": "Komut Arayüzü",
+  "subtitle": "Cihazı USB seri bağlantı ya da telefondan Bluetooth ile metin komutlarıyla sürmek: test, demo, otomasyon ve uzaktan kontrol için.",
+  "end_title": "Yeni bir taşıyıcı eklemek küçük bir adaptör yazmaktır.",
+  "end_subtitle": "command_service_exec_ex fonksiyonu çağrılır; ayrıştırıcı ve komut seti olduğu gibi çalışır. corezzle.com",
+  "scenes": [
+    {
+      "step": "0",
+      "title": "Tek parser, iki kanal",
+      "image": "assets/hero-devices.mp4",
+      "captions": [
+        "Telefondan Bluetooth ile gönderilen komut, iki kart varyantında da aynı ekranı açıyor.",
+        "Komutlar yeni ekran kodu içermez; mevcut iç API'lere köprü görevi görür."
+      ]
+    },
+    {
+      "step": "1",
+      "title": "Taşıyıcı-bağımsız çekirdek",
+      "code": "USB seri (UART0 RX) ──┐   yanıtlar reply-sink ile geri döner:\nBLE \"NarRTOS CMD\"  ──┴─► parser ──► USB'den gelen -> seriye (printf)\n                                     BLE'den gelen -> telefona (notify)",
+      "captions": [
+        "USB seri ve Bluetooth kanalları aynı ayrıştırıcıyı besler. Yanıt, komutun geldiği kanaldan geri döner."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Komut seti (1/2)",
+      "items": [
+        "help komutu komut listesini, info komutu sürüm, çalışma süresi, bellek, WiFi ve aktif uygulamayı içeren bir durum özetini verir.",
+        "app launch komutu adı verilen uygulamayı açar. Bu, EVENT_APP_SWITCH olayı üzerinden LVGL görevinde güvenle yapılır.",
+        "app back geri döner, app current aktif uygulamayı gösterir, app list isim ve kimlik tablosunu listeler.",
+        "swipe komutu sola, sağa, yukarı ya da aşağı kaydırma jesti üretir; ekranlar arasında gezinmeyi sağlar.",
+        "brightness komutu ekran parlaklığını 0 ile 255 arasında ayarlar."
+      ],
+      "captions": [
+        "Uygulama açma komutu app_manager_launch fonksiyonunu doğrudan çağırmaz. Bir olay yayınlar; app_manager uygulamayı kendi görevinde açar."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Komut seti (2/2)",
+      "items": [
+        "set wifi ve set bt komutları WiFi ve Bluetooth'u açıp kapatır. WiFi tercihi NVS'e kalıcı olarak yazılır.",
+        "get wifi ve get bt durumu okur; toggle wifi ve toggle bt durumu tersine çevirir.",
+        "set rail komutu AXP2101 güç raylarını (aldo1-4, dcdc2-4, bldo1-2) tek tek açıp kapatır; get rails hepsini listeler.",
+        "wake komutu ekranı uyandırır, reboot komutu cihazı yeniden başlatır."
+      ],
+      "captions": [
+        "set rail komutu yalnızca PMIC bulunan kartta çalışır. Sistem rayı olan DCDC1 bilinçli olarak listede yer almaz."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "USB kullanımı",
+      "code": "$ pio device monitor\n> help\n> app launch weather\n[cmd] OK: launch weather (id=6)\n> brightness 30\n[cmd] OK: brightness=30\n> get wifi\n[cmd] OK: wifi connected=yes pref=on",
+      "captions": [
+        "Seri terminali 115200 baud hızında açıp komutu bir satır olarak yazın. Yanıtlar [cmd] önekiyle döner.",
+        "macOS'ta CH34x köprüsü kullanan kartlarda port her açılışta cihaza reset atar. Portu bir kez açıp aynı oturumda çalışın."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Telefon kullanımı (BLE)",
+      "code": "GATT servisi \"NarRTOS CMD\":\n  Service : 4E010063-6D64-004E-4152-52544F530001\n  RX      : ...530002 (Write / WriteNoRsp)  <- UTF-8 komut satırı yaz\n  TX      : ...530003 (Notify)             <- yanıtlar buraya düşer\n\nnRF Connect ile:\n  1. \"NarRTOS Watch\"a bağlan\n  2. ...530003 characteristic'inde Notify'ı aç\n  3. ...530002'ye UTF-8 text olarak komut yaz: app launch weather\n  4. Saatte uygulama açılır; yanıt notify'da düşer",
+      "captions": [
+        "Özel bir uygulama gerekmez; nRF Connect gibi herhangi bir GATT istemcisi yeter.",
+        "Bluetooth'ta port sıfırlama sorunu yoktur; cihaz koldayken bile komut gönderilebilir. set bt off gönderirseniz kendi bağlantınızı da kesersiniz."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Mimari notlar",
+      "items": [
+        "Görev güvenliği: uygulama açma EVENT_APP_SWITCH olayı yayınlar; geri işlemi lv_async_call ile LVGL görevine devredilir.",
+        "Ekran uyandırma: her komuttan önce power_service_user_activity çağrılır, çünkü ekran kapalıyken geçiş animasyonu tamamlanmaz.",
+        "Eşzamanlılık: USB ve Bluetooth aynı anda komut gönderebilir; ayrıştırıcı bir kilitle bunları sıraya koyar.",
+        "Dosyalar: çekirdek ve USB tarafı services/command_service dosyalarında, Bluetooth taşıyıcısı services/ble_cmd_service dosyalarındadır."
+      ],
+      "captions": [
+        "iOS'ta \"Peer removed pairing information\" hatası çıkarsa eşleştirme bozulmuştur. Telefonda cihazı unutun ve yeniden bağlanın."
+      ]
+    }
+  ]
+}

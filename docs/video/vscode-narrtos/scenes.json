@@ -22,7 +22,7 @@
     {
       "step": "1",
       "title": "VS Code'u indirip kurun",
-      "image": "assets/vscode-indirme.png",
+      "image": "assets/vscode-download.png",
       "captions": [
         "code.visualstudio.com adresine gidin. Büyük Download düğmesi işletim sisteminizi kendisi tanır.",
         "Windows'ta .exe dosyasını çalıştırın ve \"Add to PATH\" kutusu işaretli kalsın. macOS'ta uygulamayı Applications klasörüne sürükleyin.",
@@ -91,7 +91,7 @@
     {
       "step": "5",
       "title": "Eklenti önerisini kapatın",
-      "image": "assets/vscode-eklenti-onerisi.png",
+      "image": "assets/vscode-extension-prompt.png",
       "captions": [
         "Sağ altta bu balon çıkar. Install ya da Show Recommendations demeden çarpı ile kapatın.",
         "Bu rehber PlatformIO'yu Başlarken sayfasındaki komut satırı yoluyla kurar; eklenti gerekmez."

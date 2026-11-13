@@ -5,7 +5,7 @@
  * Tasarım notları:
  *  - Doğrusal arama: tablo 96 girdi, tipik araç 30-80 kimlik yayınlar; hash
  *    tablosu bu boyutta kendini amorti etmiyor.
- *  - Mutex: TWAI görevi (çekirdek 1, öncelik 6) ile komut/telemetri görevleri
+ *  - Mutex: TWAI görevi (çekirdek 1, öncelik 6) ile komut/telemetry görevleri
  *    aynı anda erişebilir.
  *  - Tablo dolunca YENİ kimlik atılır, mevcutlar korunur; en eskiyi atmak nadir ama
  *    önemli bir PGN'i (arıza kodu) sürekli yayın yapan bir PGN uğruna düşürürdü.

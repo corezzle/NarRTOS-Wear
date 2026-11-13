@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NarRTOS için VS Code Kurulumu · NarRTOS Wiki</title>
+<link rel="stylesheet" href="assets/css/wiki.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brand">NarRTOS <span>Wiki</span></div>
+    <a class="back" href="index.html">← Wiki ana sayfası</a>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="layout">
+<main>
+
+  <div class="hero">
+    <div class="eyebrow">Hazırlık</div>
+    <h1>NarRTOS için VS Code Kurulumu</h1>
+    <p class="lede">
+      NarRTOS dokümanındaki bütün komutlar bir terminale yazılır. VS Code, proje dosyalarını
+      ve terminali aynı pencerede gösteren ücretsiz bir editördür. Bu sayfa, bilgisayarında
+      hiçbir geliştirme aracı olmayan birini, Hızlı Başlangıç'taki ilk komutu
+      yapıştırabileceği noktaya getirir.
+    </p>
+  </div>
+
+  <p>
+    Sırayla takip ederseniz 10-15 dakika sürer. Sonunda VS Code kurulu, içinde bir terminal
+    açık, git hazır ve proje dosyaları bilgisayarınızda olur. Bundan sonrası NarRTOS Wear
+    dokümanındaki <strong>Hızlı Başlangıç</strong> bölümünde devam eder.
+  </p>
+
+  <h2 id="gereksinimler">Neye ihtiyacınız var</h2>
+  <ul>
+    <li>Windows, macOS ya da Linux çalıştıran bir bilgisayar</li>
+    <li>İnternet bağlantısı (iki program indirilecek)</li>
+    <li>Kurulum sırasında bilgisayarınızın şifresi sorulabilir</li>
+  </ul>
+
+  <h2 id="kurulum">Kurulum</h2>
+
+  <h3>1. VS Code'u indirip kurun</h3>
+  <p>
+    <a href="https://code.visualstudio.com">code.visualstudio.com</a> adresine gidin ve büyük
+    <strong>Download</strong> düğmesine basın; site işletim sisteminizi kendisi tanır.
+  </p>
+  <ul>
+    <li><strong>Windows:</strong> İnen <code>.exe</code> dosyasını çalıştırın. Sihirbazdaki seçeneklerde "Add to PATH" işaretli kalsın (zaten öyledir). Bitince VS Code açılır.</li>
+    <li><strong>macOS:</strong> İnen <code>.zip</code> dosyasını açın; çıkan <strong>Visual Studio Code</strong> simgesini Uygulamalar (Applications) klasörüne sürükleyin ve oradan açın. İlk açılışta "internetten indirildi" uyarısına <em>Aç</em> deyin.</li>
+    <li><strong>Linux (Ubuntu / Debian):</strong> <code>.deb</code> dosyasını indirin ve çift tıklayıp <em>Yükle</em> deyin. Ya da terminalde: <code>sudo apt install ./code_*.deb</code></li>
+  </ul>
+  <p>
+    Açıldığında karşınıza "Welcome" sekmesi gelir. Arayüz İngilizcedir; bu sayfada menü
+    adları İngilizce yazılıp yanına Türkçesi eklenmiştir.
+  </p>
+
+  <h3>2. Terminali VS Code içinde açın</h3>
+  <p>
+    Üst menüden <strong>Terminal → New Terminal</strong> (Terminal → Yeni Terminal) seçin.
+    Pencerenin alt kısmında bir panel açılır; komutları buraya yazacaksınız. Windows'ta bu
+    panel PowerShell, Mac'te zsh çalıştırır; bu dokümandaki komutlar ikisinde de aynıdır.
+  </p>
+  <figure><img src="assets/img/vscode-new-terminal.png" alt="Terminal menüsünde New Terminal" />
+    <figcaption>macOS: ekranın en üstündeki menüden <strong>Terminal → New Terminal</strong>.</figcaption></figure>
+  <figure><img src="assets/img/vscode-win-new-terminal.png" alt="Windows ve Linux'ta Terminal menüsü" />
+    <figcaption>Windows ve Linux'ta menü şeridi pencerenin içinde, en üsttedir: <strong>Terminal → New Terminal</strong> (çizim).</figcaption></figure>
+  <p>
+    Bir komut yazıp Enter'a basarsınız, çalışırken beklersiniz, bitince yeni bir satır başı
+    gelir. Satır başının sonunda Windows'ta <code>&gt;</code>, Mac ve Linux'ta
+    <code>%</code> ya da <code>$</code> işareti olur; komutu ondan sonra yazarsınız.
+  </p>
+
+  <h3>3. Git'i kurun</h3>
+  <p>
+    Git, proje dosyalarını internetten indiren araçtır; Hızlı Başlangıç'taki ilk komut
+    (<code>git clone</code>) onu kullanır. Önce kurulu mu diye bakın:
+  </p>
+  <pre><code>git --version</code></pre>
+  <p><code>git version 2.x.x</code> gibi bir satır görüyorsanız kurulu; 4. adıma geçin. Görmüyorsanız:</p>
+  <ul>
+    <li><strong>Windows:</strong> <a href="https://git-scm.com/download/win">git-scm.com/download/win</a> adresinden kurulum dosyasını indirip çalıştırın. Bütün ekranlarda <em>Next</em> deyin; varsayılanlar doğrudur. Bitince <strong>VS Code'u tamamen kapatıp yeniden açın</strong>; yoksa terminal yeni programı görmez.</li>
+    <li><strong>macOS:</strong> <code>git --version</code> yazdığınızda Mac, "command line developer tools" kurulum penceresi açar. <em>Install</em> deyin; birkaç yüz MB iner, birkaç dakika sürer. Pencere çıkmadıysa terminale <code>xcode-select --install</code> yazın.</li>
+    <li><strong>Linux:</strong> <code>sudo apt install git</code></li>
+  </ul>
+  <p>Kurulum bitince <code>git --version</code> komutunu tekrar çalıştırıp sürüm satırını gördüğünüzden emin olun.</p>
+
+  <h3>4. Projenin duracağı klasörü seçin</h3>
+  <p>
+    Terminal açıldığında ev klasörünüzdesiniz (Windows'ta <code>C:\Users\adınız</code>,
+    Mac'te <code>/Users/adınız</code>). İndireceğiniz proje, o an bulunduğunuz klasörün
+    içine gelir. Dağınık olmasın diye bir klasör açıp içine girin:
+  </p>
+  <pre><code>mkdir Projeler
+cd Projeler</code></pre>
+  <p>
+    İlk komut klasörü oluşturur, ikincisi içine girer. Satır başının sonunda artık
+    <code>Projeler</code> yazar; nerede olduğunuzu her zaman buradan anlarsınız.
+  </p>
+
+  <h3>5. Hızlı Başlangıç'taki ilk komutu yapıştırın</h3>
+  <p>
+    NarRTOS Wear dokümanında Hızlı Başlangıç bölümünü açın. Kod kutusundaki ilk satır
+    <code>git clone</code> ile başlar; o satırı kopyalayın ve terminale yapıştırın:
+    Windows'ta Ctrl + V (PowerShell'de sağ tık da yapıştırır), Mac'te ⌘ + V. Enter'a basın.
+  </p>
+  <p>
+    Ekranda <code>Cloning into ...</code> ile başlayan birkaç satır akar ve <code>done.</code>
+    ile biter. Proje artık <code>Projeler</code> klasörünün içindedir. Hızlı Başlangıç'taki
+    ikinci komut (<code>cd</code> ile başlayan) sizi o klasörün içine sokar; onu da yapıştırıp
+    Enter'a basın.
+  </p>
+
+  <h3>6. Klasörü VS Code'da açın</h3>
+  <p>
+    Üst menüden <strong>File → Open Folder</strong> (Dosya → Klasör Aç) seçin, Projeler
+    içindeki yeni klasörü seçip <em>Open</em> deyin. VS Code "Do you trust the authors of the
+    files in this folder?" diye sorabilir; sorarsa <strong>Yes, I trust the authors</strong> deyin.
+    Sol tarafta proje dosyaları listelenir: <code>src</code>, <code>docs</code>,
+    <code>platformio.ini</code> ve diğerleri.
+  </p>
+  <figure><img src="assets/img/vscode-open-folder.png" alt="File menüsünde Open Folder" />
+    <figcaption>macOS: <strong>File → Open Folder…</strong></figcaption></figure>
+  <figure><img src="assets/img/vscode-win-open-folder.png" alt="Windows ve Linux'ta File menüsü" />
+    <figcaption>Windows ve Linux'ta: <strong>File → Open Folder…</strong>, menü pencerenin içindeki üst şeritte (çizim).</figcaption></figure>
+  <p>
+    Sağ altta "Do you want to install the recommended 'PlatformIO IDE' extension from PlatformIO for this repository?" balonu çıkar. <em>Show Recommendations</em> ya da
+    <em>Install</em> demeden çarpıyla kapatın; bu rehber PlatformIO'yu Başlarken sayfasındaki
+    komut satırı yoluyla kurar, eklenti gerekmez.
+  </p>
+  <figure><img src="assets/img/vscode-extension-prompt.png" alt="Eklenti öneri balonu" />
+    <figcaption>Klasör açılınca sağ altta çıkan balon. Çarpı ile kapatın.</figcaption></figure>
+  <p>
+    Klasörü açınca alttaki terminal kapanmış olabilir. <strong>Terminal → New Terminal</strong>
+    ile yeniden açın. Bu kez terminal doğrudan proje klasörünün içinde açılır, <code>cd</code>
+    yapmanız gerekmez; satır başındaki klasör adından görürsünüz.
+  </p>
+  <figure><img src="assets/img/vscode-explorer.png" alt="Proje açık, altta terminal" />
+    <figcaption>Proje açık: solda dosya ağacı, altta terminal. Satır başında klasör adı <code>NarRTOS-Wear</code> görünüyor.</figcaption></figure>
+
+  <h3>7. Buradan sonrası</h3>
+  <p>
+    Elinizde artık şunlar var: VS Code kurulu, içinde terminal açık, git hazır, proje
+    indirilmiş ve açık. Hızlı Başlangıç'ın ilk iki komutunu tamamladınız. Kalan iki komut
+    (<code>pio run ...</code> ve <code>pio device monitor</code>) PlatformIO'nun kurulu
+    olmasını ister.
+  </p>
+  <p>
+    Daha önce hiç kurmadıysanız <strong>Başlarken</strong> sayfasına geçin. Oradaki 1. adım
+    (terminali açın) ve 5. adım (proje dosyalarını indirin) zaten yapıldı; 2. adımdan (Python)
+    devam edin. Oradaki bütün komutları bu VS Code terminaline yazacaksınız.
+  </p>
+
+  <h2 id="takilinan-yerler">İlk denemede en sık takılınan yerler</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Gördüğünüz</th><th>Sebebi ve çözümü</th></tr></thead>
+    <tbody>
+      <tr><td>Windows'ta git kurdum ama <code>git</code> "tanınmıyor"</td><td>VS Code kurulumdan önce açılmıştı. Tamamen kapatıp yeniden açın</td></tr>
+      <tr><td>Mac'te kurulum penceresi çıkmadı</td><td>Terminale <code>xcode-select --install</code> yazın</td></tr>
+      <tr><td>Ctrl + V terminale yapıştırmıyor</td><td>Sağ tıkla yapıştırın ya da Ctrl + Shift + V deneyin</td></tr>
+      <tr><td><code>fatal: repository ... not found</code></td><td>Adres eksik kopyalanmış. Hızlı Başlangıç'taki satırı baştan sona seçip yeniden kopyalayın</td></tr>
+      <tr><td>Nerede olduğumu bilmiyorum</td><td>Satır başının sonundaki klasör adına bakın. İçindekileri görmek için Mac/Linux'ta <code>ls</code>, Windows'ta <code>dir</code></td></tr>
+      <tr><td>"Trust" sorusuna yanlışlıkla <em>No</em> dedim</td><td>Klasörü File → Open Folder ile yeniden açın; bu kez <em>Yes</em></td></tr>
+      <tr><td>Terminal paneli kayboldu</td><td>Terminal → New Terminal ile yeniden açın</td></tr>
+    </tbody>
+  </table></div>
+
+  <a class="next" href="index.html#quick-start">
+    <div>
+      <div class="next-k">Sonraki adım</div>
+      <div class="next-t">Hızlı Başlangıç</div>
+      <div class="next-s">Dört komutla projeyi derleyip karta yükleyin</div>
+    </div>
+    <div class="next-a">→</div>
+  </a>
+
+  <footer>
+    <div>NarRTOS · Corezzle Electronics</div>
+    <div class="sp">Editör: <code>Visual Studio Code</code></div>
+  </footer>
+
+</main>
+
+<aside class="toc">
+  <div class="toc-h">Bu sayfada</div>
+  <nav class="toc-list"></nav>
+</aside>
+</div>
+</div>
+
+<script src="assets/js/wiki.js"></script>
+</body>
+</html>

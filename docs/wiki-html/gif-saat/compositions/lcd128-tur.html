@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <title>240×240 round panel tour — GIF</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      /* GC9A01A 240×240 round panel. PNG'lerde dairesel maske gömülü,
+         gövde de daire olarak çizilir. Hareket yalnızca transform ile. */
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:300px; height:330px; overflow:hidden; background:#00102E; }
+      body { font-family:"Inter",sans-serif; -webkit-font-smoothing:antialiased; }
+      #bg { position:absolute; inset:0; background:linear-gradient(155deg,#00102E 0%,#001B3F 100%); }
+
+      #body { position:absolute; left:20px; top:20px; width:260px; height:260px; border-radius:50%;
+        background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%);
+        box-shadow:0 14px 30px rgba(0,0,0,.55); }
+      #win { position:absolute; left:30px; top:30px; width:240px; height:240px;
+        border-radius:50%; overflow:hidden; background:#000; }
+      #win img { position:absolute; left:0; top:0; width:240px; height:240px; }
+
+      #cap { position:absolute; left:0; right:0; bottom:10px; text-align:center;
+        font-size:12px; color:#93AEC7; }
+    </style>
+  </head>
+
+  <body>
+    <div data-hf-id="hf-g4mq" id="root" data-composition-id="lcd128" data-start="0" data-duration="7.5" data-width="300" data-height="330" data-fps="15">
+      <div data-hf-id="hf-2xc0" id="bg"></div>
+      <div data-hf-id="hf-gw7p" id="body"></div>
+
+      <div data-hf-id="hf-7on1" id="win">
+        <img data-hf-id="hf-lw1v" id="s0" src="assets/r240-kadran-dijital.png" alt="Digital face">
+        <img data-hf-id="hf-2hzv" id="s1" src="assets/r240-launcher.png" alt="Home screen">
+        <img data-hf-id="hf-g6fa" id="s2" src="assets/r240-ayarlar.png" alt="Settings">
+        <img data-hf-id="hf-5pjc" id="s3" src="assets/r240-guc-raylari.png" alt="Power rails">
+        <img data-hf-id="hf-y7er" id="s4" src="assets/r240-adim-sayar.png" alt="Step counter">
+        <img data-hf-id="hf-smqf" id="s5" src="assets/r240-hava-durumu.png" alt="Weather">
+        <img data-hf-id="hf-p6ou" id="s6" src="assets/r240-kadran-dijital-son.png" alt="Digital face">
+      </div>
+
+      <div data-hf-id="hf-h61w" id="cap">240×240 round panel</div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["lcd128"] = tl;
+
+      /* Ekranlar üst üste duruyor; sıradaki aşağıdan yukarı süzülerek geliyor
+         (dikey sayfa geçişi). Son kare ilkinin kopyası → döngü kapanır. */
+      const N = 7, HOLD = 0.9, SLIDE = 0.35;
+      for (let i = 1; i < N; i++) {
+        gsap.set("#s" + i, { y: 240, zIndex: i });
+      }
+      gsap.set("#s0", { zIndex: 0 });
+      for (let i = 1; i < N; i++) {
+        tl.to("#s" + i, { y: 0, duration: SLIDE, ease: "power2.inOut" },
+              i * HOLD + (i - 1) * SLIDE);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,99 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "Sorun Giderme",
+  "title": "Sorun Giderme",
+  "subtitle": "Sık karşılaşılan belirtiler ve çözümleri: derleme, seri monitör, açılış, WiFi, telemetri, komut arayüzü ve arayüz düzeni.",
+  "end_title": "Sorun devam ediyorsa",
+  "end_subtitle": "Seri açılış günlüğünü, derleme ortamını ve kart modelini ekleyerek GitHub'da issue açın. corezzle.com",
+  "scenes": [
+    {
+      "step": "1",
+      "title": "Derleme ve yükleme",
+      "items": [
+        "Yüklemede checksum hatası (Failed to write to target RAM) alıyorsanız USB-seri köprüsü 921600 hızında kararsız çalışıyor olabilir. upload_speed değerini 460800'e düşürün.",
+        "pio komutu bulunamıyorsa PlatformIO Core kurulu değildir. pip install platformio ile kurun.",
+        "Port bulunamıyorsa CH34x USB-seri sürücüsünün kurulu olduğundan emin olun. ls /dev/cu.* komutuyla kontrol edebilirsiniz.",
+        "Yanlış kart derleniyorsa -e parametresini açıkça verin, örneğin pio run -e esp32s3_lcd128.",
+        "Değişiklik cihaza yansımıyorsa önce -t clean, sonra -t upload çalıştırın."
+      ],
+      "captions": [
+        "Yükleme sorunlarının çoğu kablo, sürücü ya da hız kaynaklıdır. Bunları sırayla deneyin."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Seri monitör",
+      "items": [
+        "Monitörde hiç çıktı yoksa okuma aracı DTR ve RTS hatlarını yanlış sürüyor olabilir. Portu DTR kapalı açıp RTS ile bir reset darbesi verin.",
+        "Her bağlanışta cihaz yeniden başlıyorsa bu, macOS ile CH34x köprüsünün bilinen davranışıdır. Portu bir kez açıp aynı oturumda çalışın.",
+        "Günlükler bozuk ya da anlamsız görünüyorsa baud hızının 115200 olduğundan emin olun."
+      ],
+      "captions": [
+        "DTR ve RTS için çalışan bir Python örneği dökümanda var: hatları açılışta tutmayın, RTS ile sıfırlayın, sonra okuyun."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "Açılış (boot)",
+      "items": [
+        "Açılışta dokunmatik I2C hatası görmek normal olabilir. Cihaz geç hazırlanıyordur ve ilk dokunuşla toparlar.",
+        "PMIC bulunamadı uyarısı, PMIC olmayan kartta beklenen davranıştır. Sistem çalışmaya devam eder.",
+        "RTC bulunamadıysa dahili saat kullanılır ve NTP ile eşitlenir.",
+        "Ekran açık ama görüntü yoksa açılış günlüklerinde ekran sürücüsü ve ui_service satırlarına bakın."
+      ],
+      "captions": [
+        "Hata toleransı ilkesi gereği çevre birimleri başlatılamasa bile sistem açılmaya devam eder."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "WiFi",
+      "items": [
+        "Açılışta bağlanmıyorsa kullanıcı tercihi NVS'te kapalı olabilir. Ayarlar'dan açın.",
+        "Sürekli retry 1/5, 2/5 diye gidiyorsa ağ menzil dışındadır ya da şifre yanlıştır. Ayarlar'daki WiFi sayfasından yeniden bağlanın.",
+        "Tarama sırasında bağlantının kopması beklenen bir durumdur. Aktif tarama bağlantıyı kısa süre böler."
+      ],
+      "captions": [
+        "Tarama ve rapor döngüsünün ayrıntısı Telemetri ve Konumlandırma dökümanında."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Telemetri akışı durdu",
+      "items": [
+        "Önce sunucunun IP adresinin değişip değişmediğine bakın; en sık neden budur. Kalıcı çözüm yönlendiricide statik DHCP rezervasyonu, geçici çözüm OTA_BACKEND_HOST bayrağını güncelleyip yeniden derlemektir.",
+        "Sonra sunucunun ayakta olduğunu doğrulayın. curl ile /api/wear-os/health adresine istek atın.",
+        "En son cihazın açık ve WiFi'ye bağlı olduğunu seri günlükten kontrol edin."
+      ],
+      "captions": [
+        "Kontrol sırası önemlidir: önce adres, sonra sunucu, en son cihaz."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Komut arayüzü",
+      "items": [
+        "Komut yazıyorsunuz ama yanıt gelmiyorsa cihaz açılışın ortasında olabilir. CmdSvc: init OK satırını bekleyin.",
+        "app current komutu id=-1 döndürüyorsa uygulama geçişi tamamlanmamıştır. Ekran kapalıysa önce wake gönderin.",
+        "Bluetooth'ta \"Peer removed pairing information\" hatası çıkarsa telefonda cihazı unutun, uygulamayı yeniden başlatın ve tekrar bağlanın.",
+        "set rail komutu NOT_SUPPORTED döndürüyorsa kartta PMIC yoktur. Bu beklenen, dürüst bir hatadır."
+      ],
+      "captions": [
+        "Komut listesi ve örnekler Komut Arayüzü dökümanında."
+      ]
+    },
+    {
+      "step": "7",
+      "title": "Arayüz / düzen",
+      "items": [
+        "Küçük ekranda ikonlar orantısız görünüyorsa ikon ve daire oranını koruyun. 40 piksellik dairede 24 piksellik sembol, 26 piksellik dairede 16 piksele iner.",
+        "Satır araları aşırı açıksa liste adım değeri satır yüksekliğinin yaklaşık 8 piksel fazlası olmalıdır.",
+        "Başlık ile saat çakışıyorsa yuvarlak ekranda üst kenarın dar olduğunu unutmayın; öğeleri alt alta yerleştirin.",
+        "Metin taşıyor ya da kırpılıyorsa ölçü sabitlerini varyant bloğunda tanımlayın."
+      ],
+      "captions": [
+        "Çözünürlük uyumu kuralları Uygulama Geliştirme dökümanında."
+      ]
+    }
+  ]
+}

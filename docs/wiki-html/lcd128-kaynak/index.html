@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>LCD128 (240×240) screens</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      /* ESP32-S3-Touch-LCD-1.28 — GC9A01A, 240×240 YUVARLAK panel.
+         Ölçüler firmware'den birebir alınmıştır:
+           settings : SAFE_X 18, SAFE_W 204, ana liste STEP 60 (satır 52 + 8)
+           rails    : STEP 50 (satır 44 + 6)
+           launcher : hücre 88×92, ikon 64, radius 15, glow 200×200 (+10 y)
+           watchface: Rubik Black 100 (dijital ana font)
+         Yuvarlak maske render sonrası ffmpeg ile uygulanır. */
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:240px; height:240px; overflow:hidden; background:#000; }
+      body { font-family:"Inter",sans-serif; -webkit-font-smoothing:antialiased; color:#fff; }
+      .scr { position:absolute; inset:0; background:#000; }
+
+      /* iki katmanlı header: saat en üstte ortada, başlık bir alt satırda */
+      .hdr-clock { position:absolute; top:6px; left:0; right:0; text-align:center;
+        font-size:14px; color:#8E8E93; }
+      .hdr-title { position:absolute; top:24px; left:0; right:0; text-align:center;
+        font-size:19px; font-weight:700; }
+      .hdr-back { position:absolute; top:24px; left:14px; font-size:13px; color:#0A84FF; }
+      .sep { position:absolute; top:50px; left:18px; width:204px; height:1px; background:#2C2C2E; }
+
+      .row { position:absolute; left:18px; width:204px; background:#1C1C1E; border-radius:13px;
+        display:flex; align-items:center; padding:0 12px; }
+      .ic { width:26px; height:26px; border-radius:7px; display:flex; align-items:center;
+        justify-content:center; font-size:16px; margin-right:10px; flex:0 0 26px; }
+      .rl { font-size:15px; font-weight:600; }
+      .rc { margin-left:auto; color:#8E8E93; font-size:15px; }
+
+      .sw { margin-left:auto; width:38px; height:22px; border-radius:11px; background:#39393D;
+        position:relative; flex:0 0 38px; }
+      .sw i { position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%;
+        background:#fff; }
+      .sw.on { background:#30D158; } .sw.on i { left:18px; }
+    </style>
+  </head>
+
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="12"
+         data-width="240" data-height="240" data-fps="10">
+
+      <!-- 1 — DİJİTAL KADRAN -->
+      <section class="scr clip" data-start="0" data-duration="2" data-track-index="1">
+        <div style="position:absolute;top:34px;left:0;right:0;text-align:center;
+                    font-size:74px;font-weight:900;line-height:.96;letter-spacing:-2px;color:#F2E14C">10</div>
+        <div style="position:absolute;top:110px;left:0;right:0;text-align:center;
+                    font-size:74px;font-weight:900;line-height:.96;letter-spacing:-2px;color:#F5A3B7">09</div>
+        <div style="position:absolute;bottom:34px;left:0;right:0;text-align:center;
+                    font-size:13px;color:#8E8E93">15 June · 87%</div>
+      </section>
+
+      <!-- 2 — ANA EKRAN (LAUNCHER) -->
+      <section class="scr clip" data-start="2" data-duration="2" data-track-index="1">
+        <div style="position:absolute;left:20px;top:30px;width:200px;height:200px;border-radius:50%;
+                    background:radial-gradient(circle,#0B2A55 0%,#000 70%)"></div>
+        <div style="position:absolute;top:8px;left:0;right:0;text-align:center;font-size:12px;color:#8E8E93">10:09</div>
+        <div style="position:absolute;left:32px;top:44px;width:176px">
+          <div style="display:flex;gap:24px;justify-content:center">
+            <div style="text-align:center;width:64px">
+              <div style="width:64px;height:64px;border-radius:15px;background:#3A3A3C;display:flex;
+                          align-items:center;justify-content:center;font-size:28px">⚙</div>
+              <div style="font-size:10px;color:#C7C7CC;margin-top:5px">Settings</div>
+            </div>
+            <div style="text-align:center;width:64px">
+              <div style="width:64px;height:64px;border-radius:15px;background:#2E9E6B;display:flex;
+                          align-items:center;justify-content:center;font-size:28px">▣</div>
+              <div style="font-size:10px;color:#C7C7CC;margin-top:5px">Gallery</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:24px;justify-content:center;margin-top:16px">
+            <div style="text-align:center;width:64px">
+              <div style="width:64px;height:64px;border-radius:15px;background:#E2622C;display:flex;
+                          align-items:center;justify-content:center;font-size:28px">⏰</div>
+              <div style="font-size:10px;color:#C7C7CC;margin-top:5px">Alarms</div>
+            </div>
+            <div style="text-align:center;width:64px">
+              <div style="width:64px;height:64px;border-radius:15px;background:#2F7DD1;display:flex;
+                          align-items:center;justify-content:center;font-size:28px">↓</div>
+              <div style="font-size:10px;color:#C7C7CC;margin-top:5px">Store</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 — AYARLAR (STEP 60) -->
+      <section class="scr clip" data-start="4" data-duration="2" data-track-index="1">
+        <div class="hdr-clock">10:09</div>
+        <div class="hdr-title">Settings</div>
+        <div class="sep"></div>
+        <!-- Yuvarlak panelde 204 px'lik satır ancak y≈180'e kadar daire içinde
+             kalır; liste kaydırılır, aynı anda iki satır tam görünür. -->
+        <div class="row" style="top:66px;height:52px">
+          <div class="ic" style="background:#636366">⚙</div><div class="rl">General</div><div class="rc">›</div>
+        </div>
+        <div class="row" style="top:126px;height:52px">
+          <div class="ic" style="background:#FF9F0A">✈</div><div class="rl">Airplane Mode</div><div class="rc">›</div>
+        </div>
+        <div style="position:absolute;left:0;right:0;top:196px;text-align:center;
+                    font-size:10px;color:#48484A">• • ·</div>
+      </section>
+
+      <!-- 4 — GÜÇ RAYLARI (STEP 50) -->
+      <section class="scr clip" data-start="6" data-duration="2" data-track-index="1">
+        <div class="hdr-clock">10:09</div>
+        <div class="hdr-back" style="left:30px">‹</div>
+        <div class="hdr-title">Power Rails</div>
+        <div class="sep"></div>
+        <!-- Ray satırları alta indikçe daire daralıyor: 180 px genişlik, x=30. -->
+        <div class="row" style="top:58px;height:44px;left:30px;width:180px">
+          <div class="rl" style="font-size:12px">ALDO1 <span style="color:#8E8E93">3.3V Sensors</span></div>
+          <div class="sw"><i></i></div>
+        </div>
+        <div class="row" style="top:108px;height:44px;left:30px;width:180px">
+          <div class="rl" style="font-size:12px">ALDO2 <span style="color:#8E8E93">3.3V Display</span></div>
+          <div class="sw"><i></i></div>
+        </div>
+        <div class="row" style="top:158px;height:44px;left:30px;width:180px">
+          <div class="rl" style="font-size:12px">DCDC2 <span style="color:#8E8E93">0.9V Disp.</span></div>
+          <div class="sw on"><i></i></div>
+        </div>
+        <div style="position:absolute;left:62px;top:208px;width:116px;height:26px;border-radius:13px;
+                    background:#3A1216;display:flex;align-items:center;justify-content:center">
+          <div style="font-size:11px;color:#FF453A;font-weight:700">Turn Off</div>
+        </div>
+      </section>
+
+      <!-- 5 — ADIM SAYAR -->
+      <section class="scr clip" data-start="8" data-duration="2" data-track-index="1">
+        <div class="hdr-clock">10:09</div>
+        <div class="hdr-title" style="color:#0AC8D7">Steps</div>
+        <div style="position:absolute;left:45px;top:62px;width:150px;height:150px;border-radius:50%;
+                    border:9px solid #1C1C1E"></div>
+        <div style="position:absolute;left:45px;top:62px;width:150px;height:150px;border-radius:50%;
+                    border:9px solid transparent;border-top-color:#0AC8D7;border-right-color:#0AC8D7;
+                    transform:rotate(45deg)"></div>
+        <div style="position:absolute;left:0;right:0;top:108px;text-align:center;
+                    font-size:34px;font-weight:800">6842</div>
+        <div style="position:absolute;left:0;right:0;top:146px;text-align:center;
+                    font-size:12px;color:#8E8E93">steps · %68</div>
+      </section>
+
+      <!-- 6 — HAVA DURUMU -->
+      <section class="scr clip" data-start="10" data-duration="2" data-track-index="1">
+        <div class="hdr-clock">10:09</div>
+        <div style="position:absolute;top:40px;left:0;right:0;text-align:center;
+                    font-size:15px;color:#C7C7CC">Istanbul</div>
+        <div style="position:absolute;top:62px;left:0;right:0;text-align:center;
+                    font-size:56px;font-weight:800;letter-spacing:-2px">21°</div>
+        <div style="position:absolute;top:132px;left:0;right:0;text-align:center;
+                    font-size:13px;color:#8E8E93">Partly Cloudy</div>
+        <div style="position:absolute;top:156px;left:0;right:0;text-align:center;
+                    font-size:12px;color:#8E8E93">H:24° L:16°</div>
+        <div style="position:absolute;bottom:34px;left:0;right:0;display:flex;justify-content:center;gap:14px">
+          <div style="text-align:center"><div style="font-size:14px;font-weight:700;color:#F5A623">4</div>
+            <div style="font-size:9px;color:#8E8E93">UV</div></div>
+          <div style="text-align:center"><div style="font-size:14px;font-weight:700;color:#C7C7CC">12</div>
+            <div style="font-size:9px;color:#8E8E93">km/s</div></div>
+          <div style="text-align:center"><div style="font-size:14px;font-weight:700;color:#0AC8D7">63</div>
+            <div style="font-size:9px;color:#8E8E93">%</div></div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NarRTOS Wear · Karta yükle</title>
+<!--
+  Tarayıcıdan yükleme sayfası. ESP Web Tools (esphome/esp-web-tools) + Web Serial.
+  Yalnız Chrome ve Edge (Chromium) çalıştırır; sayfa HTTPS'ten sunulmalı.
+  Sürüm ve kart listesi ../releases/latest.json'dan okunur (scripts/release.py üretir).
+  Bu dosya ile release/ klasörü aynı sunucuda şu yerleşimle durur:
+      <kök>/install/index.html      (bu sayfa)
+      <kök>/releases/latest.json
+      <kök>/releases/v1.4.81/web/<env>/manifest.json + parçalar
+-->
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+  :root { --bg:#00102E; --bg2:#001B3F; --card:#0B1622; --line:#12304F; --ink:#E4F0EE; --muted:#93AEC7; --trq:#12A0AD; --warn:#F2C46D; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif; background:linear-gradient(155deg,var(--bg),var(--bg2)); color:var(--ink); min-height:100vh; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:860px; margin:0 auto; padding:40px 20px 80px; }
+  .k { font-size:13px; font-weight:800; letter-spacing:2px; color:var(--trq); }
+  h1 { font-size:36px; letter-spacing:-.5px; margin:10px 0 8px; }
+  .lede { color:var(--muted); font-size:17px; line-height:1.55; max-width:640px; }
+  .lang { position:absolute; right:20px; top:20px; display:flex; gap:6px; }
+  .lang button { background:transparent; border:1px solid var(--line); color:var(--muted); border-radius:999px; padding:5px 12px; cursor:pointer; font-weight:700; }
+  .lang button.on { background:var(--trq); color:var(--bg); border-color:var(--trq); }
+  .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin:34px 0 30px; }
+  .step { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 18px 16px; }
+  .step > b { display:block; font-size:15px; margin-bottom:6px; } .step > b i { display:inline-flex; width:24px; height:24px; border-radius:50%; background:var(--trq); color:var(--bg); font-style:normal; font-size:13px; align-items:center; justify-content:center; margin-right:8px; }
+  .step p { color:var(--muted); font-size:14px; line-height:1.55; }
+  .boards { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; }
+  .board { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px; }
+  .board h3 { font-size:18px; margin-bottom:4px; } .board .v { color:var(--muted); font-size:13.5px; margin-bottom:16px; }
+  esp-web-install-button button.go { background:var(--trq); color:var(--bg); border:0; border-radius:10px; padding:12px 18px; font-size:15px; font-weight:800; cursor:pointer; }
+  esp-web-install-button button.go:hover { filter:brightness(1.08); }
+  .msg { border-left:4px solid var(--warn); background:rgba(242,196,109,.10); border-radius:0 10px 10px 0; padding:12px 14px; color:var(--ink); font-size:14px; line-height:1.55; }
+  .note { border-left:4px solid var(--trq); background:rgba(18,160,173,.10); border-radius:0 10px 10px 0; padding:14px 18px; margin:26px 0; line-height:1.6; }
+  .note > b { display:block; margin-bottom:4px; }
+  details { margin-top:22px; color:var(--muted); } summary { cursor:pointer; color:var(--ink); font-weight:700; }
+  details p, details li { font-size:14px; line-height:1.6; margin-top:8px; } details ul { padding-left:20px; }
+  code { font-family:Menlo,Consolas,monospace; font-size:13px; background:rgba(255,255,255,.06); padding:1px 6px; border-radius:5px; }
+  footer { margin-top:50px; color:var(--muted); font-size:13px; }
+  /* Dil görünürlüğü: !important, çünkü .step > b gibi kurallar bunları eziyordu. */
+  html:not([lang=en]) [data-en] { display:none !important; } html[lang=en] [data-tr] { display:none !important; }
+</style>
+</head>
+<body>
+<div class="lang"><button id="btn-tr" class="on">TR</button><button id="btn-en">EN</button></div>
+<div class="wrap">
+  <div class="k">NARRTOS WEAR</div>
+  <h1><span data-tr>Karta yükle</span><span data-en>Install to the board</span></h1>
+  <p class="lede">
+    <span data-tr>Hiçbir program kurmadan, doğrudan tarayıcıdan. Kartı USB ile takın, kartınızı seçin, düğmeye basın; NarRTOS birkaç dakikada yüklenir.</span>
+    <span data-en>No software to install; straight from the browser. Plug the board in over USB, pick your board, press the button; NarRTOS is on it in a few minutes.</span>
+  </p>
+
+  <div id="unsupported" class="msg" hidden>
+    <span data-tr><b>Bu tarayıcı USB'ye erişemiyor.</b> Sayfayı <b>Google Chrome</b> veya <b>Microsoft Edge</b> ile açın (Safari ve Firefox desteklemez). Telefon ve tabletlerde çalışmaz; bilgisayar gerekir.</span>
+    <span data-en><b>This browser cannot reach USB.</b> Open this page in <b>Google Chrome</b> or <b>Microsoft Edge</b> (Safari and Firefox do not support it). It does not work on phones or tablets; you need a computer.</span>
+  </div>
+
+  <div class="steps">
+    <div class="step"><b><i>1</i><span data-tr>Kabloyu takın</span><span data-en>Plug in the cable</span></b>
+      <p data-tr>Kartı bilgisayara <b>veri taşıyan</b> bir USB kablosuyla bağlayın. Kartın ışığı yanmalı. Yalnız şarj kablolarıyla kart görünmez; en sık takılma noktası budur.</p>
+      <p data-en>Connect the board to the computer with a USB cable that <b>carries data</b>. The board's light should come on. Charge-only cables make the board invisible; this is the most common snag.</p></div>
+    <div class="step"><b><i>2</i><span data-tr>Kartınızı seçin</span><span data-en>Pick your board</span></b>
+      <p data-tr>Aşağıda iki kart var. Ekranı dikdörtgen olan AMOLED, yuvarlak olan 240×240 LCD. Yanlış seçerseniz ekran karanlık kalır; tekrar doğrusunu yüklersiniz, zararı olmaz.</p>
+      <p data-en>There are two boards below. The rectangular screen is the AMOLED, the round one is the 240×240 LCD. Pick the wrong one and the screen stays dark; just install the right one again, no harm done.</p></div>
+    <div class="step"><b><i>3</i><span data-tr>Düğmeye basın, portu seçin</span><span data-en>Press the button, choose the port</span></b>
+      <p data-tr>Tarayıcı bir pencere açıp portları listeler. <code>usbserial</code>, <code>wchusbserial</code> veya <code>COM</code> ile başlayanı seçin. İlk kurulumda "Erase device" kutusunu işaretleyin.</p>
+      <p data-en>The browser opens a window listing ports. Pick the one starting with <code>usbserial</code>, <code>wchusbserial</code> or <code>COM</code>. On a first install tick "Erase device".</p></div>
+  </div>
+
+  <div id="boards" class="boards"><div class="board"><h3 data-tr>Sürüm bilgisi yükleniyor…</h3><h3 data-en>Loading release info…</h3></div></div>
+
+  <div class="note">
+    <b data-tr>Kart listede yoksa</b><b data-en>If the board is not in the list</b>
+    <span data-tr>Önce kabloyu değiştirin. Sonra USB sürücüsü: kartta CH343 çipi var; Windows ve macOS'ta sürücü gerekebilir (üreticinin CH34x VCP sürücüsü). Kurulumdan sonra bilgisayarı yeniden başlatıp sayfayı yenileyin.</span>
+    <span data-en>Change the cable first. Then the USB driver: the board has a CH343 chip; Windows and macOS may need the manufacturer's CH34x VCP driver. Restart the computer after installing and reload this page.</span>
+  </div>
+
+  <details>
+    <summary><span data-tr>Bu sayfa ne yapıyor?</span><span data-en>What does this page do?</span></summary>
+    <p data-tr>Tarayıcının Web Serial özelliğiyle karta seri porttan bağlanır ve Espressif'in açık kaynak <code>esptool-js</code> aracıyla yazılımı yazar. Yazılan dosyalar bu sunucudan iner; başka bir yere veri gönderilmez. Aynı işi bilgisayarında geliştirme ortamı kuran biri <code>pio run -t upload</code> ile yapar.</p>
+    <p data-en>It connects to the board over the serial port using the browser's Web Serial feature and writes the firmware with Espressif's open-source <code>esptool-js</code>. The files come from this server; no data is sent anywhere else. Someone with a development setup does the same job with <code>pio run -t upload</code>.</p>
+    <ul>
+      <li data-tr>Yükleme bittikten sonra kart kendini yeniden başlatır ve saat kadranı gelir.</li><li data-en>When the install finishes the board restarts and the watch face appears.</li>
+      <li data-tr>Yükleme yarıda kesilirse kablo çekilmiş olabilir; tekrar takıp yeniden basın.</li><li data-en>If the install stops halfway the cable may have been unplugged; plug it back in and press again.</li>
+      <li data-tr>Sürüm, bu sunucuda yayımlanan son sürümdür; daha sonraki güncellemeleri cihaz kendi indirir (OTA).</li><li data-en>The version is the latest published on this server; later updates the device downloads itself (OTA).</li>
+    </ul>
+  </details>
+
+  <footer><span data-tr>NarRTOS · Corezzle Electronics · Sürüm </span><span data-en>NarRTOS · Corezzle Electronics · Version </span><span id="ver">…</span></footer>
+</div>
+
+<script>
+  // Dil: ?lang=en ya da tarayıcı dili; düğmeyle değişir.
+  const html = document.documentElement;
+  function setLang(l) { html.lang = l; document.getElementById('btn-tr').classList.toggle('on', l === 'tr'); document.getElementById('btn-en').classList.toggle('on', l === 'en'); try { localStorage.setItem('narrtos-lang', l); } catch (e) {} }
+  document.getElementById('btn-tr').onclick = () => setLang('tr'); document.getElementById('btn-en').onclick = () => setLang('en');
+  const qs = new URLSearchParams(location.search).get('lang'); let saved = null; try { saved = localStorage.getItem('narrtos-lang'); } catch (e) {}
+  setLang(qs || saved || ((navigator.language || 'tr').toLowerCase().startsWith('tr') ? 'tr' : 'en'));
+
+  // Web Serial yoksa (Safari, Firefox, telefon) uyarı göster.
+  if (!('serial' in navigator)) document.getElementById('unsupported').hidden = false;
+
+  // Kart kartları latest.json'dan.
+  const RELEASES = '../releases/';
+  fetch(RELEASES + 'latest.json', { cache: 'no-store' }).then(r => r.json()).then(latest => {
+    document.getElementById('ver').textContent = 'v' + latest.version;
+    const boards = document.getElementById('boards'); boards.innerHTML = '';
+    for (const [env, b] of Object.entries(latest.boards)) {
+      const card = document.createElement('div'); card.className = 'board';
+      card.innerHTML = `<h3>${b.name}</h3><div class="v">v${latest.version} · ${env}</div>
+        <esp-web-install-button manifest="${RELEASES}${b.manifest}">
+          <button slot="activate" class="go"><span data-tr>Karta yükle</span><span data-en>Install to the board</span></button>
+          <span slot="unsupported" class="msg"><span data-tr>Bu tarayıcı desteklemiyor; Chrome veya Edge kullanın.</span><span data-en>This browser is not supported; use Chrome or Edge.</span></span>
+          <span slot="not-allowed" class="msg"><span data-tr>Sayfa HTTPS üzerinden açılmalı.</span><span data-en>The page must be opened over HTTPS.</span></span>
+        </esp-web-install-button>`;
+      boards.appendChild(card);
+    }
+  }).catch(() => { document.getElementById('boards').innerHTML = '<div class="board"><h3 data-tr>Sürüm listesi alınamadı</h3><h3 data-en>Could not load the release list</h3><div class="v">releases/latest.json</div></div>'; });
+</script>
+</body>
+</html>

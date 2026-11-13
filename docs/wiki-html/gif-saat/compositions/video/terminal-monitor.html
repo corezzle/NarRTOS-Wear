@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <title>pio device monitor — açılış kaydı GIF</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/term-video.css">
+  </head>
+  <body>
+    <div data-hf-id="hf-4hik" id="root" data-composition-id="termv-monitor" data-start="0" data-duration="8.5" data-width="760" data-height="420" data-fps="15">
+      <div data-hf-id="hf-2xc0" id="bg"></div>
+      <div data-hf-id="hf-7on1" id="win">
+        <div data-hf-id="hf-2to0" id="bar"><div data-hf-id="hf-og9e" class="dot" id="d1"></div><div data-hf-id="hf-ki5d" class="dot" id="d2"></div><div data-hf-id="hf-jqhk" class="dot" id="d3"></div>
+          <div data-hf-id="hf-a9bd" id="title">Terminal</div></div>
+        <div data-hf-id="hf-lj6z" id="out"><div data-hf-id="hf-v0ty" id="lines"></div></div>
+      </div>
+    </div>
+    <script src="assets/term.js"></script>
+    <script>
+      buildTerminal("termv-monitor", [
+
+        { type:"cmd", text:"pio device monitor" },
+        { type:"out", text:"--- Terminal on /dev/cu.usbserial-1420 | 115200 8-N-1", dt:0.3 },
+        { type:"out", text:"--- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H", dt:0.7 },
+        { type:"out", text:"I (312) MAIN: ═══════════════════════════════════════", dt:0.15 },
+        { type:"out", text:"I (318) MAIN:  Embedded Wearable OS  v1.4.81", cls:"hi", dt:0.15 },
+        { type:"out", text:"I (323) MAIN:  ESP32-S3R8 @ 240MHz", dt:0.15 },
+        { type:"out", text:"I (327) MAIN:  Free heap  : 318208 bytes", dt:0.15 },
+        { type:"out", text:"I (331) MAIN:  PSRAM size : 8388608 bytes", dt:0.15 },
+        { type:"out", text:"I (335) MAIN:  Free PSRAM : 8257536 bytes", dt:0.15 },
+        { type:"out", text:"I (339) MAIN: ═══════════════════════════════════════", dt:0.35 },
+        { type:"out", text:"I (352) MAIN: Boot: normal (cause=0, reset=1) → UI ON", dt:0.3 },
+        { type:"out", text:"I (361) MAIN: [Core0] UI Task started", dt:0.25 },
+        { type:"out", text:"I (366) MAIN: [Core1] Sensor Task started", dt:0.25 },
+        { type:"out", text:"I (402) MAIN: [Core0] Entering LVGL main loop", cls:"ok" }
+      ], { visible: 11, lineHeight: 28, holdEnd: true });
+    </script>
+  </body>
+</html>

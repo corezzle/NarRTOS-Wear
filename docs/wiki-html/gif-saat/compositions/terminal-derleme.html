@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <title>pio run -t upload — terminal GIF</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/term.css">
+  </head>
+  <body>
+    <div data-hf-id="hf-lq98" id="root" data-composition-id="term-derleme" data-start="0" data-duration="17.5" data-width="760" data-height="420" data-fps="15">
+      <div data-hf-id="hf-2xc0" id="bg"></div>
+      <div data-hf-id="hf-7on1" id="win">
+        <div data-hf-id="hf-2to0" id="bar"><div data-hf-id="hf-og9e" class="dot" id="d1"></div><div data-hf-id="hf-ki5d" class="dot" id="d2"></div><div data-hf-id="hf-jqhk" class="dot" id="d3"></div>
+          <div data-hf-id="hf-a9bd" id="title">Terminal</div></div>
+        <div data-hf-id="hf-lj6z" id="out"><div data-hf-id="hf-v0ty" id="lines"></div></div>
+      </div>
+    </div>
+    <script src="assets/term.js"></script>
+    <script>
+      buildTerminal("term-derleme", [
+
+        { type:"cmd", text:"pio run -e esp32s3_wearable -t upload" },
+        { type:"out", text:"Processing esp32s3_wearable (platform: espressif32; framework: espidf)", dt:0.4 },
+        { type:"out", text:"--------------------------------------------------------------------", dt:0.3 },
+        { type:"out", text:"HARDWARE: ESP32S3 240MHz, 8MB RAM, 8MB Flash", dt:0.4 },
+        { type:"out", text:"Reading CMake configuration...", dt:0.5 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/main.cpp.o", dt:0.16 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/core/app_manager.cpp.o", dt:0.16 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/core/event_bus.cpp.o", dt:0.16 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/services/ui_service.cpp.o", dt:0.16 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/services/power_service.cpp.o", dt:0.16 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/services/wifi_service.cpp.o", dt:0.16 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/apps/watchface/watchface_app.cpp.o", dt:0.16 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/apps/launcher/launcher_app.cpp.o", dt:0.16 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/apps/weather/weather_app.cpp.o", dt:0.16 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/drivers/display/co5300_driver.cpp.o", dt:0.16 },
+        { type:"out", text:"Linking .pio/build/esp32s3_wearable/firmware.elf", dt:0.5 },
+        { type:"out", text:"Building .pio/build/esp32s3_wearable/firmware.bin", dt:0.4 },
+        { type:"out", text:"RAM:   [==        ]  18.4% (used 60312 bytes from 327680 bytes)", dt:0.35 },
+        { type:"out", text:"Flash: [=====     ]  47.1% (used 1481216 bytes from 3145728 bytes)", dt:0.35 },
+        { type:"out", text:"Configuring upload protocol...", dt:0.3 },
+        { type:"out", text:"CURRENT: upload_protocol = esptool", dt:0.2 },
+        { type:"out", text:"Looking for upload port...", dt:0.3 },
+        { type:"out", text:"Auto-detected: /dev/cu.usbserial-1420", cls:"hi", dt:0.4 },
+        { type:"out", text:"Uploading .pio/build/esp32s3_wearable/firmware.bin", dt:0.3 },
+        { type:"out", text:"Serial port /dev/cu.usbserial-1420", dt:0.2 },
+        { type:"out", text:"Connecting....", dt:0.6 },
+        { type:"out", text:"Chip is ESP32-S3 (QFN56) (revision v0.2)", dt:0.4 },
+        { type:"out", text:"Writing at 0x00010000... (2 %)", dt:0.45 },
+        { type:"out", text:"Writing at 0x0007a3c1... (25 %)", dt:0.45 },
+        { type:"out", text:"Writing at 0x000e2b7f... (50 %)", dt:0.45 },
+        { type:"out", text:"Writing at 0x0014c0a2... (75 %)", dt:0.45 },
+        { type:"out", text:"Writing at 0x001ba5e9... (100 %)", dt:0.45 },
+        { type:"out", text:"Wrote 1481216 bytes (912664 compressed) in 17.3 seconds", dt:0.3 },
+        { type:"out", text:"Hash of data verified.", dt:0.4 },
+        { type:"out", text:"Hard resetting via RTS pin...", dt:0.5 },
+        { type:"out", text:"==================== [SUCCESS] Took 42.61 seconds ====================", cls:"ok" }
+      ]);
+    </script>
+  </body>
+</html>

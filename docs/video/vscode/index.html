@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<title>VS Code Kurulumu</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  body { margin:0; background:#00102E; font-family:Inter, system-ui, sans-serif; color:#E4F0EE; -webkit-font-smoothing:antialiased; }
+  #root { position:relative; width:1920px; height:1080px; overflow:hidden; }
+  .clip { position:absolute; inset:0; }
+  #bg { background:linear-gradient(140deg,#00102E 0%,#00234E 55%,#001B3F 100%); }
+  .grid { position:absolute; inset:0; opacity:.22;
+    background-image:linear-gradient(#093159 1px,transparent 1px),linear-gradient(90deg,#093159 1px,transparent 1px); background-size:80px 80px; }
+  .glow { position:absolute; left:1100px; top:-260px; width:900px; height:900px; border-radius:50%;
+    background:radial-gradient(circle,rgba(0,202,215,.16) 0%,rgba(0,202,215,0) 65%); }
+  .brand { position:absolute; left:80px; top:52px; font-size:20px; font-weight:800; letter-spacing:3px; color:#00CAD7; }
+  .doc { position:absolute; right:80px; top:50px; font-size:22px; color:#93AEC7; }
+  .progress { position:absolute; left:0; bottom:0; width:1920px; height:6px; background:rgba(255,255,255,.08); }
+  .bar { width:1920px; height:6px; background:#00CAD7; transform-origin:left center; }
+  .card { position:absolute; left:160px; top:0; width:1600px; height:1080px; display:flex; flex-direction:column; justify-content:center; }
+  .k { font-size:24px; font-weight:800; letter-spacing:4px; color:#00CAD7; }
+  h1 { margin:22px 0 0; font-size:88px; font-weight:800; line-height:1.08; letter-spacing:-1.5px; max-width:1400px; }
+  #title h1 { max-width:960px; }  #title .card p { max-width:900px; }
+  .devs { position:absolute; left:1120px; top:0; width:800px; height:1080px; }
+  .devs .b1 { position:absolute; left:0; top:262px; width:400px; height:476px; border-radius:86px; background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%); box-shadow:0 34px 80px rgba(0,0,0,.65); }
+  .devs .c1 { position:absolute; left:400px; top:426px; width:14px; height:68px; border-radius:7px; background:linear-gradient(180deg,#4A4F57,#23262B); }
+  .devs .w1 { position:absolute; left:30px; top:294px; width:340px; height:412px; border-radius:68px; overflow:hidden; background:#000; }
+  .devs .b2 { position:absolute; left:400px; top:500px; width:300px; height:300px; border-radius:50%; background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%); box-shadow:0 28px 70px rgba(0,0,0,.65); }
+  .devs .w2 { position:absolute; left:417px; top:517px; width:266px; height:266px; border-radius:50%; overflow:hidden; background:#000; }
+  .devs img { position:absolute; left:0; top:0; width:100%; height:100%; opacity:0; }
+  .devs img[id$="-0"] { opacity:1; }
+  .card p { margin:28px 0 0; font-size:34px; line-height:1.45; color:#93AEC7; max-width:1200px; }
+  .inner { position:absolute; inset:0; }
+  .left { position:absolute; left:80px; top:112px; width:1560px; }
+  .steptitle { font-size:50px; font-weight:800; line-height:1.15; letter-spacing:-.5px; white-space:nowrap; }
+  .stepmeta { position:absolute; right:80px; top:128px; font-size:24px; color:#93AEC7; }
+  .shot { position:absolute; border-radius:22px; overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.10); background:#0B1622; }
+  .shot img, .shot video { width:100%; height:100%; object-fit:contain; display:block; }
+  .shot.list { background:rgba(4,14,30,.72); padding:44px 64px; box-sizing:border-box; }
+  .shot.list ul { margin:0; padding:0; list-style:none; }
+  .shot.list li { position:relative; padding:0 0 0 44px; margin:0 0 26px; font-size:36px; line-height:1.4; color:#E4F0EE; }
+  .shot.list li::before { content:""; position:absolute; left:0; top:16px; width:18px; height:18px; border-radius:50%; background:#00CAD7; }
+  .shot.gallery { background:rgba(4,14,30,.72); padding:26px 30px; box-sizing:border-box; display:grid;
+    grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:14px 18px; }
+  .shot.gallery figure { margin:0; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; }
+  .shot.gallery img { width:auto; height:200px; object-fit:contain; border-radius:16px; display:block; }
+  .shot.gallery b { display:block; margin-top:10px; font-size:22px; font-weight:800; color:#E4F0EE; }
+  .shot.gallery span { display:block; margin-top:2px; font-size:16px; color:#93AEC7; }
+  .shot.code { background:#0B1622; padding:34px 40px; box-sizing:border-box; display:flex; align-items:center; }
+  .shot.code pre { margin:0; font-family:Menlo,Consolas,monospace; font-size:24px; line-height:1.5; color:#D6E4F0; white-space:pre; }
+  .shot.code.small pre { font-size:19px; line-height:1.45; }
+  .shot.list.dense { padding:44px 56px; }
+  .shot.list.dense li { font-size:30px; line-height:1.35; margin-bottom:22px; padding-left:38px; }
+  .shot.list.dense li::before { top:12px; width:15px; height:15px; }
+  .caps { position:absolute; left:80px; right:330px; bottom:58px; height:150px; }
+  .cap.long { font-size:33px; line-height:1.35; padding:18px 30px; }
+  .cap.xlong { font-size:29px; }
+  .ilogo { position:absolute; left:460px; top:330px; width:1000px; }
+  .iseries { position:absolute; left:0; right:0; top:690px; text-align:center; }
+  .iseries b { display:block; font-size:30px; font-weight:800; letter-spacing:6px; color:#00CAD7; }
+  .iseries span { display:block; margin-top:14px; font-size:26px; color:#93AEC7; }
+  .oh { position:absolute; left:0; right:0; top:110px; text-align:center; font-size:44px; font-weight:800; }
+  .obox { position:absolute; top:225px; width:740px; height:416px; border-radius:22px; box-sizing:border-box; padding:28px 34px;
+    border:2px dashed rgba(0,202,215,.45); background:rgba(4,14,30,.55); display:flex; flex-direction:column; justify-content:flex-end; }
+  .obox span { font-size:22px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:#00CAD7; }
+  .obox b { margin-top:10px; font-size:38px; font-weight:800; color:#E4F0EE; }
+  .osub { position:absolute; left:0; right:0; top:700px; display:flex; justify-content:center; align-items:center; gap:28px; }
+  .ocircle { width:170px; height:170px; border-radius:50%; border:2px dashed rgba(0,202,215,.45); background:rgba(4,14,30,.55); }
+  .osub b { display:block; font-size:36px; font-weight:800; }
+  .osub span { display:block; margin-top:8px; font-size:24px; color:#93AEC7; }
+  .ologo { position:absolute; left:80px; bottom:52px; width:300px; }
+  .olinks { position:absolute; right:80px; bottom:60px; font-size:26px; color:#93AEC7; }
+  .avatar { position:absolute; right:60px; bottom:34px; width:220px; height:220px; border-radius:50%; overflow:hidden;
+    border:4px solid #00CAD7; box-shadow:0 20px 50px rgba(0,0,0,.55); background:#0B1622; }
+  .avatar img { width:100%; height:100%; display:block; }
+  .cap { position:absolute; left:0; right:0; bottom:0; margin:0 auto; max-width:1400px; padding:22px 34px; border-radius:18px;
+    background:rgba(4,14,30,.82); border:1px solid rgba(255,255,255,.08); font-size:38px; line-height:1.4; text-align:center; opacity:0; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="315.5" data-fps="30">
+<div id="bg" class="clip" data-start="0" data-duration="315.5" data-track-index="0">
+      <div class="grid"></div><div class="glow"></div>
+      <div class="brand">COREZZLE</div><div class="doc">VS Code Kurulumu</div>
+      <div class="progress"><div id="bar" class="bar"></div></div>
+      <div class="avatar" id="avatar"><img src="assets/avatar.svg" alt=""></div></div>
+<div id="intro" class="clip" data-start="0" data-duration="4.5" data-track-index="1">
+      <img class="ilogo" id="intro-logo" src="assets/logo.png" alt="">
+      <div class="iseries" id="intro-series"><b>COREZZLE</b><span>Dökümantasyon Serisi</span></div></div>
+<div id="title" class="clip" data-start="4.5" data-duration="5.0" data-track-index="1">
+      <div class="card"><div class="k" id="title-k">COREZZLE</div>
+      <h1 id="title-h">VS Code Kurulumu</h1><p id="title-s">Windows, macOS ve Linux&#x27;ta sıfırdan kurulum: ilk açılış, terminal, eklentiler ve git.</p></div>
+      <div class="devs" id="title-devs">
+        <div class="b1"></div><div class="c1"></div><div class="w1"><img id="tw1-0" src="assets/a410-kadran-analog.png" alt=""><img id="tw1-1" src="assets/a410-launcher.png" alt=""><img id="tw1-2" src="assets/a410-hava-durumu.png" alt=""><img id="tw1-3" src="assets/a410-adim-sayar.png" alt=""></div>
+        <div class="b2"></div><div class="w2"><img id="tw2-0" src="assets/r240-kadran-dijital.png" alt=""><img id="tw2-1" src="assets/r240-launcher.png" alt=""><img id="tw2-2" src="assets/r240-hava-durumu.png" alt=""><img id="tw2-3" src="assets/r240-adim-sayar.png" alt=""></div>
+      </div></div>
+<div id="s1" class="clip" data-start="9.50" data-duration="20.10" data-track-index="1">
+      <div class="inner" id="s1-in">
+        <div class="left"><div class="steptitle">VS Code nedir, ne değildir</div></div><div class="stepmeta">1 / 16</div>
+        <div class="shot list" id="s1-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>VS Code ücretsiz ve açık kaynak bir kod editörüdür; Windows, macOS ve Linux&#x27;ta çalışır.</li><li>Dosyaları, terminali ve eklentileri tek bir pencerede toplar.</li><li>Programları kendisi derlemez. Bu işi eklentiler ve terminaldeki araçlar yapar.</li><li>Visual Studio ile karıştırmayın. O, yalnızca Windows&#x27;ta çalışan, ayrı ve çok daha büyük bir programdır.</li></ul></div>
+        <div class="caps"><div class="cap" id="s1-c0">Kurulum yaklaşık 10 dakika sürer ve hiçbir ön bilgi gerektirmez.</div><div class="cap" id="s1-c1">Sonunda VS Code açık, bir klasör içinde çalışır durumda ve terminal kullanıma hazır olur.</div></div>
+      </div></div>
+<div id="s2" class="clip" data-start="29.60" data-duration="11.10" data-track-index="1">
+      <div class="inner" id="s2-in">
+        <div class="left"><div class="steptitle">İndirin</div></div><div class="stepmeta">2 / 16</div>
+        <div class="shot" id="s2-shot" style="left:80px;top:324px;width:1540px;height:411px"><img src="assets/vscode-indirme.png" alt="İndirin" /></div>
+        <div class="caps"><div class="cap" id="s2-c0">code.visualstudio.com adresine gidin. Büyük Download düğmesi işletim sisteminizi kendisi tanır.</div><div class="cap" id="s2-c1">Düğmede sizde Windows ya da Linux yazabilir; bu görüntüde macOS görünüyor.</div></div>
+      </div></div>
+<div id="s3" class="clip" data-start="40.70" data-duration="19.70" data-track-index="1">
+      <div class="inner" id="s3-in">
+        <div class="left"><div class="steptitle">Kurun: Windows</div></div><div class="stepmeta">3 / 16</div>
+        <div class="shot list" id="s3-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>İndirilen .exe dosyasını çalıştırın. Lisansı kabul edin ve kurulum yerini olduğu gibi bırakın.</li><li>Select Additional Tasks ekranında şu kutuları işaretleyin: Add &quot;Open with Code&quot; (dosya ve klasör için), Register Code as an editor ve Add to PATH.</li><li>Install düğmesine, ardından Finish düğmesine basın. VS Code açılır.</li></ul></div>
+        <div class="caps"><div class="cap" id="s3-c0">&quot;Open with Code&quot; seçenekleri, herhangi bir klasöre sağ tıklayıp doğrudan VS Code ile açmanızı sağlar.</div></div>
+      </div></div>
+<div id="s4" class="clip" data-start="60.40" data-duration="19.70" data-track-index="1">
+      <div class="inner" id="s4-in">
+        <div class="left"><div class="steptitle">Kurun: macOS</div></div><div class="stepmeta">4 / 16</div>
+        <div class="shot list" id="s4-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>İndirilen .zip dosyasına çift tıklayın; Visual Studio Code uygulaması ortaya çıkar.</li><li>Simgeyi Uygulamalar (Applications) klasörüne sürükleyin. İndirilenler klasöründe bırakmayın.</li><li>Launchpad&#x27;den açın. &quot;İnternetten indirilen uygulama&quot; uyarısında Aç deyin.</li><li>Terminalden code komutunu kullanmak için ⇧⌘P ile komut paletini açıp Shell Command: Install &#x27;code&#x27; command in PATH seçeneğini çalıştırın.</li></ul></div>
+        <div class="caps"><div class="cap" id="s4-c0">Uygulamayı İndirilenler klasöründe bırakırsanız güncellemeler sorun çıkarır.</div></div>
+      </div></div>
+<div id="s5" class="clip" data-start="80.10" data-duration="14.90" data-track-index="1">
+      <div class="inner" id="s5-in">
+        <div class="left"><div class="steptitle">Kurun: Linux</div></div><div class="stepmeta">5 / 16</div>
+        <div class="shot list" id="s5-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>Ubuntu ve Debian&#x27;da .deb dosyasını indirip sudo apt install ./code_*.deb komutuyla kurun.</li><li>Fedora ve RHEL&#x27;de .rpm dosyasını indirip sudo dnf install ./code-*.rpm komutuyla kurun.</li><li>Snap kullanan dağıtımlarda sudo snap install code --classic komutu yeter.</li></ul></div>
+        <div class="caps"><div class="cap" id="s5-c0">.deb yöntemi Microsoft&#x27;un paket deposunu da ekler; sonraki güncellemeler apt ile gelir.</div></div>
+      </div></div>
+<div id="s6" class="clip" data-start="95.00" data-duration="18.20" data-track-index="1">
+      <div class="inner" id="s6-in">
+        <div class="left"><div class="steptitle">İlk açılış</div></div><div class="stepmeta">6 / 16</div>
+        <div class="shot" id="s6-shot" style="left:338px;top:215px;width:1024px;height:630px"><img src="assets/vscode-welcome.png" alt="İlk açılış" /></div>
+        <div class="caps"><div class="cap" id="s6-c0">Karşınıza Welcome sekmesi gelir. Koyu ya da açık tema seçebilirsiniz.</div><div class="cap long" id="s6-c1">Arayüz İngilizcedir. Dokümanların çoğu İngilizce menü adlarını kullandığı için başlangıçta öyle bırakmak takibi kolaylaştırır.</div><div class="cap" id="s6-c2">Güncellemeler kendiliğinden iner. Sağ altta Restart to update yazısını görünce yeniden başlatın.</div></div>
+      </div></div>
+<div id="s7" class="clip" data-start="113.20" data-duration="14.25" data-track-index="1">
+      <div class="inner" id="s7-in">
+        <div class="left"><div class="steptitle">Türkçe istiyorsanız</div></div><div class="stepmeta">7 / 16</div>
+        <div class="shot" id="s7-shot" style="left:80px;top:252px;width:1540px;height:555px"><img src="assets/vscode-extensions-tr.png" alt="Türkçe istiyorsanız" /></div>
+        <div class="caps"><div class="cap" id="s7-c0">Soldaki dikey şeritteki dört kare simgesi Extensions görünümünü açar. Kısayolu Ctrl, Shift ve X tuşlarıdır.</div><div class="cap" id="s7-c1">Arama kutusuna Turkish Language Pack yazın. Microsoft&#x27;un paketi çıkar; mavi Install düğmesine basın.</div></div>
+      </div></div>
+<div id="s8" class="clip" data-start="127.45" data-duration="16.05" data-track-index="1">
+      <div class="inner" id="s8-in">
+        <div class="left"><div class="steptitle">Dili değiştirin</div></div><div class="stepmeta">8 / 16</div>
+        <div class="shot" id="s8-shot" style="left:80px;top:348px;width:1540px;height:363px"><img src="assets/vscode-dil-degistir.png" alt="Dili değiştirin" /></div>
+        <div class="caps"><div class="cap" id="s8-c0">Sağ altta dil değişikliği sorusu çıkar. Change Language and Restart deyin; VS Code Türkçe açılır.</div><div class="cap" id="s8-c1">Soru çıkmadıysa Ctrl, Shift ve P ile komut paletini açın, Configure Display Language yazın ve Türkçe&#x27;yi seçin.</div></div>
+      </div></div>
+<div id="s9" class="clip" data-start="143.50" data-duration="26.75" data-track-index="1">
+      <div class="inner" id="s9-in">
+        <div class="left"><div class="steptitle">Pencereyi tanıyın</div></div><div class="stepmeta">9 / 16</div>
+        <div class="shot" id="s9-shot" style="left:352px;top:215px;width:995px;height:630px"><img src="assets/vscode-pencere.png" alt="Pencereyi tanıyın" /></div>
+        <div class="caps"><div class="cap long" id="s9-c0">1 numaralı Activity Bar görünümler arasında geçiş sağlar. 2 numaralı Sidebar seçili görünümün içeriğini, Explorer&#x27;da dosya ağacını gösterir.</div><div class="cap" id="s9-c1">3 numaralı Editor dosyaları sekmeler halinde açar. 4 numaralı Panel terminali, hataları ve çıktıları barındırır.</div><div class="cap long" id="s9-c2">5 numaralı Status Bar satır numarası, dosya türü ve git dalını gösterir. 6 numaralı Command Palette ile her komuta adını yazarak ulaşırsınız.</div></div>
+      </div></div>
+<div id="s10" class="clip" data-start="170.25" data-duration="13.35" data-track-index="1">
+      <div class="inner" id="s10-in">
+        <div class="left"><div class="steptitle">Bir klasör açın (macOS)</div></div><div class="stepmeta">10 / 16</div>
+        <div class="shot" id="s10-shot" style="left:684px;top:215px;width:332px;height:630px"><img src="assets/vscode-open-folder.png" alt="Bir klasör açın (macOS)" /></div>
+        <div class="caps"><div class="cap" id="s10-c0">VS Code dosyalarla değil klasörlerle çalışır. File menüsünden Open Folder ile proje klasörünüzü seçin.</div><div class="cap" id="s10-c1">&quot;Do you trust the authors?&quot; diye sorabilir. Kendi projeleriniz için Yes deyin.</div></div>
+      </div></div>
+<div id="s11" class="clip" data-start="183.60" data-duration="12.90" data-track-index="1">
+      <div class="inner" id="s11-in">
+        <div class="left"><div class="steptitle">Bir klasör açın (Windows / Linux)</div></div><div class="stepmeta">11 / 16</div>
+        <div class="shot" id="s11-shot" style="left:352px;top:215px;width:995px;height:630px"><img src="assets/vscode-win-open-folder.png" alt="Bir klasör açın (Windows / Linux)" /></div>
+        <div class="caps"><div class="cap" id="s11-c0">Windows ve Linux&#x27;ta menü şeridi pencerenin içinde, en üsttedir. File menüsünden Open Folder&#x27;ı seçin.</div><div class="cap" id="s11-c1">Daha önce açtığınız klasörlere File menüsündeki Open Recent ile geri dönersiniz.</div></div>
+      </div></div>
+<div id="s12" class="clip" data-start="196.50" data-duration="14.70" data-track-index="1">
+      <div class="inner" id="s12-in">
+        <div class="left"><div class="steptitle">Terminali kullanın (macOS)</div></div><div class="stepmeta">12 / 16</div>
+        <div class="shot" id="s12-shot" style="left:589px;top:215px;width:521px;height:630px"><img src="assets/vscode-new-terminal.png" alt="Terminali kullanın (macOS)" /></div>
+        <div class="caps"><div class="cap" id="s12-c0">Terminal menüsünden New Terminal, alt panelde bir terminal açar. Kısayolu Ctrl ve ` tuşlarıdır.</div><div class="cap" id="s12-c1">Terminal, o an açık olan klasörün içinde başlar. Komutları başka bir yere gitmeden doğrudan yazarsınız.</div></div>
+      </div></div>
+<div id="s13" class="clip" data-start="211.20" data-duration="12.90" data-track-index="1">
+      <div class="inner" id="s13-in">
+        <div class="left"><div class="steptitle">Terminali kullanın (Windows / Linux)</div></div><div class="stepmeta">13 / 16</div>
+        <div class="shot" id="s13-shot" style="left:352px;top:215px;width:995px;height:630px"><img src="assets/vscode-win-new-terminal.png" alt="Terminali kullanın (Windows / Linux)" /></div>
+        <div class="caps"><div class="cap" id="s13-c0">Windows&#x27;ta PowerShell, macOS&#x27;ta zsh, Linux&#x27;ta bash çalışır.</div><div class="cap long" id="s13-c1">Sağ üstteki artı işareti ikinci bir terminal açar. Yanındaki ok menüsünden Select Default Profile ile varsayılan kabuğu değiştirebilirsiniz.</div></div>
+      </div></div>
+<div id="s14" class="clip" data-start="224.10" data-duration="21.80" data-track-index="1">
+      <div class="inner" id="s14-in">
+        <div class="left"><div class="steptitle">Eklentiler</div></div><div class="stepmeta">14 / 16</div>
+        <div class="shot" id="s14-shot" style="left:80px;top:329px;width:1540px;height:402px"><img src="assets/vscode-eklenti-onerisi.png" alt="Eklentiler" /></div>
+        <div class="caps"><div class="cap" id="s14-c0">Dil desteği, tema ve araç entegrasyonu gibi her şey eklentiyle gelir. Extensions görünümünde arayıp Install deyin.</div><div class="cap" id="s14-c1">Kullandığınız dilin resmi eklentisi başlangıç için yeter. Diğerlerini ihtiyaç doğduğunda kurun.</div><div class="cap" id="s14-c2">Bir proje kendi eklentisini önerirse bu balon çıkar. Projenin dökümanı ne diyorsa onu yapın; emin değilseniz kapatın.</div></div>
+      </div></div>
+<div id="s15" class="clip" data-start="245.90" data-duration="20.90" data-track-index="1">
+      <div class="inner" id="s15-in">
+        <div class="left"><div class="steptitle">Git ile birlikte</div></div><div class="stepmeta">15 / 16</div>
+        <div class="shot list" id="s15-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>Source Control görünümü ve çoğu proje, git programının kurulu olmasını bekler.</li><li>Windows&#x27;ta git-scm.com/download/win adresinden kurulum dosyasını indirin ve bütün ekranlarda Next deyin.</li><li>macOS&#x27;ta terminale xcode-select --install yazın. Apple&#x27;ın komut satırı araçları git&#x27;i de içerir.</li><li>Linux&#x27;ta sudo apt install git komutu yeter.</li><li>Kurulumdan sonra VS Code&#x27;u tamamen kapatıp yeniden açın.</li></ul></div>
+        <div class="caps"><div class="cap" id="s15-c0">VS Code &quot;Git not found&quot; uyarısı veriyorsa git&#x27;i kurun ve uygulamayı yeniden başlatın.</div></div>
+      </div></div>
+<div id="s16" class="clip" data-start="266.80" data-duration="33.70" data-track-index="1">
+      <div class="inner" id="s16-in">
+        <div class="left"><div class="steptitle">Sık karşılaşılan sorunlar</div></div><div class="stepmeta">16 / 16</div>
+        <div class="shot list dense" id="s16-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>Mac&#x27;te &quot;Apple cannot check it for malicious software&quot; uyarısı çıkarsa uygulamaya sağ tıklayıp Open deyin. Bir kez yeter.</li><li>Windows&#x27;ta terminal code komutunu tanımıyorsa kurulumda Add to PATH işaretlenmemiştir. Terminali yeniden açın; gerekirse kurulumu tekrar çalıştırın.</li><li>Mac&#x27;te code komutu yoksa ⇧⌘P ile paleti açıp Shell Command: Install &#x27;code&#x27; command in PATH seçeneğini çalıştırın.</li><li>&quot;Git not found&quot; uyarısı için git&#x27;i kurun ve VS Code&#x27;u yeniden başlatın.</li><li>Yazılar çok küçük ya da büyükse View menüsünden Appearance, ardından Zoom In ya da Zoom Out seçin.</li></ul></div>
+        <div class="caps"><div class="cap" id="s16-c0">Yanlışlıkla kapattığınız bir paneli View menüsünden ya da komut paletine adını yazarak geri getirebilirsiniz.</div></div>
+      </div></div>
+<div id="end" class="clip" data-start="300.50" data-duration="5.0" data-track-index="1">
+      <div class="card"><div class="k" id="end-k">COREZZLE</div>
+      <h1 id="end-h">VS Code hazır.</h1><p id="end-s">NarRTOS projesini VS Code&#x27;da açmak için NarRTOS için VS Code Kurulumu dökümanına geçin. corezzle.com</p></div></div>
+<div id="outro" class="clip" data-start="305.50" data-duration="10.0" data-track-index="1">
+      <div class="oh" id="outro-h">İzlediğiniz için teşekkürler</div>
+      <div class="obox" id="outro-a" style="left:120px"><span>Sıradaki video</span><b>Sıradaki video</b></div>
+      <div class="obox" id="outro-b" style="left:1060px"><span>Oynatma listesi</span><b>Oynatma listesi</b></div>
+      <div class="osub" id="outro-s"><div class="ocircle"></div><div><b>Abone olun</b><span>Yeni bölümlerden haberdar olun</span></div></div>
+      <img class="ologo" id="outro-logo" src="assets/logo.png" alt="">
+      <div class="olinks" id="outro-l">corezzle.com &nbsp;·&nbsp; github.com/corezzle/NarRTOS-Wear</div></div>
+</div>
+<script>
+  window.__timelines = window.__timelines || {};
+  const tl = gsap.timeline({ paused: true });
+    tl.set("#avatar", {opacity: 0}, 0); tl.to("#avatar", {opacity: 1, duration: .5}, 9.3); tl.to("#avatar", {opacity: 0, duration: .4}, 305.10);
+  tl.fromTo("#intro-logo", {scale: .86, opacity: 0}, {scale: 1, opacity: 1, duration: 1.1, ease: "power3.out"}, .15);
+  tl.to("#intro-logo", {y: -70, duration: .8, ease: "power3.inOut"}, 1.6);
+  tl.fromTo("#intro-series", {y: 30, opacity: 0}, {y: 0, opacity: 1, duration: .7, ease: "power3.out"}, 2.0);
+  tl.to(["#intro-logo","#intro-series"], {opacity: 0, duration: .45, ease: "power2.in"}, 4.0);
+  tl.fromTo("#bar", {scaleX: 0}, {scaleX: 1, duration: 315.5, ease: "none"}, 0);
+  tl.from("#title-devs", {x: 60, opacity: 0, duration: .9, ease: "power3.out"}, 5.1);
+  tl.to(["#tw1-1","#tw2-1"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 6.45);
+  tl.to(["#tw1-2","#tw2-2"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 7.50);
+  tl.to(["#tw1-3","#tw2-3"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 8.55);
+  tl.to("#title-devs", {opacity: 0, duration: .45, ease: "power2.in"}, 9.0);
+  tl.from("#title-k", {y: 30, opacity: 0, duration: .6, ease: "power3.out"}, 4.7);
+  tl.from("#title-h", {y: 40, opacity: 0, duration: .8, ease: "power3.out"}, 4.95);
+  tl.from("#title-s", {y: 30, opacity: 0, duration: .7, ease: "power3.out"}, 5.3);
+  tl.to(["#title-k","#title-h","#title-s"], {opacity: 0, duration: .45, ease: "power2.in"}, 9.0);
+  tl.from("#s1-in", {opacity: 0, duration: .45, ease: "power2.out"}, 9.50);
+  tl.from("#s1-shot", {y: 36, duration: .7, ease: "power3.out"}, 9.50);
+  tl.to("#s1-in", {opacity: 0, duration: .4, ease: "power2.in"}, 29.18);
+  tl.fromTo("#s1-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 10.10);
+  tl.to("#s1-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 14.60);
+  tl.fromTo("#s1-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 14.95);
+  tl.from("#s2-in", {opacity: 0, duration: .45, ease: "power2.out"}, 29.60);
+  tl.from("#s2-shot", {y: 36, duration: .7, ease: "power3.out"}, 29.60);
+  tl.to("#s2-in", {opacity: 0, duration: .4, ease: "power2.in"}, 40.28);
+  tl.fromTo("#s2-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 30.20);
+  tl.to("#s2-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 34.70);
+  tl.fromTo("#s2-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 35.05);
+  tl.from("#s3-in", {opacity: 0, duration: .45, ease: "power2.out"}, 40.70);
+  tl.from("#s3-shot", {y: 36, duration: .7, ease: "power3.out"}, 40.70);
+  tl.to("#s3-in", {opacity: 0, duration: .4, ease: "power2.in"}, 59.98);
+  tl.fromTo("#s3-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 41.30);
+  tl.from("#s4-in", {opacity: 0, duration: .45, ease: "power2.out"}, 60.40);
+  tl.from("#s4-shot", {y: 36, duration: .7, ease: "power3.out"}, 60.40);
+  tl.to("#s4-in", {opacity: 0, duration: .4, ease: "power2.in"}, 79.68);
+  tl.fromTo("#s4-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 61.00);
+  tl.from("#s5-in", {opacity: 0, duration: .45, ease: "power2.out"}, 80.10);
+  tl.from("#s5-shot", {y: 36, duration: .7, ease: "power3.out"}, 80.10);
+  tl.to("#s5-in", {opacity: 0, duration: .4, ease: "power2.in"}, 94.58);
+  tl.fromTo("#s5-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 80.70);
+  tl.from("#s6-in", {opacity: 0, duration: .45, ease: "power2.out"}, 95.00);
+  tl.from("#s6-shot", {y: 36, duration: .7, ease: "power3.out"}, 95.00);
+  tl.to("#s6-in", {opacity: 0, duration: .4, ease: "power2.in"}, 112.78);
+  tl.fromTo("#s6-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 95.60);
+  tl.to("#s6-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 100.10);
+  tl.fromTo("#s6-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 100.45);
+  tl.to("#s6-c1", {opacity: 0, duration: .25, ease: "power2.in"}, 106.75);
+  tl.fromTo("#s6-c2", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 107.10);
+  tl.from("#s7-in", {opacity: 0, duration: .45, ease: "power2.out"}, 113.20);
+  tl.from("#s7-shot", {y: 36, duration: .7, ease: "power3.out"}, 113.20);
+  tl.to("#s7-in", {opacity: 0, duration: .4, ease: "power2.in"}, 127.03);
+  tl.fromTo("#s7-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 113.80);
+  tl.to("#s7-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 120.55);
+  tl.fromTo("#s7-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 120.90);
+  tl.from("#s8-in", {opacity: 0, duration: .45, ease: "power2.out"}, 127.45);
+  tl.from("#s8-shot", {y: 36, duration: .7, ease: "power3.out"}, 127.45);
+  tl.to("#s8-in", {opacity: 0, duration: .4, ease: "power2.in"}, 143.08);
+  tl.fromTo("#s8-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 128.05);
+  tl.to("#s8-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 134.80);
+  tl.fromTo("#s8-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 135.15);
+  tl.from("#s9-in", {opacity: 0, duration: .45, ease: "power2.out"}, 143.50);
+  tl.from("#s9-shot", {y: 36, duration: .7, ease: "power3.out"}, 143.50);
+  tl.to("#s9-in", {opacity: 0, duration: .4, ease: "power2.in"}, 169.83);
+  tl.fromTo("#s9-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 144.10);
+  tl.to("#s9-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 152.20);
+  tl.fromTo("#s9-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 152.55);
+  tl.to("#s9-c1", {opacity: 0, duration: .25, ease: "power2.in"}, 159.30);
+  tl.fromTo("#s9-c2", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 159.65);
+  tl.from("#s10-in", {opacity: 0, duration: .45, ease: "power2.out"}, 170.25);
+  tl.from("#s10-shot", {y: 36, duration: .7, ease: "power3.out"}, 170.25);
+  tl.to("#s10-in", {opacity: 0, duration: .4, ease: "power2.in"}, 183.18);
+  tl.fromTo("#s10-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 170.85);
+  tl.to("#s10-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 177.15);
+  tl.fromTo("#s10-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 177.50);
+  tl.from("#s11-in", {opacity: 0, duration: .45, ease: "power2.out"}, 183.60);
+  tl.from("#s11-shot", {y: 36, duration: .7, ease: "power3.out"}, 183.60);
+  tl.to("#s11-in", {opacity: 0, duration: .4, ease: "power2.in"}, 196.08);
+  tl.fromTo("#s11-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 184.20);
+  tl.to("#s11-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 190.50);
+  tl.fromTo("#s11-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 190.85);
+  tl.from("#s12-in", {opacity: 0, duration: .45, ease: "power2.out"}, 196.50);
+  tl.from("#s12-shot", {y: 36, duration: .7, ease: "power3.out"}, 196.50);
+  tl.to("#s12-in", {opacity: 0, duration: .4, ease: "power2.in"}, 210.78);
+  tl.fromTo("#s12-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 197.10);
+  tl.to("#s12-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 203.40);
+  tl.fromTo("#s12-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 203.75);
+  tl.from("#s13-in", {opacity: 0, duration: .45, ease: "power2.out"}, 211.20);
+  tl.from("#s13-shot", {y: 36, duration: .7, ease: "power3.out"}, 211.20);
+  tl.to("#s13-in", {opacity: 0, duration: .4, ease: "power2.in"}, 223.68);
+  tl.fromTo("#s13-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 211.80);
+  tl.to("#s13-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 214.95);
+  tl.fromTo("#s13-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 215.30);
+  tl.from("#s14-in", {opacity: 0, duration: .45, ease: "power2.out"}, 224.10);
+  tl.from("#s14-shot", {y: 36, duration: .7, ease: "power3.out"}, 224.10);
+  tl.to("#s14-in", {opacity: 0, duration: .4, ease: "power2.in"}, 245.48);
+  tl.fromTo("#s14-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 224.70);
+  tl.to("#s14-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 231.90);
+  tl.fromTo("#s14-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 232.25);
+  tl.to("#s14-c1", {opacity: 0, duration: .25, ease: "power2.in"}, 237.20);
+  tl.fromTo("#s14-c2", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 237.55);
+  tl.from("#s15-in", {opacity: 0, duration: .45, ease: "power2.out"}, 245.90);
+  tl.from("#s15-shot", {y: 36, duration: .7, ease: "power3.out"}, 245.90);
+  tl.to("#s15-in", {opacity: 0, duration: .4, ease: "power2.in"}, 266.38);
+  tl.fromTo("#s15-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 246.50);
+  tl.from("#s16-in", {opacity: 0, duration: .45, ease: "power2.out"}, 266.80);
+  tl.from("#s16-shot", {y: 36, duration: .7, ease: "power3.out"}, 266.80);
+  tl.to("#s16-in", {opacity: 0, duration: .4, ease: "power2.in"}, 300.08);
+  tl.fromTo("#s16-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 267.40);
+  tl.from(["#end-k","#end-h","#end-s"], {y: 30, opacity: 0, duration: .7, stagger: .18, ease: "power3.out"}, 300.70);
+  tl.to(["#end-k","#end-h","#end-s"], {opacity: 0, duration: .45, ease: "power2.in"}, 305.00);
+  tl.from(["#outro-h","#outro-a","#outro-b","#outro-s","#outro-l","#outro-logo"], {y: 30, opacity: 0, duration: .7, stagger: .14, ease: "power3.out"}, 305.65);
+  window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

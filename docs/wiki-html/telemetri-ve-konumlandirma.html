@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Telemetri ve Konumlandırma — NarRTOS Wiki</title>
+<link rel="stylesheet" href="assets/css/wiki.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brand">NarRTOS <span>Wiki</span></div>
+    <a class="back" href="index.html">← Wiki ana sayfası</a>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="layout">
+<main>
+
+  <div class="hero">
+    <div class="eyebrow">Cihaz Tarafı</div>
+    <h1>Telemetri ve Konumlandırma</h1>
+    <p class="lede">
+      NarRTOS cihazları periyodik olarak sağlık verisi ve çevre WiFi taraması raporlar.
+      Sunucu tarafı bu taramadan cihazın konumunu çözer — <strong>GPS donanımı olmadan</strong>,
+      yaklaşık <strong>±19 metre</strong> hassasiyetle.
+    </p>
+  </div>
+
+  <div class="note">
+    <div class="note-t">Bu sayfa cihaz tarafını anlatır</div>
+    <p>
+      Sunucuyu kurmak, konum sağlayıcısını seçmek ve mesaj kuyruğunu bağlamak için
+      <a href="sunucu-kurulumu.html">Sunucu Kurulumu</a> sayfasından devam edin.
+    </p>
+  </div>
+
+  <h2 id="nasil-calisir">Nasıl çalışır</h2>
+  <p>
+    Zincirin tamamı beş adımdır. Cihaz yalnızca ilk ikisinden sorumludur: ölçmek ve göndermek.
+    Konum çözümü ve dış sistemlere yayın sunucu tarafında olur.
+  </p>
+
+  <figure>
+    <img src="assets/gif/boru-hatti.gif" alt="Telemetri boru hattı animasyonu" />
+    <figcaption>Bir raporun cihazdan mesaj kuyruğuna kadar izlediği yol</figcaption>
+  </figure>
+
+  <div class="cards">
+    <div class="card">
+      <span class="k">Periyot</span>
+      <h4>60 saniye</h4>
+      <p>WiFi bağlıysa her turda bir rapor denenir.</p>
+    </div>
+    <div class="card">
+      <span class="k">Tarama</span>
+      <h4>5 turda bir</h4>
+      <p>Çevre BSSID listesi tazelenir ve önbelleğe alınır.</p>
+    </div>
+    <div class="card">
+      <span class="k">Hata davranışı</span>
+      <h4>Fire-and-forget</h4>
+      <p>Ağ ya da sunucu yoksa rapor atlanır; cihaz etkilenmez.</p>
+    </div>
+  </div>
+
+  <h2 id="dongu">Tarama ve rapor neden ayrı turlarda?</h2>
+  <p>
+    Aktif WiFi taraması bağlantıyı <strong>yaklaşık 20 saniye</strong> kesintiye uğratır.
+    Aynı turda hem tarama hem POST yapılırsa rapor hep başarısız olur. Bu yüzden tarama
+    turu yalnızca listeyi tazeler, gönderim bir sonraki turlara bırakılır.
+  </p>
+
+  <figure>
+    <img src="assets/gif/tarama-dongusu.gif" alt="Tarama ve rapor döngüsü animasyonu" />
+    <figcaption>Altı turluk döngü ve her turda üretilen seri port çıktısı</figcaption>
+  </figure>
+
+  <pre><code><span class="c-cmt">#define</span> TELEMETRY_PERIOD_MS         (<span class="c-num">60</span> * <span class="c-num">1000</span>)  <span class="c-cmt">// rapor periyodu</span>
+<span class="c-cmt">#define</span> TELEMETRY_SCAN_EVERY_CYCLES <span class="c-num">5</span>            <span class="c-cmt">// 5 turda bir tarama</span>
+
+<span class="c-key">static void</span> telemetry_task(<span class="c-key">void</span>* arg) {
+    <span class="c-key">uint32_t</span> cycle = <span class="c-num">0</span>;
+    <span class="c-key">for</span> (;;) {
+        <span class="c-key">if</span> (wifi_service_is_connected()) {
+            <span class="c-key">if</span> (cycle % TELEMETRY_SCAN_EVERY_CYCLES == <span class="c-num">0</span>)
+                refresh_wifi_scan();   <span class="c-cmt">// BSSID listesini önbelleğe al</span>
+            <span class="c-key">else</span>                       <span class="c-cmt">//   (bu tur rapor YOK — bağlantı toparlansın)</span>
+                send_report();         <span class="c-cmt">// önbellekli listeyle temiz HTTP POST</span>
+        }
+        cycle++;
+        vTaskDelay(pdMS_TO_TICKS(TELEMETRY_PERIOD_MS));
+    }
+}</code></pre>
+
+  <h2 id="bssid">Konum: SSID ile değil, BSSID ile</h2>
+  <p>
+    Cihaz, çevredeki erişim noktalarının <strong>ağ adlarını (SSID) değil, donanım MAC
+    adreslerini (BSSID)</strong> toplar. Sebebi basit: SSID benzersiz değildir, MAC ise tekildir.
+  </p>
+
+  <figure>
+    <img src="assets/img/02-bssid-ile-konum.png" alt="BSSID ile konum çözümü" />
+    <figcaption>Sinyal güçlerine göre ağırlıklandırılmış kesişim — yaklaşık ±19 m</figcaption>
+  </figure>
+
+  <ul>
+    <li>SSID benzersiz değildir; binlerce modem aynı ismi taşır.</li>
+    <li>Geolocation sağlayıcılarının veritabanı <em>"bu MAC'li modem şu koordinattadır"</em> eşlemesini tutar.</li>
+    <li>Tarama için ağlara <strong>bağlanmak gerekmez</strong> — yayınları duymak yeterlidir.
+        Şifre kullanılmaz, SSID gönderilmez.</li>
+  </ul>
+
+  <pre><code><span class="c-key">typedef struct</span> { <span class="c-key">uint8_t</span> bssid[<span class="c-num">6</span>]; <span class="c-key">int8_t</span> rssi; <span class="c-key">uint8_t</span> channel; } wifi_bssid_ap_t;
+
+esp_err_t wifi_service_scan_bssids(wifi_bssid_ap_t* out, <span class="c-key">uint8_t</span> max, <span class="c-key">uint8_t</span>* out_count);</code></pre>
+
+  <details>
+    <summary>Bluetooth açıkken tarama tuzağı</summary>
+    <p>
+      BT+WiFi coexistence altında sürücüye özel tarama süreleri verilirse hata üretir.
+      <code>scan_time</code> alanı <strong>0 bırakılmalıdır</strong> — sürücü coex-güvenli
+      varsayılanı kendi seçer.
+    </p>
+  </details>
+
+  <details>
+    <summary>Ayarlardaki ağ listesi neden ayrı bir API kullanıyor?</summary>
+    <p>
+      Ayarlar ekranındaki ağ listesi asenkron taramayla <strong>SSID</strong> döndürür — kullanıcı
+      okusun diye. Geolocation ise senkron API ile <strong>BSSID</strong> ister. İki farklı amaç,
+      iki farklı çağrı.
+    </p>
+  </details>
+
+  <h2 id="rapor">Rapor anatomisi</h2>
+  <p>
+    Cihaz ham veriyi gönderir; sunucu konum çözümünü aynı kayda gömer.
+    Aşağıdaki iki sekme, aynı raporun iki aşamasıdır.
+  </p>
+
+  <div class="tabs">
+    <div class="tabbar">
+      <button type="button">Cihaz → Backend</button>
+      <button type="button">Sunucunun gömdüğü çözüm</button>
+    </div>
+    <div class="tabpanel">
+<pre><code>{
+  <span class="c-key">"device_id"</span>:        <span class="c-str">"E4B063A764CC"</span>,
+  <span class="c-key">"wifi_rssi"</span>:        <span class="c-num">-55</span>,
+  <span class="c-key">"wifi"</span>:             [ {<span class="c-key">"mac"</span>: <span class="c-str">"A4:B1:C2:D3:E4:F5"</span>, <span class="c-key">"rssi"</span>: <span class="c-num">-53</span>}, ... ],
+  <span class="c-key">"uptime_s"</span>:         <span class="c-num">887</span>,
+  <span class="c-key">"firmware_version"</span>: <span class="c-str">"1.4.81"</span>,
+  <span class="c-key">"heap_free"</span>:        <span class="c-num">970288</span>
+}</code></pre>
+    </div>
+    <div class="tabpanel">
+<pre><code><span class="c-key">"geo"</span>: {
+  <span class="c-key">"lat"</span>: <span class="c-num">41.0289898</span>, <span class="c-key">"lng"</span>: <span class="c-num">29.2229154</span>,
+  <span class="c-key">"accuracy_m"</span>: <span class="c-num">18.9</span>,
+  <span class="c-key">"fallback"</span>: <span class="c-key">null</span>,              <span class="c-cmt">// null = GERÇEK WiFi çözümü; "ipf" = IP tahmini</span>
+  <span class="c-key">"provider"</span>: <span class="c-str">"www.googleapis.com"</span>
+}</code></pre>
+    </div>
+  </div>
+
+  <h2 id="veri-durustlugu">Veri dürüstlüğü kuralı</h2>
+  <p>
+    Sağlayıcı erişim noktalarını tanımadığında <strong>IP tabanlı kaba tahmine</strong> düşebilir.
+    Sapması ±25 km'ye çıkar — testlerde İstanbul'daki bir cihazı farklı bir şehirde gösterdi.
+    Bu yüzden fallback'li sonuç konum sayılmaz.
+  </p>
+
+  <div class="demo" id="integrity-demo">
+    <div class="demo-head">
+      <div class="demo-title">Sonucu değiştirin, tüketicilere ne gittiğini görün</div>
+      <div class="switch">
+        <button type="button" data-state="real" aria-pressed="true">fallback: null</button>
+        <button type="button" data-state="ipf" aria-pressed="false">fallback: "ipf"</button>
+      </div>
+    </div>
+
+    <div class="codewrap demo-json"><pre><code></code></pre></div>
+
+    <div class="sinks">
+      <div class="sink" data-sink="coords">
+        <span class="sink-v">✓</span>
+        <div class="sink-n">Koordinat alanları</div>
+        <div class="sink-s">latitude / longitude</div>
+      </div>
+      <div class="sink" data-sink="queue">
+        <span class="sink-v">✓</span>
+        <div class="sink-n">location-data-queue</div>
+        <div class="sink-s">konum tüketen sistemler</div>
+      </div>
+      <div class="sink" data-sink="panel">
+        <span class="sink-v">✓</span>
+        <div class="sink-n">Admin paneli</div>
+        <div class="sink-s">konum olarak, OSM bağlantısıyla</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note stop">
+    <div class="note-t">Kural koda gömülüdür</div>
+    <p>
+      Fallback'li sonuç koordinat alanlarına <strong>yazılmaz</strong> ve konum kuyruğuna
+      <strong>asla</strong> basılmaz. Kaba tahminin konum tüketen sistemlere gitmesi
+      mimari olarak imkânsızdır — panelde bir seçenek değildir.
+    </p>
+  </div>
+
+  <h2 id="maliyet">Maliyet koruması</h2>
+  <p>
+    Önlem alınmasaydı her rapor bir API çağrısı olurdu: cihaz başına ayda yaklaşık
+    <strong>43.000 istek</strong>. Önbellek, aynı erişim noktası kümesi için sonucu yeniden kullanır.
+  </p>
+
+  <figure>
+    <img src="assets/img/05-maliyet-korumasi.png" alt="Konum önbelleği maliyet karşılaştırması" />
+    <figcaption>Sıralı MAC seti anahtarı, 10 dakika TTL — sabit cihazda ayda birkaç yüz çağrı</figcaption>
+  </figure>
+
+  <div class="note">
+    <div class="note-t">Telemetri konuma bağımlı değildir</div>
+    <p>
+      Konum API'si hata verse ya da zaman aşımına uğrasa bile rapor konumsuz devam eder.
+      Telemetri akışı hiçbir koşulda konum servisine bağlı değildir.
+    </p>
+  </div>
+
+  <h2 id="panel">Panelde nasıl görünür</h2>
+  <p>
+    Raporlar admin panelinin Telemetri sekmesinde listelenir. Konum sütunu, veri dürüstlüğü
+    kuralını doğrudan gösterir: gerçek çözümler tıklanabilir koordinat, IP tahminleri gri metindir.
+  </p>
+
+  <figure>
+    <img src="assets/img/01-admin-telemetri.png" alt="Admin paneli telemetri sekmesi" />
+    <figcaption>
+      Mavi bağlantılar gerçek WiFi çözümü; gri satır IP tahmini (±25 km).
+      İletim rozetleri: <span class="badge b-ok">sent</span>
+      <span class="badge b-gray">dry-run</span>
+      <span class="badge b-no">dropped</span>
+    </figcaption>
+  </figure>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Durum</th><th>Anlamı</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge b-gray">dry_run</span></td>
+            <td>İletim anahtarı kapalı — mesaj hazırlanır ve kaydedilir ama gönderilmez (güvenli prova modu)</td></tr>
+        <tr><td><span class="badge b-ok">sent</span></td>
+            <td>Mesaj kuyruğa iletildi</td></tr>
+        <tr><td><span class="badge b-no">dropped</span></td>
+            <td>İletim denendi, başarısız — kalıcı kayıt yine tutulur</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="cihazda-ekran-yok">Cihazda ekranı yoktur</h2>
+  <p>
+    Telemetri ve konumlandırma <strong>başsız (headless) arka plan servisleridir</strong>.
+    Saat üzerinde bunları gösteren bir uygulama ya da ayar sayfası yoktur:
+    <code>telemetry_service.h</code> yalnızca <code>telemetry_service_init()</code> açar,
+    ve <code>src/apps/</code> altındaki hiçbir dosya telemetriye referans vermez.
+  </p>
+  <p>Cihaz tarafındaki tek görünür çıktı seri port logudur:</p>
+
+  <pre><code>I (12034) telemetry: init OK (device_id=E4B063A764CC)
+I (12040) telemetry: telemetry loop started (period=60 s, url=...)
+I (72118) telemetry: wifi scan refreshed: 7 AP
+I (132204) telemetry: report sent (HTTP 200, rssi=-53)</code></pre>
+
+  <div class="note warn">
+    <div class="note-t">Hava Durumu'ndaki şehir bu değildir</div>
+    <p>
+      Saatte konum gösteren tek yer Hava Durumu uygulamasının şehir adıdır — ama o
+      <code>weather_service</code>'in <strong>IP geolocation</strong> (ip-api.com) sonucudur,
+      NVS'e önbelleklenir. Buradaki WiFi BSSID konumlandırmasıyla ilgisi yoktur ve
+      hassasiyeti kilometrelerdir.
+    </p>
+  </div>
+
+  <a class="next" href="sunucu-kurulumu.html">
+    <div>
+      <div class="next-k">Sonraki adım</div>
+      <div class="next-t">Sunucu Kurulumu</div>
+      <div class="next-s">Backend'i ayağa kaldırın, konum sağlayıcısını seçin, kuyruğu bağlayın</div>
+    </div>
+    <div class="next-a">→</div>
+  </a>
+
+  <footer>
+    <div>NarRTOS — Corezzle Electronics</div>
+    <div class="sp">Kaynak: <code>src/services/telemetry_service.cpp</code></div>
+  </footer>
+
+</main>
+
+<aside class="toc">
+  <div class="toc-h">Bu sayfada</div>
+  <nav class="toc-list"></nav>
+</aside>
+</div>
+</div>
+
+<script src="assets/js/wiki.js"></script>
+</body>
+</html>

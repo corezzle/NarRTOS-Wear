@@ -1,0 +1,87 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "Hızlı Başlangıç",
+  "title": "Hızlı Başlangıç",
+  "subtitle": "PlatformIO kuruluysa ve kart bağlıysa NarRTOS'u karta yüklemek için dört komut yeter.",
+  "end_title": "Dört komutla kartınızda NarRTOS çalışıyor.",
+  "end_subtitle": "Adım adım anlatım için Başlarken, kod derlemeden yükleme için Corezzle Imager ile Yükleme dökümanına bakın. corezzle.com",
+  "scenes": [
+    {
+      "step": "0",
+      "title": "Kod derlemeden yüklemek isteyenler",
+      "items": [
+        "Corezzle Imager masaüstü uygulaması, NarRTOS'un hazır sürümünü karta sizin yerinize yazar.",
+        "Kartı takar, listeden kartınızı seçer ve düğmeye basarsınız. Kod derlenmez, hiçbir araç kurulmaz.",
+        "Adım adım anlatımı Corezzle Imager ile Yükleme dökümanında ve videosunda bulabilirsiniz.",
+        "Bu videodaki komutlar, kodu kendisi derleyip değiştirmek isteyen geliştiriciler içindir."
+      ],
+      "captions": [
+        "Amacınız yalnızca cihazı kullanmaksa Corezzle Imager yeter. Videonun geri kalanı geliştiriciler için."
+      ]
+    },
+    {
+      "step": "0",
+      "title": "Kuruluma başlamadan önce",
+      "items": [
+        "Bilgisayarınızda VS Code yoksa önce onu kurun. Bunun için VS Code Kurulumu dökümanını izleyin.",
+        "VS Code kurulu ama projeyi içinde nasıl indirip açacağınızı bilmiyorsanız NarRTOS için VS Code Kurulumu dökümanına bakın.",
+        "İki döküman da ilk komutu nereye yapıştıracağınızı adım adım gösterir."
+      ],
+      "captions": [
+        "Aşağıdaki dört komut bir terminale yazılır. Terminali açmayı bilmiyorsanız önce bu dökümanlardan geçin."
+      ]
+    },
+    {
+      "step": "1",
+      "title": "Dört komut",
+      "image": "assets/terminal-hizli-baslangic.mp4",
+      "captions": [
+        "İlk komut olan git clone, projeyi GitHub'dan bilgisayarınıza indirir.",
+        "İkinci komut olan cd NarRTOS-Wear, indirilen proje klasörünün içine girer.",
+        "Üçüncü komut olan pio run … -t upload, kodu derler ve karta yükler.",
+        "Son komut olan pio device monitor, cihazın seri çıktısını ekranda gösterir."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "İlk kez mi kuruyorsunuz?",
+      "items": [
+        "Bu dört komut, Python, PlatformIO ve git programlarının zaten kurulu olduğunu varsayar.",
+        "Bunları hiç kurmadıysanız Başlarken dökümanından ilerleyin.",
+        "Orada Python ve PlatformIO kurulumundan kabloyu takmaya kadar her adım tek tek anlatılıyor.",
+        "Yuvarlak ekranlı kart için komuttaki ortam adı esp32s3_lcd128 olmalıdır."
+      ],
+      "captions": [
+        "Ekranda pio: command not found görürseniz PlatformIO kurulu değildir ya da terminal onu bulamıyordur. Çözümü Başlarken dökümanının üçüncü adımında."
+      ]
+    }
+  ],
+  "youtube": {
+    "series": "Dökümantasyon Serisi",
+    "series_no": 2,
+    "next": "VS Code Kurulumu",
+    "playlist": "NarRTOS Wear Dökümantasyon",
+    "site": "corezzle.com",
+    "github": "github.com/corezzle/NarRTOS-Wear",
+    "yt_title": "NarRTOS Wear #2 · Hızlı Başlangıç: Dört Komutla Karta Yükleme",
+    "description": "PlatformIO kuruluysa ve kart bağlıysa NarRTOS Wear'ı karta yüklemek dört komut sürer: projeyi indir, klasöre gir, derleyip yükle, cihazın çıktısını dinle. Bu bölümde dört komutun terminaldeki akışını ve ilk kez kuruyorsanız hangi dökümanlardan başlamanız gerektiğini gösteriyoruz. Kod derlemeden hazır sürümü yüklemek isteyenler için Corezzle Imager yolunu da hatırlatıyoruz.",
+    "doc_url": "https://www.corezzle.com/document-content/narrtos-wear-6",
+    "tags": [
+      "NarRTOS",
+      "NarRTOS Wear",
+      "ESP32",
+      "ESP32-S3",
+      "akıllı saat",
+      "smartwatch",
+      "FreeRTOS",
+      "LVGL",
+      "PlatformIO",
+      "gömülü sistemler",
+      "açık kaynak",
+      "Corezzle"
+    ],
+    "thumb_title": "Hızlı Başlangıç",
+    "thumb_sub": "Dört komutla karta NarRTOS",
+    "thumb_term": "$ git clone …\n$ cd NarRTOS-Wear\n$ pio run -t upload\n<b>✓ Hard resetting…</b>"
+  }
+}

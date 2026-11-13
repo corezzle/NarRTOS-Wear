@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VS Code Kurulumu · NarRTOS Wiki</title>
+<link rel="stylesheet" href="assets/css/wiki.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brand">NarRTOS <span>Wiki</span></div>
+    <a class="back" href="index.html">← Wiki ana sayfası</a>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="layout">
+<main>
+
+  <div class="hero">
+    <div class="eyebrow">Araçlar</div>
+    <h1>VS Code Kurulumu</h1>
+    <p class="lede">
+      Visual Studio Code (kısaca VS Code), Microsoft'un ücretsiz ve açık kaynak kod
+      editörüdür. Windows, macOS ve Linux'ta çalışır; dosyalarınızı, terminali ve eklentileri
+      tek pencerede toplar. Bu sayfa sıfırdan kurulumu ve ilk açılışta bilmeniz gereken
+      birkaç şeyi anlatır.
+    </p>
+  </div>
+
+  <p>
+    Kurulum 10 dakika sürer ve hiçbir ön bilgi gerektirmez. Sonunda VS Code açık, bir klasör
+    içinde çalışır durumda ve terminali kullanmaya hazır olursunuz.
+  </p>
+
+  <h2 id="nedir">VS Code nedir, ne değildir</h2>
+  <p>
+    VS Code bir metin editörüdür: kod dosyalarını açar, renklendirir, düzenlemenize yardım
+    eder. Programları kendisi derlemez ya da çalıştırmaz; o işi eklentiler ve terminalde
+    çalıştırdığınız araçlar yapar. Bu yüzden hafiftir ve her dil için kullanılabilir.
+  </p>
+  <p>
+    <strong>Visual Studio</strong> ile karıştırılmasın: o, Microsoft'un yalnız Windows'ta
+    çalışan, çok daha büyük ve ayrı bir programıdır. Bu sayfa VS Code'u anlatır.
+  </p>
+
+  <h2 id="kurulum">Kurulum</h2>
+  <p>
+    <a href="https://code.visualstudio.com">code.visualstudio.com</a> adresine gidin. Büyük
+    <strong>Download</strong> düğmesi işletim sisteminizi kendisi tanır; ardından kendi
+    sisteminizin bölümünü izleyin.
+  </p>
+  <figure><img src="assets/img/vscode-indirme.png" alt="code.visualstudio.com indirme sayfası" />
+    <figcaption>İndirme sayfası. Büyük düğme sisteminize göre adlanır: burada macOS, sizde Windows veya Linux yazabilir.</figcaption></figure>
+
+  <h3>Windows</h3>
+  <ul>
+    <li>İnen <code>.exe</code> dosyasını çalıştırın; lisansı kabul edin, kurulum yerini olduğu gibi bırakın.</li>
+    <li><strong>Select Additional Tasks</strong> ekranında şunları işaretleyin: <em>Add "Open with Code" action to Windows Explorer file context menu</em>, aynı satırın <em>directory</em> olanı, <em>Register Code as an editor for supported file types</em> ve <em>Add to PATH</em> (zaten işaretlidir). Böylece herhangi bir klasöre sağ tıklayıp VS Code ile açabilirsiniz.</li>
+    <li><strong>Install</strong>, ardından <strong>Finish</strong>. VS Code açılır.</li>
+  </ul>
+
+  <h3>macOS</h3>
+  <ul>
+    <li>İnen <code>.zip</code> dosyasına çift tıklayın; <strong>Visual Studio Code</strong> uygulaması çıkar.</li>
+    <li>Bu simgeyi <strong>Uygulamalar</strong> (Applications) klasörüne sürükleyin. İndirilenler klasöründe bırakırsanız güncellemeler sorun çıkarır.</li>
+    <li>Launchpad'den açın. "İnternetten indirilen bir uygulama" uyarısına <em>Aç</em> deyin.</li>
+    <li>Sık kullanacaksanız Dock'taki simgeye sağ tıklayıp <em>Options → Keep in Dock</em> seçin.</li>
+    <li>Terminalden <code>code</code> komutuyla açabilmek için: VS Code içinde ⇧⌘P tuşlarına basın, <code>Shell Command: Install 'code' command in PATH</code> yazıp Enter. Artık herhangi bir terminalde <code>code .</code> yazmak bulunduğunuz klasörü VS Code'da açar.</li>
+  </ul>
+
+  <h3>Linux</h3>
+  <ul>
+    <li><strong>Ubuntu / Debian:</strong> <code>.deb</code> dosyasını indirip terminalde <code>sudo apt install ./code_*.deb</code> çalıştırın (ya da dosyaya çift tıklayıp <em>Yükle</em> deyin). Bu yöntem Microsoft'un paket deposunu da ekler; sonraki güncellemeler <code>apt</code> ile gelir.</li>
+    <li><strong>Fedora / RHEL:</strong> <code>.rpm</code> dosyasını indirip <code>sudo dnf install ./code-*.rpm</code>.</li>
+    <li><strong>Snap kullanan dağıtımlar:</strong> <code>sudo snap install code --classic</code></li>
+  </ul>
+
+  <h2 id="ilk-acilis">İlk açılış</h2>
+  <p>
+    Karşınıza <strong>Welcome</strong> sekmesi gelir. Buradan koyu ya da açık tema
+    seçebilirsiniz; sonradan değiştirmek için <em>File → Preferences → Theme → Color Theme</em>.
+  </p>
+  <figure><img src="assets/img/vscode-welcome.png" alt="VS Code Welcome sekmesi" />
+    <figcaption>İlk açılış: solda Explorer, ortada Welcome sekmesi.</figcaption></figure>
+  <p>
+    Arayüz İngilizcedir. Dokümanların ve eğitimlerin büyük çoğunluğu İngilizce menü adlarını
+    kullandığı için başlangıçta İngilizce bırakmak takip etmeyi kolaylaştırır. Yine de Türkçe
+    istiyorsanız birkaç adımda değiştirebilirsiniz:
+  </p>
+  <ol>
+    <li>Pencerenin en solundaki dikey şeritte, üst üste dört kare görünen simgeye tıklayın; bu <strong>Extensions</strong> (Eklentiler) görünümüdür. Klavyeden Ctrl + Shift + X (Mac'te ⇧⌘X) de açar.</li>
+    <li>Üstte beliren arama kutusuna <code>Turkish Language Pack</code> yazın.</li>
+    <li>Listede <strong>Turkish Language Pack for Visual Studio Code</strong> (yayıncı: Microsoft) çıkar. Yanındaki mavi <strong>Install</strong> düğmesine basın; birkaç saniye sürer.</li>
+    <li>Sağ altta "Would you like to change Visual Studio Code's display language to Turkish and restart?" sorusu çıkar. <strong>Change Language and Restart</strong> düğmesine basın. VS Code kapanıp Türkçe açılır.</li>
+  </ol>
+  <figure><img src="assets/img/vscode-extensions-tr.png" alt="Turkish Language Pack eklenti sayfası" />
+    <figcaption>Eklenti sayfası: yayıncı Microsoft, mavi Install düğmesi.</figcaption></figure>
+  <figure><img src="assets/img/vscode-dil-degistir.png" alt="Change Language and Restart balonu" />
+    <figcaption>Kurulumdan hemen sonra sağ altta çıkan soru. Düğmeye basınca VS Code Türkçe açılır.</figcaption></figure>
+  <p>
+    Soru çıkmadıysa: Ctrl + Shift + P (Mac'te ⇧⌘P) tuşlarına basın, <code>Configure Display Language</code>
+    yazıp Enter'a basın, listeden <strong>Türkçe</strong> seçin; VS Code yeniden başlatmayı ister.
+  </p>
+  <p>
+    Türkçeye geçtiyseniz bu dokümandaki İngilizce menü adlarının Türkçe karşılığını kullanırsınız;
+    örneğin <strong>Terminal → New Terminal</strong>, <strong>Terminal → Yeni Terminal</strong> olur.
+    Geri dönmek için aynı komutu çalıştırıp <strong>English</strong> seçin.
+  </p>
+  <p>
+    Güncellemeler kendiliğinden iner. Sağ altta "Restart to update" görünce yeniden başlatın;
+    birkaç saniye sürer.
+  </p>
+
+  <h2 id="pencere">Pencereyi tanıyın</h2>
+  <figure><img src="assets/img/vscode-pencere.png" alt="VS Code penceresinin bölgeleri" />
+    <figcaption>Pencerenin altı bölgesi. Numaralar aşağıdaki tabloyla aynı sırada.</figcaption></figure>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Bölge</th><th>Nerede</th><th>Ne işe yarar</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Activity Bar</strong></td><td>En soldaki dikey şerit</td><td>Görünümler arasında geçiş: Explorer (dosyalar), Search (ara), Source Control (git), Run and Debug, Extensions (eklentiler)</td></tr>
+      <tr><td><strong>Sidebar</strong></td><td>Şeridin sağındaki panel</td><td>Seçili görünümün içeriği; Explorer'da açık klasörün dosya ağacı</td></tr>
+      <tr><td><strong>Editor</strong></td><td>Ortadaki geniş alan</td><td>Dosyalar sekmeler halinde açılır; yan yana bölünebilir</td></tr>
+      <tr><td><strong>Panel</strong></td><td>Alt kısım</td><td>Terminal, Problems (hatalar), Output (çıktılar)</td></tr>
+      <tr><td><strong>Status Bar</strong></td><td>En alt ince şerit</td><td>Satır/sütun, dosya türü, git dalı, hata sayısı</td></tr>
+      <tr><td><strong>Command Palette</strong></td><td>Ctrl + Shift + P (Mac'te ⇧⌘P)</td><td>Her komuta adını yazarak ulaşmanın yolu; menülerde aramaktan hızlıdır</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="klasor">Bir klasör açın</h2>
+  <p>
+    VS Code dosyalarla değil klasörlerle çalışır. <strong>File → Open Folder</strong> ile
+    proje klasörünüzü seçin. VS Code, "Do you trust the authors of the files in this folder?"
+    diye sorabilir; kendi projeleriniz ve bildiğiniz kaynaklardan indirdikleriniz için
+    <strong>Yes, I trust the authors</strong> deyin. Sol taraftaki Explorer'da klasörün içeriği
+    listelenir; bir dosyaya tıklamak onu ortada açar.
+  </p>
+  <figure><img src="assets/img/vscode-open-folder.png" alt="File menüsünde Open Folder" />
+    <figcaption>macOS: <strong>File → Open Folder…</strong></figcaption></figure>
+  <figure><img src="assets/img/vscode-win-open-folder.png" alt="Windows ve Linux'ta File menüsü" />
+    <figcaption>Windows ve Linux'ta: <strong>File → Open Folder…</strong>, menü pencerenin içindeki üst şeritte (çizim).</figcaption></figure>
+  <p>
+    Daha önce açtığınız klasörlere <em>File → Open Recent</em> ile dönersiniz. Tek bir dosya
+    açmak için <em>File → Open File</em>.
+  </p>
+
+  <h2 id="terminal">Terminali kullanın</h2>
+  <p>
+    <strong>Terminal → New Terminal</strong> alt panelde bir terminal açar. Kısayolu
+    Ctrl + ` (Mac'te de Ctrl + `) tuşudur; Türkçe klavyede ` işareti yoksa menü yolunu kullanın.
+    Terminal, o an açık olan klasörün içinde başlar; komutları ayrıca bir yere gitmeden
+    yazarsınız.
+  </p>
+  <figure><img src="assets/img/vscode-new-terminal.png" alt="Terminal menüsünde New Terminal" />
+    <figcaption>macOS: ekranın en üstündeki menüden <strong>Terminal → New Terminal</strong>.</figcaption></figure>
+  <figure><img src="assets/img/vscode-win-new-terminal.png" alt="Windows ve Linux'ta Terminal menüsü" />
+    <figcaption>Windows ve Linux'ta menü şeridi pencerenin içinde, en üsttedir: <strong>Terminal → New Terminal</strong> (çizim).</figcaption></figure>
+  <p>
+    Windows'ta PowerShell, macOS'ta zsh, Linux'ta bash çalışır. Sağ üstteki <strong>+</strong>
+    ikinci bir terminal açar, çöp kutusu kapatır. Varsayılan kabuğu değiştirmek için
+    <strong>+</strong> düğmesinin yanındaki ▾ okuna basıp <em>Select Default Profile</em> seçin.
+  </p>
+
+  <h2 id="eklentiler">Eklentiler</h2>
+  <p>
+    Dil desteği, tema, araç entegrasyonu gibi her şey eklentiyle gelir. Activity Bar'daki
+    <strong>Extensions</strong> simgesine (Ctrl + Shift + X) tıklayın, arama kutusuna adı yazın,
+    <strong>Install</strong> deyin. Kullandığınız programlama dilinin resmi eklentisi
+    (Python, C/C++, Go...) başlangıç için yeterlidir; diğerlerini ihtiyaç doğduğunda kurun.
+  </p>
+  <p>
+    Bir proje klasörünün içinde <code>.vscode/extensions.json</code> dosyası varsa VS Code
+    açılışta sağ altta "Do you want to install the recommended … extension for this repository?"
+    diye sorar. Projenin kendi dokümanı ne diyorsa onu yapın; emin değilseniz çarpıyla kapatın,
+    sonradan kurmak her zaman mümkündür.
+  </p>
+  <figure><img src="assets/img/vscode-eklenti-onerisi.png" alt="Eklenti öneri balonu" />
+    <figcaption>Öneri balonu. Install kurar, Show Recommendations listeyi açar, çarpı kapatır.</figcaption></figure>
+
+  <h2 id="git">Git ile birlikte</h2>
+  <p>
+    Source Control görünümü ve çoğu proje, bilgisayarınızda <strong>git</strong> kurulu olmasını
+    bekler. VS Code "Git not found" uyarısı veriyorsa:
+  </p>
+  <ul>
+    <li><strong>Windows:</strong> <a href="https://git-scm.com/download/win">git-scm.com/download/win</a> adresinden kurulum dosyasını indirin, bütün ekranlarda <em>Next</em> deyin.</li>
+    <li><strong>macOS:</strong> terminale <code>xcode-select --install</code> yazın; Apple'ın komut satırı araçları git'i içerir.</li>
+    <li><strong>Linux:</strong> <code>sudo apt install git</code></li>
+  </ul>
+  <p>Kurulumdan sonra VS Code'u tamamen kapatıp yeniden açın; yoksa yeni programı görmez.</p>
+
+  <h2 id="sorunlar">Sık karşılaşılan sorunlar</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Gördüğünüz</th><th>Çözümü</th></tr></thead>
+    <tbody>
+      <tr><td>Mac: "cannot be opened because Apple cannot check it for malicious software"</td><td>Uygulamaya sağ tıklayıp <em>Open</em> seçin (bir kez yeter). Olmazsa System Settings → Privacy &amp; Security → <em>Open Anyway</em></td></tr>
+      <tr><td>Windows: terminalde <code>code</code> komutu tanınmıyor</td><td>Kurulumda <em>Add to PATH</em> işaretlenmemiş ya da terminal eskiden açık. Terminali yeniden açın; hâlâ yoksa kurulum dosyasını tekrar çalıştırıp seçeneği işaretleyin</td></tr>
+      <tr><td>Mac: <code>code</code> komutu yok</td><td>VS Code içinde ⇧⌘P → <em>Shell Command: Install 'code' command in PATH</em></td></tr>
+      <tr><td>Terminal açılıyor ama beklediğim kabuk değil</td><td>Terminal panelindeki ▾ ok → <em>Select Default Profile</em></td></tr>
+      <tr><td>"Git not found" uyarısı</td><td>Yukarıdaki gibi git'i kurun, VS Code'u yeniden başlatın</td></tr>
+      <tr><td>Yazılar çok küçük ya da çok büyük</td><td>View → Appearance → Zoom In / Zoom Out (Ctrl + = ve Ctrl + -)</td></tr>
+      <tr><td>Sağ altta sürekli bildirim çıkıyor</td><td>Status Bar'ın en sağındaki çan simgesi → <em>Do Not Disturb Mode</em></td></tr>
+      <tr><td>Yanlışlıkla bir paneli kapattım, bulamıyorum</td><td>View menüsünden ilgili görünümü seçin ya da Command Palette'e adını yazın</td></tr>
+    </tbody>
+  </table></div>
+
+  <footer>
+    <div>Visual Studio Code · <code>code.visualstudio.com</code></div>
+    <div class="sp">Resmi belgeler: <code>code.visualstudio.com/docs</code></div>
+  </footer>
+
+</main>
+
+<aside class="toc">
+  <div class="toc-h">Bu sayfada</div>
+  <nav class="toc-list"></nav>
+</aside>
+</div>
+</div>
+
+<script src="assets/js/wiki.js"></script>
+</body>
+</html>

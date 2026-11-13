@@ -1,0 +1,105 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "Uygulama Geliştirme",
+  "title": "Uygulama Geliştirme",
+  "subtitle": "Dört adımda yeni bir uygulama, uyulması gereken kurallar ve iki çözünürlükte çalışan ölçü sabitleri kalıbı.",
+  "end_title": "Yeni bir çözünürlük, her uygulamada yalnızca bir sabit bloğu dalı demektir.",
+  "end_subtitle": "Arayüz mantığına dokunulmaz; varsayılan derlemenin çıktısı değişmez. corezzle.com",
+  "scenes": [
+    {
+      "step": "0",
+      "title": "Bir uygulama nasıl yaşar",
+      "image": "assets/uygulama-acilis.mp4",
+      "captions": [
+        "Ekranın sahibi her an yalnızca bir uygulamadır. Geçişleri app_manager animasyonla yapar.",
+        "Yeni bir uygulama eklemek dört adımdır: dosyaları oluşturmak, kimlik vermek, kaydetmek ve isterseniz ana menüye bir kutucuk eklemek."
+      ]
+    },
+    {
+      "step": "1",
+      "title": "Adım 1: Uygulama dosyaları (başlık)",
+      "code": "// src/apps/myapp/myapp_app.h\n#pragma once\n#include \"../../core/app_manager.h\"\nconst app_interface_t* myapp_get_interface(void);",
+      "captions": [
+        "Her uygulama iki dosyadan oluşur ve dışarıya yalnızca bir fonksiyon verir: kendi get_interface fonksiyonu.",
+        "Yerleşik uygulamaların tamamı bu kalıpla yazılmıştır."
+      ]
+    },
+    {
+      "step": "1",
+      "title": "Adım 1: Uygulama dosyaları (kaynak)",
+      "code": "// src/apps/myapp/myapp_app.cpp\n#include \"myapp_app.h\"\n\nstatic void my_on_start(lv_obj_t* screen) {\n  lv_obj_t* lbl = lv_label_create(screen);\n  lv_label_set_text(lbl, \"Merhaba NarRTOS\");\n  lv_obj_center(lbl);\n  app_manager_enable_gestures(screen); // swipe'lar ekrana ulaşsın\n}\nstatic void my_on_stop(void) { /* on_start'ta ayrılanları bırak */ }\nstatic bool my_on_event(const os_event_t* e) {\n  // örn. EVENT_TIME_UPDATED geldiğinde etiketi tazele\n  return false;                        // true = olayı tükettim\n}",
+      "captions": [
+        "on_start içinde arayüz yalnızca verilen ekrana kurulur. app_manager_enable_gestures çağrısı, kaydırma jestlerinin bu ekrana ulaşmasını sağlar.",
+        "on_stop, on_start içinde ayrılan her kaynağı serbest bırakır. on_event ise ilgilenmediği olaylarda false döner."
+      ]
+    },
+    {
+      "step": "1",
+      "title": "Adım 1: Arayüz tablosu",
+      "code": "static const app_interface_t my_app = {\n  .on_start  = my_on_start,\n  .on_resume = NULL, .on_pause = NULL,\n  .on_stop   = my_on_stop,\n  .on_event  = my_on_event,\n  .name      = \"myapp\",\n};\nconst app_interface_t* myapp_get_interface(void) { return &my_app; }",
+      "captions": [
+        "Kullanılmayan yaşam döngüsü fonksiyonları NULL bırakılabilir. name alanı yalnızca log kayıtlarında kullanılır."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Adım 2 ve 3: Kimlik ve kayıt",
+      "code": "// core/os_config.h\ntypedef enum {\n  APP_ID_WATCHFACE = 0,\n  ...\n  APP_ID_STORE     = 11,\n  APP_ID_MYAPP     = 12,   // <-- YENİ: her zaman APP_ID_COUNT'tan önce\n  APP_ID_COUNT\n} app_id_t;\n\n// core/app_manager.cpp\n#include \"../apps/myapp/myapp_app.h\"\nvoid app_manager_init(void) {\n  ...\n  app_manager_register(APP_ID_MYAPP, myapp_get_interface()); // <-- YENİ\n}",
+      "captions": [
+        "Yeni APP_ID sabiti her zaman APP_ID_COUNT satırının önüne eklenir.",
+        "Bütün uygulamalar tek bir yerde, app_manager_init fonksiyonunda kaydedilir. main.cpp dosyasına dokunulmaz."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Adım 4: Derle ve çalıştır",
+      "code": "pio run -e esp32s3_wearable -t clean\npio run -e esp32s3_wearable -t upload   # cihazda: Launcher'da yeni kutucuk\n\n// Launcher'a eklemeden de açılabilir (buton, alarm, başka uygulama, komut):\napp_manager_launch(APP_ID_MYAPP);",
+      "captions": [
+        "Kayıt, uygulamayı çalıştırılabilir yapar. Menüde görünmesi için ana menü ızgarasına bir kutucuk eklenir.",
+        "Kodda her değişiklikten sonra önce clean ile temizleyin, ardından derleyip yükleyin."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Uyulması gereken kurallar",
+      "items": [
+        "Arayüz yalnızca on_start fonksiyonuna verilen ekrana kurulur. Ekran nesnesi saklanıp başka ekranlara dokunulmaz.",
+        "Başka bir görevden yapılan arayüz güncellemeleri ui_service_lock ve unlock çağrıları arasına alınır.",
+        "on_stop, on_start içinde ayrılan her kaynağı (zamanlayıcı, tampon, servis aboneliği) bırakır; çünkü uygulamalar tekrar tekrar açılıp kapanır.",
+        "Servisleri sürekli yoklamayın; olayları dinleyin."
+      ],
+      "captions": [
+        "Bu dört kural, çok uygulamalı bir sistemde kaynak sızıntısını ve çakışmaları önler."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Gerçek örnek: WatchFace on_event",
+      "code": "static bool on_event(const os_event_t* event)\n{\n  if (!event) return false;\n  if (event->type == EVENT_WEATHER_UPDATE) {\n    // Hava durumu görevi yeni veri yayınladı -> ikonu yenile.\n    // UI task bağlamındayız; doğrudan render güvenli.\n    if (s_activity_icon_cloud)\n      weather_icon_render(s_activity_icon_cloud,\n                          (weather_condition_t)event->data);\n    return true;   // olay tüketildi\n  }\n  return false;    // ilgilenmiyorum -> diğer dinleyicilere geçsin\n}",
+      "captions": [
+        "Hava durumu görevi yeni veri yayınlar. Kadran bu olayı yakalar, ikonu yeniler ve true dönerek olayı tükettiğini bildirir."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Çözünürlük uyumu: ölçü sabitleri",
+      "code": "// launcher_app.cpp — ölçü sabitleri (tek blok, uygulamanın başında)\n#ifdef BOARD_VARIANT_LCD128          // 240×240 yuvarlak LCD\n  #define L_SCR_W    240\n  #define L_CELL_W    88               // grid hücresi\n  #define L_CELL_H    92\n  #define L_ICON      64               // uygulama ikonu\n  #define L_SYM_FONT  (&lv_font_montserrat_28)\n#else                                 // 410×502 AMOLED (varsayılan)\n  #define L_SCR_W    410\n  #define L_CELL_W   120\n  #define L_CELL_H   128\n  #define L_ICON      95\n  #define L_SYM_FONT  (&lv_font_montserrat_36)\n#endif\n// UI kodu her yerde SADECE sabiti kullanır:\nlv_obj_set_size(cell, L_CELL_W, L_CELL_H);",
+      "captions": [
+        "Her uygulama, ekrana bağlı ölçülerini varyanta göre seçilen tek bir sabit bloğunda tanımlar. Arayüz kodu yalnızca bu sabitleri kullanır.",
+        "Değişmezlik kuralı: varsayılan dal #else tarafında orijinal değerlerin birebir aynısını taşır. Böylece varsayılan derleme tek bayt bile değişmez."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Küçük ekran için pratik notlar",
+      "items": [
+        "İkon ve daire oranını koruyun. 40 piksellik dairede 24 piksellik sembol, 26 piksellik dairede 16 piksele iner.",
+        "Liste satır aralığını satır yüksekliğinin yaklaşık 8 piksel fazlası olarak ayarlayın. AMOLED değerini olduğu gibi taşımak devasa boşluklar üretir.",
+        "Yuvarlak ekranda üst ve alt kenarlarda görünür genişlik daralır. Başlık ve saat gibi öğeleri yan yana değil alt alta yerleştirin."
+      ],
+      "captions": [
+        "Basit yükseklik ya da konum farkları için satır içi bir #ifdef de yeterlidir."
+      ]
+    }
+  ]
+}

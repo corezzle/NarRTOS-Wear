@@ -1,0 +1,12 @@
+# LCD128 (ESP32-S3-Touch-LCD-1.28) — 16 MB flash.
+# partitions_custom.csv ile ilk 8 MB'ı BİREBİR aynı (nvs/app0/app1/assets
+# ofsetleri değişmez → mevcut kayıtlar ve yüklü kadranlar korunur).
+# Session 35: 8 MB sonrasına galeri görsel paketi bölümü eklendi; 'assets'
+# SPIFFS'i yüklenen kadran fotoğrafları kullandığı için paket AYRI bölümde.
+# Name,   Type, SubType, Offset,   Size
+nvs,      data, nvs,     0x9000,   0x5000
+otadata,  data, ota,     0xe000,   0x2000
+app0,     app,  ota_0,   0x10000,  0x300000
+app1,     app,  ota_1,   0x310000, 0x300000
+assets,   data, spiffs,  0x610000, 0x1F0000
+gallery,  data, spiffs,  0x800000, 0x300000

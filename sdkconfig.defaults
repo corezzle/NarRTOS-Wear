@@ -1,0 +1,72 @@
+# ============================================================
+# ESP-IDF sdkconfig.defaults
+# Wearable OS - ESP32-S3R8
+# ============================================================
+
+# CPU — 240 MHz max performance
+# Both keys needed: ESP32S3_*_240 is legacy, ESP_DEFAULT_CPU_FREQ_MHZ_240 is current.
+# sdkconfig.esp32s3_wearable was generated with 160 MHz (default), explicit
+# overrides force 240 MHz in regen + active config.
+CONFIG_ESP32S3_DEFAULT_CPU_FREQ_MHZ_240=y
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ=240
+
+# Compiler optimization — RELEASE (-O2 + assertion silent)
+# Önceki DEBUG ayarı 2-3× CPU yavaşlığı yaratıyordu (LVGL render hot path
+# inline edilmiyor, assertion'lar her malloc/free'de çalışıyor).
+CONFIG_COMPILER_OPTIMIZATION_PERF=y
+CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE=y
+
+# PSRAM - OPI mode for S3R8
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_80M=y
+CONFIG_SPIRAM_USE_CAPS_ALLOC=y
+CONFIG_SPIRAM_CACHE_WORKAROUND=y
+CONFIG_SPIRAM_FETCH_INSTRUCTIONS=y
+CONFIG_SPIRAM_RODATA=y
+
+# Flash - 32MB
+CONFIG_ESPTOOLPY_FLASHSIZE_32MB=y
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+CONFIG_ESPTOOLPY_FLASHSIZE="32MB"
+
+# FreeRTOS - Dual Core
+CONFIG_FREERTOS_UNICORE=n
+CONFIG_FREERTOS_HZ=1000
+CONFIG_FREERTOS_USE_TRACE_FACILITY=n
+
+# Power Management
+CONFIG_PM_ENABLE=y
+CONFIG_PM_DFS_INIT_AUTO=n
+
+# UART (Monitor)
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200
+
+# Logging
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+CONFIG_LOG_COLORS=y
+
+# Bluetooth LE
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+CONFIG_BT_NIMBLE_MEM_ALLOC_MODE_EXTERNAL=y
+# v1.2.8 (1.4.67): ANCS/BLE bonding persistence — pairing bilgisi NVS'e
+# yazılır, power cycle sonrası iPhone auto-reconnect olur. Olmadan iOS
+# "Peer removed pairing information" hatası verir (bond bekler, store yok).
+CONFIG_BT_NIMBLE_NVS_PERSIST=y
+CONFIG_BT_NIMBLE_MAX_BONDS=4
+CONFIG_BT_NIMBLE_MAX_CCCDS=16
+
+# Watchdog
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=5
+CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU0=n
+CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1=n
+
+# Deep Sleep / RTC
+CONFIG_ESP_SLEEP_RTC_USE_RC_REF=y
+
+# (OTA dev configs were removed in v0.1; software update is deferred to v0.2.
+#  When OTA returns, re-enable CONFIG_ESP_HTTPS_OTA_ALLOW_HTTP for local dev
+#  servers and enforce HTTPS + cert bundle for production.)

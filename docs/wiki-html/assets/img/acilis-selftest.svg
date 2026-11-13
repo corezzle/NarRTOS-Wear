@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 541" font-family="-apple-system,'Segoe UI',Roboto,sans-serif">
+<rect width="1200" height="541" fill="#040B1C"/>
+<rect x="40" y="24" width="1120" height="477" rx="16" fill="#02060F" stroke="#1B4570" stroke-width="1.6"/>
+<circle cx="74" cy="56" r="7.5" fill="#FF6E6E" opacity="0.85"/>
+<circle cx="100" cy="56" r="7.5" fill="#F5A623" opacity="0.85"/>
+<circle cx="126" cy="56" r="7.5" fill="#2ECC71" opacity="0.85"/>
+<text x="600" y="62" text-anchor="middle" fill="#93AEC7" font-size="14.5" font-weight="700">USB serial monitor · cold-boot hardware self-test</text>
+
+<text x="76" y="104" fill="#00CAD7" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">===== NarRTOS hardware checklist (NAR-ESP32S3) =====</text>
+
+<text x="76" y="131" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="131" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">PSRAM/Flash      16 MB PSRAM + 32 MB flash</text>
+
+<text x="76" y="158" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="158" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">I2C bus          0x18 0x19 0x34 0x40 0x68 found</text>
+
+<text x="76" y="185" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="185" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">PMIC AXP2101     chip-id 0x47 (linear)</text>
+
+<text x="76" y="212" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="212" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">Power rails      DCDC1 3.3V, ALDO1/2/3/4 on</text>
+
+<text x="76" y="239" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="239" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">IMU              ICM42670, 1.00 g</text>
+
+<text x="76" y="266" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="266" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">RTC PCF85063     clock advancing</text>
+
+<text x="76" y="293" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="293" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">Touch chip       CST820</text>
+
+<text x="76" y="320" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="320" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">Codec / mic ADC  ES8311 83/11 · ES7210 72/10</text>
+
+<text x="76" y="347" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="347" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">Speaker + mic    1 kHz tone read back</text>
+
+<text x="76" y="374" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="374" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">Wi-Fi            5 APs, best -58 dBm</text>
+
+<text x="76" y="401" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="401" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">GSM module       AT -&gt; OK, IMEI 35502593911xxxx</text>
+
+<text x="76" y="428" fill="#2ECC71" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">[PASS]</text>
+<text x="146" y="428" fill="#93AEC7" font-size="15" font-family="Menlo,Consolas,monospace">SD card          mounted, read/write OK</text>
+
+<text x="76" y="455" fill="#6B8299" font-size="15" font-family="Menlo,Consolas,monospace">------------------------------------------------------</text>
+<text x="76" y="482" fill="#00CAD7" font-size="15" font-weight="700" font-family="Menlo,Consolas,monospace">CHECKLIST: 12 PASS · 0 FAIL · 0 WARN · 0 SKIP</text>
+</svg>

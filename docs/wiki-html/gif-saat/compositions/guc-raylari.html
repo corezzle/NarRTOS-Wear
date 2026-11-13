@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <title>Power rails — toggle GIF</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      /* Settings → Power Rails, 410×502 AMOLED geometrisiyle birebir:
+           SETTINGS_SAFE_X 12, SAFE_W 386, STEP 108 (satır 92 + 16)
+         Ray adları settings_app.cpp'deki make_rail_toggle_row çağrılarından.
+         Ekran 410×502 çizilip pencereye ölçeklenir; hareket yalnızca transform. */
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:250px; height:300px; overflow:hidden; background:#00102E; }
+      body { font-family:"Inter",sans-serif; -webkit-font-smoothing:antialiased; }
+      #bg { position:absolute; inset:0; background:linear-gradient(155deg,#00102E 0%,#001B3F 100%); }
+
+      #body { position:absolute; left:22px; top:24px; width:206px; height:246px; border-radius:44px;
+        background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%);
+        box-shadow:0 14px 30px rgba(0,0,0,.55); }
+      #crown { position:absolute; left:226px; top:104px; width:7px; height:34px; border-radius:4px;
+        background:linear-gradient(180deg,#4A4F57,#23262B); }
+
+      #win { position:absolute; left:30px; top:32px; width:190px; height:230px;
+        border-radius:36px; overflow:hidden; background:#000; }
+      /* 410×502 tuval, pencereye 190/410 oranında ölçeklenir */
+      #scr { position:absolute; left:0; top:0; width:410px; height:502px;
+        transform:scale(0.46341); transform-origin:0 0; background:#000; color:#fff; }
+
+      .hdr-back { position:absolute; left:26px; top:34px; font-size:26px; color:#0A84FF; }
+      .hdr-clock { position:absolute; right:28px; top:34px; font-size:26px; color:#8E8E93; }
+      .hdr-t { position:absolute; left:0; right:0; top:78px; text-align:center;
+        font-size:32px; font-weight:700; }
+      .sep { position:absolute; left:12px; top:126px; width:386px; height:2px; background:#2C2C2E; }
+
+      #list { position:absolute; left:0; top:134px; width:410px; }
+      .rail { position:absolute; left:12px; width:386px; height:92px; border-radius:24px;
+        background:#1C1C1E; display:flex; align-items:center; padding:0 24px; }
+      .rname { font-size:27px; font-weight:600; }
+      .rsub { font-size:27px; color:#8E8E93; margin-left:8px; }
+
+      .sw { margin-left:auto; width:76px; height:44px; border-radius:22px; background:#39393D;
+        position:relative; flex:0 0 76px; }
+      .sw i { position:absolute; top:4px; left:4px; width:36px; height:36px; border-radius:50%;
+        background:#fff; }
+
+      #tap { position:absolute; width:96px; height:96px; border-radius:50%;
+        border:5px solid rgba(255,255,255,.85); opacity:0; left:0; top:0; }
+
+      #cap { position:absolute; left:0; right:0; bottom:8px; text-align:center;
+        font-size:12px; color:#93AEC7; }
+    </style>
+  </head>
+
+  <body>
+    <div data-hf-id="hf-fuzz" id="root" data-composition-id="rails" data-start="0" data-duration="7" data-width="250" data-height="300" data-fps="15">
+      <div data-hf-id="hf-2xc0" id="bg"></div>
+      <div data-hf-id="hf-gw7p" id="body"></div>
+      <div data-hf-id="hf-j012" id="crown"></div>
+
+      <div data-hf-id="hf-7on1" id="win">
+        <div data-hf-id="hf-5vzb" id="scr">
+          <div data-hf-id="hf-ki7p" class="hdr-back">‹</div>
+          <div data-hf-id="hf-1wiv" class="hdr-clock">10:09</div>
+          <div data-hf-id="hf-fyxf" class="hdr-t">Power Rails</div>
+          <div data-hf-id="hf-kpqk" class="sep"></div>
+
+          <div data-hf-id="hf-vdqt" id="list">
+            <div data-hf-id="hf-h6mn" class="rail" style="top:8px">
+              <span data-hf-id="hf-h71n" class="rname">ALDO1</span><span data-hf-id="hf-si4e" class="rsub">3.3V Sensors</span>
+              <div data-hf-id="hf-rrxq" class="sw" id="sw0"><i data-hf-id="hf-g2gq" id="kn0"></i></div>
+            </div>
+            <div data-hf-id="hf-ymbb" class="rail" style="top:116px">
+              <span data-hf-id="hf-gsqm" class="rname">ALDO2</span><span data-hf-id="hf-9klb" class="rsub">3.3V Display</span>
+              <div data-hf-id="hf-vq1r" class="sw" id="sw1"><i data-hf-id="hf-k0kr" id="kn1"></i></div>
+            </div>
+            <div data-hf-id="hf-siib" class="rail" style="top:224px">
+              <span data-hf-id="hf-gefl" class="rname">ALDO3</span><span data-hf-id="hf-lo3o" class="rsub">3.3V Motor</span>
+              <div data-hf-id="hf-n25w" class="sw" id="sw2"><i data-hf-id="hf-9534" id="kn2"></i></div>
+            </div>
+            <div data-hf-id="hf-mspb" class="rail" style="top:332px">
+              <span data-hf-id="hf-g04k" class="rname">ALDO4</span><span data-hf-id="hf-tl2i" class="rsub">1.8V Unused</span>
+              <div data-hf-id="hf-nttp" class="sw" id="sw3"><i data-hf-id="hf-c4cp" id="kn3"></i></div>
+            </div>
+            <div data-hf-id="hf-h1lz" class="rail" style="top:440px">
+              <span data-hf-id="hf-hmoa" class="rname">DCDC2</span><span data-hf-id="hf-t6oq" class="rsub">0.9V Display</span>
+              <div data-hf-id="hf-4dxm" class="sw" id="sw4"><i data-hf-id="hf-18v2" id="kn4"></i></div>
+            </div>
+            <div data-hf-id="hf-qi5y" class="rail" style="top:548px">
+              <span data-hf-id="hf-h8d9" class="rname">DCDC3</span><span data-hf-id="hf-0djk" class="rsub">1.2V Unused</span>
+              <div data-hf-id="hf-ajnf" class="sw" id="sw5"><i data-hf-id="hf-56z3" id="kn5"></i></div>
+            </div>
+          </div>
+
+          <div data-hf-id="hf-u8x4" id="tap"></div>
+        </div>
+      </div>
+
+      <div data-hf-id="hf-amky" id="cap">Power rails — toggle control</div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["rails"] = tl;
+
+      const ON = "#30D158", OFF = "#39393D";
+      const KNOB_X = 32;              /* 76 - 36 - 2*4 */
+      const ROW_Y = [8, 116, 224, 332, 440, 548];
+
+      /* Başlangıç: ALDO1 + ALDO2 açık (sensör ve ekran rayları), diğerleri kapalı */
+      gsap.set(["#sw0", "#sw1"], { backgroundColor: ON });
+      gsap.set(["#kn0", "#kn1"], { x: KNOB_X });
+      gsap.set(["#sw2", "#sw3", "#sw4", "#sw5"], { backgroundColor: OFF });
+      gsap.set(["#kn2", "#kn3", "#kn4", "#kn5"], { x: 0 });
+
+      /* Dokunma halkası, satırın toggle'ı üzerine konumlanır (ölçekli tuvalde). */
+      function tap(t, rowIdx, scrollY) {
+        const y = 134 + ROW_Y[rowIdx] + 46 - 48 - (scrollY || 0);
+        tl.set("#tap", { x: 336 - 48, y: y }, t)
+          .fromTo("#tap", { scale: .4, opacity: 0 },
+                  { scale: 1, opacity: 1, duration: .18, ease: "power2.out" }, t)
+          .to("#tap", { scale: 1.45, opacity: 0, duration: .26, ease: "power2.in" }, t + .2);
+      }
+      function flip(t, i, on) {
+        tl.to("#sw" + i, { backgroundColor: on ? ON : OFF, duration: .22 }, t + .1)
+          .to("#kn" + i, { x: on ? KNOB_X : 0, duration: .26, ease: "power2.inOut" }, t + .1);
+      }
+
+      /* 1) ALDO3 (motor) aç  2) ALDO4 aç  3) listeyi kaydır  4) DCDC3 aç/kapa
+         5) başa dön  6) ALDO4 ve ALDO3 kapat → 7 sn sonunda başlangıç durumu   */
+      tap(0.6, 2);            flip(0.6, 2, true);
+      tap(1.5, 3);            flip(1.5, 3, true);
+
+      /* 3 satır kaydır: DCDC2 ekranın ortasına gelsin (216'da alt kenarda kalıp
+         toggle görünmeden gerçekleşiyordu). */
+      tl.to("#list", { y: -324, duration: .55, ease: "power2.inOut" }, 2.4);
+
+      tap(3.2, 4, 324);       flip(3.2, 4, true);
+      tap(4.0, 4, 324);       flip(4.0, 4, false);
+
+      tl.to("#list", { y: 0, duration: .55, ease: "power2.inOut" }, 4.8);
+
+      tap(5.6, 3);            flip(5.6, 3, false);
+      tap(6.3, 2);            flip(6.3, 2, false);
+    </script>
+  </body>
+</html>

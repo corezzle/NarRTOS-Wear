@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<title>NarRTOS için VS Code Kurulumu</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  body { margin:0; background:#00102E; font-family:Inter, system-ui, sans-serif; color:#E4F0EE; -webkit-font-smoothing:antialiased; }
+  #root { position:relative; width:1920px; height:1080px; overflow:hidden; }
+  .clip { position:absolute; inset:0; }
+  #bg { background:linear-gradient(140deg,#00102E 0%,#00234E 55%,#001B3F 100%); }
+  .grid { position:absolute; inset:0; opacity:.22;
+    background-image:linear-gradient(#093159 1px,transparent 1px),linear-gradient(90deg,#093159 1px,transparent 1px); background-size:80px 80px; }
+  .glow { position:absolute; left:1100px; top:-260px; width:900px; height:900px; border-radius:50%;
+    background:radial-gradient(circle,rgba(0,202,215,.16) 0%,rgba(0,202,215,0) 65%); }
+  .brand { position:absolute; left:80px; top:52px; font-size:20px; font-weight:800; letter-spacing:3px; color:#00CAD7; }
+  .doc { position:absolute; right:80px; top:50px; font-size:22px; color:#93AEC7; }
+  .progress { position:absolute; left:0; bottom:0; width:1920px; height:6px; background:rgba(255,255,255,.08); }
+  .bar { width:1920px; height:6px; background:#00CAD7; transform-origin:left center; }
+  .card { position:absolute; left:160px; top:0; width:1600px; height:1080px; display:flex; flex-direction:column; justify-content:center; }
+  .k { font-size:24px; font-weight:800; letter-spacing:4px; color:#00CAD7; }
+  h1 { margin:22px 0 0; font-size:88px; font-weight:800; line-height:1.08; letter-spacing:-1.5px; max-width:1400px; }
+  #title h1 { max-width:960px; }  #title .card p { max-width:900px; }
+  .devs { position:absolute; left:1120px; top:0; width:800px; height:1080px; }
+  .devs .b1 { position:absolute; left:0; top:262px; width:400px; height:476px; border-radius:86px; background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%); box-shadow:0 34px 80px rgba(0,0,0,.65); }
+  .devs .c1 { position:absolute; left:400px; top:426px; width:14px; height:68px; border-radius:7px; background:linear-gradient(180deg,#4A4F57,#23262B); }
+  .devs .w1 { position:absolute; left:30px; top:294px; width:340px; height:412px; border-radius:68px; overflow:hidden; background:#000; }
+  .devs .b2 { position:absolute; left:400px; top:500px; width:300px; height:300px; border-radius:50%; background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%); box-shadow:0 28px 70px rgba(0,0,0,.65); }
+  .devs .w2 { position:absolute; left:417px; top:517px; width:266px; height:266px; border-radius:50%; overflow:hidden; background:#000; }
+  .devs img { position:absolute; left:0; top:0; width:100%; height:100%; opacity:0; }
+  .devs img[id$="-0"] { opacity:1; }
+  .card p { margin:28px 0 0; font-size:34px; line-height:1.45; color:#93AEC7; max-width:1200px; }
+  .inner { position:absolute; inset:0; }
+  .left { position:absolute; left:80px; top:112px; width:1560px; }
+  .steptitle { font-size:50px; font-weight:800; line-height:1.15; letter-spacing:-.5px; white-space:nowrap; }
+  .stepmeta { position:absolute; right:80px; top:128px; font-size:24px; color:#93AEC7; }
+  .shot { position:absolute; border-radius:22px; overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.10); background:#0B1622; }
+  .shot img, .shot video { width:100%; height:100%; object-fit:contain; display:block; }
+  .shot.list { background:rgba(4,14,30,.72); padding:44px 64px; box-sizing:border-box; }
+  .shot.list ul { margin:0; padding:0; list-style:none; }
+  .shot.list li { position:relative; padding:0 0 0 44px; margin:0 0 26px; font-size:36px; line-height:1.4; color:#E4F0EE; }
+  .shot.list li::before { content:""; position:absolute; left:0; top:16px; width:18px; height:18px; border-radius:50%; background:#00CAD7; }
+  .shot.gallery { background:rgba(4,14,30,.72); padding:26px 30px; box-sizing:border-box; display:grid;
+    grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:14px 18px; }
+  .shot.gallery figure { margin:0; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; }
+  .shot.gallery img { width:auto; height:200px; object-fit:contain; border-radius:16px; display:block; }
+  .shot.gallery b { display:block; margin-top:10px; font-size:22px; font-weight:800; color:#E4F0EE; }
+  .shot.gallery span { display:block; margin-top:2px; font-size:16px; color:#93AEC7; }
+  .shot.code { background:#0B1622; padding:34px 40px; box-sizing:border-box; display:flex; align-items:center; }
+  .shot.code pre { margin:0; font-family:Menlo,Consolas,monospace; font-size:24px; line-height:1.5; color:#D6E4F0; white-space:pre; }
+  .shot.code.small pre { font-size:19px; line-height:1.45; }
+  .shot.list.dense { padding:44px 56px; }
+  .shot.list.dense li { font-size:30px; line-height:1.35; margin-bottom:22px; padding-left:38px; }
+  .shot.list.dense li::before { top:12px; width:15px; height:15px; }
+  .caps { position:absolute; left:80px; right:330px; bottom:58px; height:150px; }
+  .cap.long { font-size:33px; line-height:1.35; padding:18px 30px; }
+  .cap.xlong { font-size:29px; }
+  .ilogo { position:absolute; left:460px; top:330px; width:1000px; }
+  .iseries { position:absolute; left:0; right:0; top:690px; text-align:center; }
+  .iseries b { display:block; font-size:30px; font-weight:800; letter-spacing:6px; color:#00CAD7; }
+  .iseries span { display:block; margin-top:14px; font-size:26px; color:#93AEC7; }
+  .oh { position:absolute; left:0; right:0; top:110px; text-align:center; font-size:44px; font-weight:800; }
+  .obox { position:absolute; top:225px; width:740px; height:416px; border-radius:22px; box-sizing:border-box; padding:28px 34px;
+    border:2px dashed rgba(0,202,215,.45); background:rgba(4,14,30,.55); display:flex; flex-direction:column; justify-content:flex-end; }
+  .obox span { font-size:22px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:#00CAD7; }
+  .obox b { margin-top:10px; font-size:38px; font-weight:800; color:#E4F0EE; }
+  .osub { position:absolute; left:0; right:0; top:700px; display:flex; justify-content:center; align-items:center; gap:28px; }
+  .ocircle { width:170px; height:170px; border-radius:50%; border:2px dashed rgba(0,202,215,.45); background:rgba(4,14,30,.55); }
+  .osub b { display:block; font-size:36px; font-weight:800; }
+  .osub span { display:block; margin-top:8px; font-size:24px; color:#93AEC7; }
+  .ologo { position:absolute; left:80px; bottom:52px; width:300px; }
+  .olinks { position:absolute; right:80px; bottom:60px; font-size:26px; color:#93AEC7; }
+  .avatar { position:absolute; right:60px; bottom:34px; width:220px; height:220px; border-radius:50%; overflow:hidden;
+    border:4px solid #00CAD7; box-shadow:0 20px 50px rgba(0,0,0,.55); background:#0B1622; }
+  .avatar img { width:100%; height:100%; display:block; }
+  .cap { position:absolute; left:0; right:0; bottom:0; margin:0 auto; max-width:1400px; padding:22px 34px; border-radius:18px;
+    background:rgba(4,14,30,.82); border:1px solid rgba(255,255,255,.08); font-size:38px; line-height:1.4; text-align:center; opacity:0; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="243.9" data-fps="30">
+<div id="bg" class="clip" data-start="0" data-duration="243.9" data-track-index="0">
+      <div class="grid"></div><div class="glow"></div>
+      <div class="brand">NARRTOS WEAR</div><div class="doc">NarRTOS için VS Code Kurulumu</div>
+      <div class="progress"><div id="bar" class="bar"></div></div>
+      <div class="avatar" id="avatar"><img src="assets/avatar.svg" alt=""></div></div>
+<div id="intro" class="clip" data-start="0" data-duration="4.5" data-track-index="1">
+      <img class="ilogo" id="intro-logo" src="assets/logo.png" alt="">
+      <div class="iseries" id="intro-series"><b>NARRTOS WEAR</b><span>Dökümantasyon Serisi</span></div></div>
+<div id="title" class="clip" data-start="4.5" data-duration="5.0" data-track-index="1">
+      <div class="card"><div class="k" id="title-k">NARRTOS WEAR</div>
+      <h1 id="title-h">NarRTOS için VS Code Kurulumu</h1><p id="title-s">Hiç geliştirme aracı olmayan bir bilgisayarı, Hızlı Başlangıç&#x27;taki ilk komutu yapıştırabilecek noktaya getiriyoruz. 10-15 dakika sürer.</p></div>
+      <div class="devs" id="title-devs">
+        <div class="b1"></div><div class="c1"></div><div class="w1"><img id="tw1-0" src="assets/a410-kadran-analog.png" alt=""><img id="tw1-1" src="assets/a410-launcher.png" alt=""><img id="tw1-2" src="assets/a410-hava-durumu.png" alt=""><img id="tw1-3" src="assets/a410-adim-sayar.png" alt=""></div>
+        <div class="b2"></div><div class="w2"><img id="tw2-0" src="assets/r240-kadran-dijital.png" alt=""><img id="tw2-1" src="assets/r240-launcher.png" alt=""><img id="tw2-2" src="assets/r240-hava-durumu.png" alt=""><img id="tw2-3" src="assets/r240-adim-sayar.png" alt=""></div>
+      </div></div>
+<div id="s1" class="clip" data-start="9.50" data-duration="11.55" data-track-index="1">
+      <div class="inner" id="s1-in">
+        <div class="left"><div class="steptitle">Neye ihtiyacınız var</div></div><div class="stepmeta">1 / 12</div>
+        <div class="shot list" id="s1-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>Windows, macOS ya da Linux çalıştıran bir bilgisayar gerekir.</li><li>İki program indirileceği için internet bağlantısı gerekir.</li><li>Kurulum sırasında bilgisayarınızın şifresi sorulabilir.</li></ul></div>
+        <div class="caps"><div class="cap" id="s1-c0">Adımları sırayla takip ederseniz 10-15 dakika sürer.</div><div class="cap" id="s1-c1">Sonunda VS Code kurulu, içinde bir terminal açık, git hazır ve proje dosyaları bilgisayarınızda olur.</div></div>
+      </div></div>
+<div id="s2" class="clip" data-start="21.05" data-duration="20.90" data-track-index="1">
+      <div class="inner" id="s2-in">
+        <div class="left"><div class="steptitle">VS Code&#x27;u indirip kurun</div></div><div class="stepmeta">2 / 12</div>
+        <div class="shot" id="s2-shot" style="left:80px;top:324px;width:1540px;height:411px"><img src="assets/vscode-indirme.png" alt="VS Code&#x27;u indirip kurun" /></div>
+        <div class="caps"><div class="cap" id="s2-c0">code.visualstudio.com adresine gidin. Büyük Download düğmesi işletim sisteminizi kendisi tanır.</div><div class="cap long" id="s2-c1">Windows&#x27;ta .exe dosyasını çalıştırın ve &quot;Add to PATH&quot; kutusu işaretli kalsın. macOS&#x27;ta uygulamayı Applications klasörüne sürükleyin.</div><div class="cap" id="s2-c2">Ubuntu ve Debian&#x27;da .deb dosyasını indirip çift tıklayın ya da sudo apt install ./code_*.deb komutunu kullanın.</div></div>
+      </div></div>
+<div id="s3" class="clip" data-start="41.95" data-duration="15.60" data-track-index="1">
+      <div class="inner" id="s3-in">
+        <div class="left"><div class="steptitle">Terminali VS Code içinde açın (macOS)</div></div><div class="stepmeta">3 / 12</div>
+        <div class="shot" id="s3-shot" style="left:589px;top:215px;width:521px;height:630px"><img src="assets/vscode-new-terminal.png" alt="Terminali VS Code içinde açın (macOS)" /></div>
+        <div class="caps"><div class="cap" id="s3-c0">Üst menüden Terminal, ardından New Terminal seçin. Pencerenin altında bir panel açılır; komutları buraya yazacaksınız.</div><div class="cap" id="s3-c1">Bir komut yazıp Enter&#x27;a basarsınız ve çalışması bitene kadar beklersiniz. Bitince yeni bir satır başı gelir.</div></div>
+      </div></div>
+<div id="s4" class="clip" data-start="57.55" data-duration="13.35" data-track-index="1">
+      <div class="inner" id="s4-in">
+        <div class="left"><div class="steptitle">Terminali VS Code içinde açın (Windows / Linux)</div></div><div class="stepmeta">4 / 12</div>
+        <div class="shot" id="s4-shot" style="left:352px;top:215px;width:995px;height:630px"><img src="assets/vscode-win-new-terminal.png" alt="Terminali VS Code içinde açın (Windows / Linux)" /></div>
+        <div class="caps"><div class="cap" id="s4-c0">Windows ve Linux&#x27;ta menü şeridi pencerenin içinde, en üsttedir. Terminal menüsünden New Terminal seçin.</div><div class="cap" id="s4-c1">Windows&#x27;ta panel PowerShell, Mac&#x27;te zsh çalıştırır. Bu dökümandaki komutlar ikisinde de aynıdır.</div></div>
+      </div></div>
+<div id="s5" class="clip" data-start="70.90" data-duration="25.70" data-track-index="1">
+      <div class="inner" id="s5-in">
+        <div class="left"><div class="steptitle">Git&#x27;i kurun</div></div><div class="stepmeta">5 / 12</div>
+        <div class="shot list dense" id="s5-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>Önce kontrol edin: git --version yazın. &quot;git version 2&quot; ile başlayan bir satır görüyorsanız git kuruludur; sonraki adıma geçin.</li><li>Windows&#x27;ta git-scm.com/download/win adresinden kurulum dosyasını indirin, bütün ekranlarda Next deyin. Bitince VS Code&#x27;u tamamen kapatıp yeniden açın.</li><li>macOS&#x27;ta git --version yazınca çıkan &quot;command line developer tools&quot; penceresinde Install deyin. Pencere çıkmazsa xcode-select --install komutunu çalıştırın.</li><li>Linux&#x27;ta sudo apt install git komutu yeter.</li></ul></div>
+        <div class="caps"><div class="cap" id="s5-c0">Git, proje dosyalarını internetten indiren araçtır. Hızlı Başlangıç&#x27;taki ilk komut onu kullanır.</div><div class="cap" id="s5-c1">Kurulum bitince git --version komutunu tekrar çalıştırıp sürüm satırını gördüğünüzden emin olun.</div></div>
+      </div></div>
+<div id="s6" class="clip" data-start="96.60" data-duration="27.65" data-track-index="1">
+      <div class="inner" id="s6-in">
+        <div class="left"><div class="steptitle">Klasör seçin ve projeyi indirin</div></div><div class="stepmeta">6 / 12</div>
+        <div class="shot" id="s6-shot" style="left:280px;top:215px;width:1140px;height:630px"><video id="s6-v" src="assets/terminal-clone-hold27.mp4" muted playsinline data-start="96.90" data-duration="27.35" data-track-index="8"></video></div>
+        <div class="caps"><div class="cap" id="s6-c0">Terminal ev klasörünüzde açılır. Dağınıklık olmasın diye mkdir Projeler ile bir klasör oluşturup cd Projeler ile içine girin.</div><div class="cap long" id="s6-c1">Hızlı Başlangıç&#x27;taki git clone satırını kopyalayıp terminale yapıştırın. Windows&#x27;ta Ctrl ve V, Mac&#x27;te ⌘ ve V tuşlarını kullanın; sonra Enter&#x27;a basın.</div><div class="cap" id="s6-c2">Cloning into ile başlayan satırlar akar ve done ile biter. İkinci komut olan cd NarRTOS-Wear klasörün içine girer.</div></div>
+      </div></div>
+<div id="s7" class="clip" data-start="124.25" data-duration="13.80" data-track-index="1">
+      <div class="inner" id="s7-in">
+        <div class="left"><div class="steptitle">Klasörü VS Code&#x27;da açın (macOS)</div></div><div class="stepmeta">7 / 12</div>
+        <div class="shot" id="s7-shot" style="left:684px;top:215px;width:332px;height:630px"><img src="assets/vscode-open-folder.png" alt="Klasörü VS Code&#x27;da açın (macOS)" /></div>
+        <div class="caps"><div class="cap" id="s7-c0">Üst menüden File, ardından Open Folder seçin. Projeler içindeki yeni klasörü seçip Open deyin.</div><div class="cap" id="s7-c1">&quot;Do you trust the authors?&quot; diye sorarsa Yes, I trust the authors deyin.</div></div>
+      </div></div>
+<div id="s8" class="clip" data-start="138.05" data-duration="7.15" data-track-index="1">
+      <div class="inner" id="s8-in">
+        <div class="left"><div class="steptitle">Klasörü VS Code&#x27;da açın (Windows / Linux)</div></div><div class="stepmeta">8 / 12</div>
+        <div class="shot" id="s8-shot" style="left:352px;top:215px;width:995px;height:630px"><img src="assets/vscode-win-open-folder.png" alt="Klasörü VS Code&#x27;da açın (Windows / Linux)" /></div>
+        <div class="caps"><div class="cap" id="s8-c0">Windows ve Linux&#x27;ta File menüsünden Open Folder seçin. Menü, pencerenin içindeki üst şerittedir.</div></div>
+      </div></div>
+<div id="s9" class="clip" data-start="145.20" data-duration="12.90" data-track-index="1">
+      <div class="inner" id="s9-in">
+        <div class="left"><div class="steptitle">Eklenti önerisini kapatın</div></div><div class="stepmeta">9 / 12</div>
+        <div class="shot" id="s9-shot" style="left:80px;top:329px;width:1540px;height:402px"><img src="assets/vscode-eklenti-onerisi.png" alt="Eklenti önerisini kapatın" /></div>
+        <div class="caps"><div class="cap" id="s9-c0">Sağ altta bu balon çıkar. Install ya da Show Recommendations demeden çarpı ile kapatın.</div><div class="cap" id="s9-c1">Bu rehber PlatformIO&#x27;yu Başlarken sayfasındaki komut satırı yoluyla kurar; eklenti gerekmez.</div></div>
+      </div></div>
+<div id="s10" class="clip" data-start="158.10" data-duration="13.80" data-track-index="1">
+      <div class="inner" id="s10-in">
+        <div class="left"><div class="steptitle">Proje açık, terminal hazır</div></div><div class="stepmeta">10 / 12</div>
+        <div class="shot" id="s10-shot" style="left:338px;top:215px;width:1024px;height:630px"><img src="assets/vscode-explorer.png" alt="Proje açık, terminal hazır" /></div>
+        <div class="caps"><div class="cap" id="s10-c0">Solda proje dosyaları listelenir: src, docs, platformio.ini ve diğerleri.</div><div class="cap long" id="s10-c1">Klasörü açınca terminal kapanmış olabilir. Terminal menüsünden New Terminal ile yeniden açın; bu kez doğrudan proje klasöründe açılır.</div></div>
+      </div></div>
+<div id="s11" class="clip" data-start="171.90" data-duration="23.70" data-track-index="1">
+      <div class="inner" id="s11-in">
+        <div class="left"><div class="steptitle">Buradan sonrası</div></div><div class="stepmeta">11 / 12</div>
+        <div class="shot list" id="s11-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>Artık VS Code kurulu, terminal açık, git hazır ve proje indirilip açılmış durumda.</li><li>Hızlı Başlangıç&#x27;ın ilk iki komutu tamamlandı. Kalan iki komut (pio run ve pio device monitor) PlatformIO ister.</li><li>PlatformIO&#x27;yu hiç kurmadıysanız Başlarken sayfasına geçin. Birinci ve beşinci adım zaten yapıldı; ikinci adımdan, yani Python&#x27;dan devam edin.</li><li>Oradaki bütün komutları bu VS Code terminaline yazacaksınız.</li></ul></div>
+        <div class="caps"><div class="cap" id="s11-c0">Bundan sonrası Başlarken dökümanında: Python, PlatformIO, kartı bağlama, derleme ve yükleme.</div></div>
+      </div></div>
+<div id="s12" class="clip" data-start="195.60" data-duration="33.30" data-track-index="1">
+      <div class="inner" id="s12-in">
+        <div class="left"><div class="steptitle">İlk denemede en sık takılınan yerler</div></div><div class="stepmeta">12 / 12</div>
+        <div class="shot list dense" id="s12-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>Windows&#x27;ta git kurdunuz ama terminal tanımıyorsa VS Code kurulumdan önce açılmıştır. Tamamen kapatıp yeniden açın.</li><li>Mac&#x27;te kurulum penceresi çıkmadıysa terminale xcode-select --install yazın.</li><li>Ctrl ve V terminale yapıştırmıyorsa sağ tıklayıp yapıştırın ya da Ctrl, Shift ve V kullanın.</li><li>fatal: repository not found hatası adresin eksik kopyalandığını gösterir. Satırı baştan sona seçip yeniden kopyalayın.</li><li>Hangi klasörde olduğunuzu bilmiyorsanız satır başındaki klasör adına bakın. İçindekileri görmek için Mac ve Linux&#x27;ta ls, Windows&#x27;ta dir yazın.</li><li>Terminal paneli kaybolduysa Terminal menüsünden New Terminal seçin.</li></ul></div>
+        <div class="caps"><div class="cap" id="s12-c0">&quot;Trust&quot; sorusuna yanlışlıkla No dediyseniz klasörü File menüsünden Open Folder ile yeniden açıp Yes deyin.</div></div>
+      </div></div>
+<div id="end" class="clip" data-start="228.90" data-duration="5.0" data-track-index="1">
+      <div class="card"><div class="k" id="end-k">NARRTOS WEAR</div>
+      <h1 id="end-h">VS Code, git ve proje hazır.</h1><p id="end-s">Devamı Hızlı Başlangıç ve Başlarken dökümanlarında. corezzle.com</p></div></div>
+<div id="outro" class="clip" data-start="233.90" data-duration="10.0" data-track-index="1">
+      <div class="oh" id="outro-h">İzlediğiniz için teşekkürler</div>
+      <div class="obox" id="outro-a" style="left:120px"><span>Sıradaki video</span><b>Sıradaki video</b></div>
+      <div class="obox" id="outro-b" style="left:1060px"><span>Oynatma listesi</span><b>Oynatma listesi</b></div>
+      <div class="osub" id="outro-s"><div class="ocircle"></div><div><b>Abone olun</b><span>Yeni bölümlerden haberdar olun</span></div></div>
+      <img class="ologo" id="outro-logo" src="assets/logo.png" alt="">
+      <div class="olinks" id="outro-l">corezzle.com &nbsp;·&nbsp; github.com/corezzle/NarRTOS-Wear</div></div>
+</div>
+<script>
+  window.__timelines = window.__timelines || {};
+  const tl = gsap.timeline({ paused: true });
+    tl.set("#avatar", {opacity: 0}, 0); tl.to("#avatar", {opacity: 1, duration: .5}, 9.3); tl.to("#avatar", {opacity: 0, duration: .4}, 233.50);
+  tl.fromTo("#intro-logo", {scale: .86, opacity: 0}, {scale: 1, opacity: 1, duration: 1.1, ease: "power3.out"}, .15);
+  tl.to("#intro-logo", {y: -70, duration: .8, ease: "power3.inOut"}, 1.6);
+  tl.fromTo("#intro-series", {y: 30, opacity: 0}, {y: 0, opacity: 1, duration: .7, ease: "power3.out"}, 2.0);
+  tl.to(["#intro-logo","#intro-series"], {opacity: 0, duration: .45, ease: "power2.in"}, 4.0);
+  tl.fromTo("#bar", {scaleX: 0}, {scaleX: 1, duration: 243.9, ease: "none"}, 0);
+  tl.from("#title-devs", {x: 60, opacity: 0, duration: .9, ease: "power3.out"}, 5.1);
+  tl.to(["#tw1-1","#tw2-1"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 6.45);
+  tl.to(["#tw1-2","#tw2-2"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 7.50);
+  tl.to(["#tw1-3","#tw2-3"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 8.55);
+  tl.to("#title-devs", {opacity: 0, duration: .45, ease: "power2.in"}, 9.0);
+  tl.from("#title-k", {y: 30, opacity: 0, duration: .6, ease: "power3.out"}, 4.7);
+  tl.from("#title-h", {y: 40, opacity: 0, duration: .8, ease: "power3.out"}, 4.95);
+  tl.from("#title-s", {y: 30, opacity: 0, duration: .7, ease: "power3.out"}, 5.3);
+  tl.to(["#title-k","#title-h","#title-s"], {opacity: 0, duration: .45, ease: "power2.in"}, 9.0);
+  tl.from("#s1-in", {opacity: 0, duration: .45, ease: "power2.out"}, 9.50);
+  tl.from("#s1-shot", {y: 36, duration: .7, ease: "power3.out"}, 9.50);
+  tl.to("#s1-in", {opacity: 0, duration: .4, ease: "power2.in"}, 20.63);
+  tl.fromTo("#s1-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 10.10);
+  tl.to("#s1-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 13.25);
+  tl.fromTo("#s1-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 13.60);
+  tl.from("#s2-in", {opacity: 0, duration: .45, ease: "power2.out"}, 21.05);
+  tl.from("#s2-shot", {y: 36, duration: .7, ease: "power3.out"}, 21.05);
+  tl.to("#s2-in", {opacity: 0, duration: .4, ease: "power2.in"}, 41.53);
+  tl.fromTo("#s2-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 21.65);
+  tl.to("#s2-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 26.15);
+  tl.fromTo("#s2-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 26.50);
+  tl.to("#s2-c1", {opacity: 0, duration: .25, ease: "power2.in"}, 33.70);
+  tl.fromTo("#s2-c2", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 34.05);
+  tl.from("#s3-in", {opacity: 0, duration: .45, ease: "power2.out"}, 41.95);
+  tl.from("#s3-shot", {y: 36, duration: .7, ease: "power3.out"}, 41.95);
+  tl.to("#s3-in", {opacity: 0, duration: .4, ease: "power2.in"}, 57.13);
+  tl.fromTo("#s3-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 42.55);
+  tl.to("#s3-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 49.30);
+  tl.fromTo("#s3-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 49.65);
+  tl.from("#s4-in", {opacity: 0, duration: .45, ease: "power2.out"}, 57.55);
+  tl.from("#s4-shot", {y: 36, duration: .7, ease: "power3.out"}, 57.55);
+  tl.to("#s4-in", {opacity: 0, duration: .4, ease: "power2.in"}, 70.48);
+  tl.fromTo("#s4-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 58.15);
+  tl.to("#s4-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 64.45);
+  tl.fromTo("#s4-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 64.80);
+  tl.from("#s5-in", {opacity: 0, duration: .45, ease: "power2.out"}, 70.90);
+  tl.from("#s5-shot", {y: 36, duration: .7, ease: "power3.out"}, 70.90);
+  tl.to("#s5-in", {opacity: 0, duration: .4, ease: "power2.in"}, 96.18);
+  tl.fromTo("#s5-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 71.50);
+  tl.to("#s5-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 76.90);
+  tl.fromTo("#s5-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 77.25);
+  tl.from("#s6-in", {opacity: 0, duration: .45, ease: "power2.out"}, 96.60);
+  tl.from("#s6-shot", {y: 36, duration: .7, ease: "power3.out"}, 96.60);
+  tl.to("#s6-in", {opacity: 0, duration: .4, ease: "power2.in"}, 123.83);
+  tl.fromTo("#s6-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 97.20);
+  tl.to("#s6-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 105.30);
+  tl.fromTo("#s6-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 105.65);
+  tl.to("#s6-c1", {opacity: 0, duration: .25, ease: "power2.in"}, 115.10);
+  tl.fromTo("#s6-c2", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 115.45);
+  tl.from("#s7-in", {opacity: 0, duration: .45, ease: "power2.out"}, 124.25);
+  tl.from("#s7-shot", {y: 36, duration: .7, ease: "power3.out"}, 124.25);
+  tl.to("#s7-in", {opacity: 0, duration: .4, ease: "power2.in"}, 137.63);
+  tl.fromTo("#s7-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 124.85);
+  tl.to("#s7-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 131.15);
+  tl.fromTo("#s7-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 131.50);
+  tl.from("#s8-in", {opacity: 0, duration: .45, ease: "power2.out"}, 138.05);
+  tl.from("#s8-shot", {y: 36, duration: .7, ease: "power3.out"}, 138.05);
+  tl.to("#s8-in", {opacity: 0, duration: .4, ease: "power2.in"}, 144.78);
+  tl.fromTo("#s8-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 138.65);
+  tl.from("#s9-in", {opacity: 0, duration: .45, ease: "power2.out"}, 145.20);
+  tl.from("#s9-shot", {y: 36, duration: .7, ease: "power3.out"}, 145.20);
+  tl.to("#s9-in", {opacity: 0, duration: .4, ease: "power2.in"}, 157.68);
+  tl.fromTo("#s9-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 145.80);
+  tl.to("#s9-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 152.10);
+  tl.fromTo("#s9-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 152.45);
+  tl.from("#s10-in", {opacity: 0, duration: .45, ease: "power2.out"}, 158.10);
+  tl.from("#s10-shot", {y: 36, duration: .7, ease: "power3.out"}, 158.10);
+  tl.to("#s10-in", {opacity: 0, duration: .4, ease: "power2.in"}, 171.48);
+  tl.fromTo("#s10-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 158.70);
+  tl.to("#s10-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 162.75);
+  tl.fromTo("#s10-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 163.10);
+  tl.from("#s11-in", {opacity: 0, duration: .45, ease: "power2.out"}, 171.90);
+  tl.from("#s11-shot", {y: 36, duration: .7, ease: "power3.out"}, 171.90);
+  tl.to("#s11-in", {opacity: 0, duration: .4, ease: "power2.in"}, 195.18);
+  tl.fromTo("#s11-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 172.50);
+  tl.from("#s12-in", {opacity: 0, duration: .45, ease: "power2.out"}, 195.60);
+  tl.from("#s12-shot", {y: 36, duration: .7, ease: "power3.out"}, 195.60);
+  tl.to("#s12-in", {opacity: 0, duration: .4, ease: "power2.in"}, 228.48);
+  tl.fromTo("#s12-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 196.20);
+  tl.from(["#end-k","#end-h","#end-s"], {y: 30, opacity: 0, duration: .7, stagger: .18, ease: "power3.out"}, 229.10);
+  tl.to(["#end-k","#end-h","#end-s"], {opacity: 0, duration: .45, ease: "power2.in"}, 233.40);
+  tl.from(["#outro-h","#outro-a","#outro-b","#outro-s","#outro-l","#outro-logo"], {y: 30, opacity: 0, duration: .7, stagger: .14, ease: "power3.out"}, 234.05);
+  window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

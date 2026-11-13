@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<title>Uygulama Geliştirme</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  body { margin:0; background:#00102E; font-family:Inter, system-ui, sans-serif; color:#E4F0EE; -webkit-font-smoothing:antialiased; }
+  #root { position:relative; width:1920px; height:1080px; overflow:hidden; }
+  .clip { position:absolute; inset:0; }
+  #bg { background:linear-gradient(140deg,#00102E 0%,#00234E 55%,#001B3F 100%); }
+  .grid { position:absolute; inset:0; opacity:.22;
+    background-image:linear-gradient(#093159 1px,transparent 1px),linear-gradient(90deg,#093159 1px,transparent 1px); background-size:80px 80px; }
+  .glow { position:absolute; left:1100px; top:-260px; width:900px; height:900px; border-radius:50%;
+    background:radial-gradient(circle,rgba(0,202,215,.16) 0%,rgba(0,202,215,0) 65%); }
+  .brand { position:absolute; left:80px; top:52px; font-size:20px; font-weight:800; letter-spacing:3px; color:#00CAD7; }
+  .doc { position:absolute; right:80px; top:50px; font-size:22px; color:#93AEC7; }
+  .progress { position:absolute; left:0; bottom:0; width:1920px; height:6px; background:rgba(255,255,255,.08); }
+  .bar { width:1920px; height:6px; background:#00CAD7; transform-origin:left center; }
+  .card { position:absolute; left:160px; top:0; width:1600px; height:1080px; display:flex; flex-direction:column; justify-content:center; }
+  .k { font-size:24px; font-weight:800; letter-spacing:4px; color:#00CAD7; }
+  h1 { margin:22px 0 0; font-size:88px; font-weight:800; line-height:1.08; letter-spacing:-1.5px; max-width:1400px; }
+  #title h1 { max-width:960px; }  #title .card p { max-width:900px; }
+  .devs { position:absolute; left:1120px; top:0; width:800px; height:1080px; }
+  .devs .b1 { position:absolute; left:0; top:262px; width:400px; height:476px; border-radius:86px; background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%); box-shadow:0 34px 80px rgba(0,0,0,.65); }
+  .devs .c1 { position:absolute; left:400px; top:426px; width:14px; height:68px; border-radius:7px; background:linear-gradient(180deg,#4A4F57,#23262B); }
+  .devs .w1 { position:absolute; left:30px; top:294px; width:340px; height:412px; border-radius:68px; overflow:hidden; background:#000; }
+  .devs .b2 { position:absolute; left:400px; top:500px; width:300px; height:300px; border-radius:50%; background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%); box-shadow:0 28px 70px rgba(0,0,0,.65); }
+  .devs .w2 { position:absolute; left:417px; top:517px; width:266px; height:266px; border-radius:50%; overflow:hidden; background:#000; }
+  .devs img { position:absolute; left:0; top:0; width:100%; height:100%; opacity:0; }
+  .devs img[id$="-0"] { opacity:1; }
+  .card p { margin:28px 0 0; font-size:34px; line-height:1.45; color:#93AEC7; max-width:1200px; }
+  .inner { position:absolute; inset:0; }
+  .left { position:absolute; left:80px; top:112px; width:1560px; }
+  .steptitle { font-size:50px; font-weight:800; line-height:1.15; letter-spacing:-.5px; white-space:nowrap; }
+  .stepmeta { position:absolute; right:80px; top:128px; font-size:24px; color:#93AEC7; }
+  .shot { position:absolute; border-radius:22px; overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.10); background:#0B1622; }
+  .shot img, .shot video { width:100%; height:100%; object-fit:contain; display:block; }
+  .shot.list { background:rgba(4,14,30,.72); padding:44px 64px; box-sizing:border-box; }
+  .shot.list ul { margin:0; padding:0; list-style:none; }
+  .shot.list li { position:relative; padding:0 0 0 44px; margin:0 0 26px; font-size:36px; line-height:1.4; color:#E4F0EE; }
+  .shot.list li::before { content:""; position:absolute; left:0; top:16px; width:18px; height:18px; border-radius:50%; background:#00CAD7; }
+  .shot.gallery { background:rgba(4,14,30,.72); padding:26px 30px; box-sizing:border-box; display:grid;
+    grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:14px 18px; }
+  .shot.gallery figure { margin:0; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; }
+  .shot.gallery img { width:auto; height:200px; object-fit:contain; border-radius:16px; display:block; }
+  .shot.gallery b { display:block; margin-top:10px; font-size:22px; font-weight:800; color:#E4F0EE; }
+  .shot.gallery span { display:block; margin-top:2px; font-size:16px; color:#93AEC7; }
+  .shot.code { background:#0B1622; padding:34px 40px; box-sizing:border-box; display:flex; align-items:center; }
+  .shot.code pre { margin:0; font-family:Menlo,Consolas,monospace; font-size:24px; line-height:1.5; color:#D6E4F0; white-space:pre; }
+  .shot.code.small pre { font-size:19px; line-height:1.45; }
+  .shot.list.dense { padding:44px 56px; }
+  .shot.list.dense li { font-size:30px; line-height:1.35; margin-bottom:22px; padding-left:38px; }
+  .shot.list.dense li::before { top:12px; width:15px; height:15px; }
+  .caps { position:absolute; left:80px; right:330px; bottom:58px; height:150px; }
+  .cap.long { font-size:33px; line-height:1.35; padding:18px 30px; }
+  .cap.xlong { font-size:29px; }
+  .ilogo { position:absolute; left:460px; top:330px; width:1000px; }
+  .iseries { position:absolute; left:0; right:0; top:690px; text-align:center; }
+  .iseries b { display:block; font-size:30px; font-weight:800; letter-spacing:6px; color:#00CAD7; }
+  .iseries span { display:block; margin-top:14px; font-size:26px; color:#93AEC7; }
+  .oh { position:absolute; left:0; right:0; top:110px; text-align:center; font-size:44px; font-weight:800; }
+  .obox { position:absolute; top:225px; width:740px; height:416px; border-radius:22px; box-sizing:border-box; padding:28px 34px;
+    border:2px dashed rgba(0,202,215,.45); background:rgba(4,14,30,.55); display:flex; flex-direction:column; justify-content:flex-end; }
+  .obox span { font-size:22px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:#00CAD7; }
+  .obox b { margin-top:10px; font-size:38px; font-weight:800; color:#E4F0EE; }
+  .osub { position:absolute; left:0; right:0; top:700px; display:flex; justify-content:center; align-items:center; gap:28px; }
+  .ocircle { width:170px; height:170px; border-radius:50%; border:2px dashed rgba(0,202,215,.45); background:rgba(4,14,30,.55); }
+  .osub b { display:block; font-size:36px; font-weight:800; }
+  .osub span { display:block; margin-top:8px; font-size:24px; color:#93AEC7; }
+  .ologo { position:absolute; left:80px; bottom:52px; width:300px; }
+  .olinks { position:absolute; right:80px; bottom:60px; font-size:26px; color:#93AEC7; }
+  .avatar { position:absolute; right:60px; bottom:34px; width:220px; height:220px; border-radius:50%; overflow:hidden;
+    border:4px solid #00CAD7; box-shadow:0 20px 50px rgba(0,0,0,.55); background:#0B1622; }
+  .avatar img { width:100%; height:100%; display:block; }
+  .cap { position:absolute; left:0; right:0; bottom:0; margin:0 auto; max-width:1400px; padding:22px 34px; border-radius:18px;
+    background:rgba(4,14,30,.82); border:1px solid rgba(255,255,255,.08); font-size:38px; line-height:1.4; text-align:center; opacity:0; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="189.75" data-fps="30">
+<div id="bg" class="clip" data-start="0" data-duration="189.75" data-track-index="0">
+      <div class="grid"></div><div class="glow"></div>
+      <div class="brand">NARRTOS WEAR</div><div class="doc">Uygulama Geliştirme</div>
+      <div class="progress"><div id="bar" class="bar"></div></div>
+      <div class="avatar" id="avatar"><img src="assets/avatar.svg" alt=""></div></div>
+<div id="intro" class="clip" data-start="0" data-duration="4.5" data-track-index="1">
+      <img class="ilogo" id="intro-logo" src="assets/logo.png" alt="">
+      <div class="iseries" id="intro-series"><b>NARRTOS WEAR</b><span>Dökümantasyon Serisi</span></div></div>
+<div id="title" class="clip" data-start="4.5" data-duration="5.0" data-track-index="1">
+      <div class="card"><div class="k" id="title-k">NARRTOS WEAR</div>
+      <h1 id="title-h">Uygulama Geliştirme</h1><p id="title-s">Dört adımda yeni bir uygulama, uyulması gereken kurallar ve iki çözünürlükte çalışan ölçü sabitleri kalıbı.</p></div>
+      <div class="devs" id="title-devs">
+        <div class="b1"></div><div class="c1"></div><div class="w1"><img id="tw1-0" src="assets/a410-kadran-analog.png" alt=""><img id="tw1-1" src="assets/a410-launcher.png" alt=""><img id="tw1-2" src="assets/a410-hava-durumu.png" alt=""><img id="tw1-3" src="assets/a410-adim-sayar.png" alt=""></div>
+        <div class="b2"></div><div class="w2"><img id="tw2-0" src="assets/r240-kadran-dijital.png" alt=""><img id="tw2-1" src="assets/r240-launcher.png" alt=""><img id="tw2-2" src="assets/r240-hava-durumu.png" alt=""><img id="tw2-3" src="assets/r240-adim-sayar.png" alt=""></div>
+      </div></div>
+<div id="s1" class="clip" data-start="9.50" data-duration="14.70" data-track-index="1">
+      <div class="inner" id="s1-in">
+        <div class="left"><div class="steptitle">Bir uygulama nasıl yaşar</div></div><div class="stepmeta">1 / 10</div>
+        <div class="shot" id="s1-shot" style="left:587px;top:215px;width:525px;height:630px"><video id="s1-v" src="assets/uygulama-acilis-hold14.mp4" muted playsinline data-start="9.80" data-duration="14.40" data-track-index="3"></video></div>
+        <div class="caps"><div class="cap" id="s1-c0">Ekranın sahibi her an yalnızca bir uygulamadır. Geçişleri app_manager animasyonla yapar.</div><div class="cap long" id="s1-c1">Yeni bir uygulama eklemek dört adımdır: dosyaları oluşturmak, kimlik vermek, kaydetmek ve isterseniz ana menüye bir kutucuk eklemek.</div></div>
+      </div></div>
+<div id="s2" class="clip" data-start="24.20" data-duration="10.75" data-track-index="1">
+      <div class="inner" id="s2-in">
+        <div class="left"><div class="steptitle">Adım 1: Uygulama dosyaları (başlık)</div></div><div class="stepmeta">2 / 10</div>
+        <div class="shot code" id="s2-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><pre>// src/apps/myapp/myapp_app.h
+#pragma once
+#include &quot;../../core/app_manager.h&quot;
+const app_interface_t* myapp_get_interface(void);</pre></div>
+        <div class="caps"><div class="cap" id="s2-c0">Her uygulama iki dosyadan oluşur ve dışarıya yalnızca bir fonksiyon verir: kendi get_interface fonksiyonu.</div><div class="cap" id="s2-c1">Yerleşik uygulamaların tamamı bu kalıpla yazılmıştır.</div></div>
+      </div></div>
+<div id="s3" class="clip" data-start="34.95" data-duration="17.30" data-track-index="1">
+      <div class="inner" id="s3-in">
+        <div class="left"><div class="steptitle">Adım 1: Uygulama dosyaları (kaynak)</div></div><div class="stepmeta">3 / 10</div>
+        <div class="shot code small" id="s3-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><pre>// src/apps/myapp/myapp_app.cpp
+#include &quot;myapp_app.h&quot;
+
+static void my_on_start(lv_obj_t* screen) {
+  lv_obj_t* lbl = lv_label_create(screen);
+  lv_label_set_text(lbl, &quot;Merhaba NarRTOS&quot;);
+  lv_obj_center(lbl);
+  app_manager_enable_gestures(screen); // swipe&#x27;lar ekrana ulaşsın
+}
+static void my_on_stop(void) { /* on_start&#x27;ta ayrılanları bırak */ }
+static bool my_on_event(const os_event_t* e) {
+  // örn. EVENT_TIME_UPDATED geldiğinde etiketi tazele
+  return false;                        // true = olayı tükettim
+}</pre></div>
+        <div class="caps"><div class="cap long" id="s3-c0">on_start içinde arayüz yalnızca verilen ekrana kurulur. app_manager_enable_gestures çağrısı, kaydırma jestlerinin bu ekrana ulaşmasını sağlar.</div><div class="cap" id="s3-c1">on_stop, on_start içinde ayrılan her kaynağı serbest bırakır. on_event ise ilgilenmediği olaylarda false döner.</div></div>
+      </div></div>
+<div id="s4" class="clip" data-start="52.25" data-duration="14.10" data-track-index="1">
+      <div class="inner" id="s4-in">
+        <div class="left"><div class="steptitle">Adım 1: Arayüz tablosu</div></div><div class="stepmeta">4 / 10</div>
+        <div class="shot code" id="s4-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><pre>static const app_interface_t my_app = {
+  .on_start  = my_on_start,
+  .on_resume = NULL, .on_pause = NULL,
+  .on_stop   = my_on_stop,
+  .on_event  = my_on_event,
+  .name      = &quot;myapp&quot;,
+};
+const app_interface_t* myapp_get_interface(void) { return &amp;my_app; }</pre></div>
+        <div class="caps"><div class="cap" id="s4-c0">Kullanılmayan yaşam döngüsü fonksiyonları NULL bırakılabilir. name alanı yalnızca log kayıtlarında kullanılır.</div></div>
+      </div></div>
+<div id="s5" class="clip" data-start="66.35" data-duration="16.90" data-track-index="1">
+      <div class="inner" id="s5-in">
+        <div class="left"><div class="steptitle">Adım 2 ve 3: Kimlik ve kayıt</div></div><div class="stepmeta">5 / 10</div>
+        <div class="shot code small" id="s5-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><pre>// core/os_config.h
+typedef enum {
+  APP_ID_WATCHFACE = 0,
+  ...
+  APP_ID_STORE     = 11,
+  APP_ID_MYAPP     = 12,   // &lt;-- YENİ: her zaman APP_ID_COUNT&#x27;tan önce
+  APP_ID_COUNT
+} app_id_t;
+
+// core/app_manager.cpp
+#include &quot;../apps/myapp/myapp_app.h&quot;
+void app_manager_init(void) {
+  ...
+  app_manager_register(APP_ID_MYAPP, myapp_get_interface()); // &lt;-- YENİ
+}</pre></div>
+        <div class="caps"><div class="cap" id="s5-c0">Yeni APP_ID sabiti her zaman APP_ID_COUNT satırının önüne eklenir.</div><div class="cap" id="s5-c1">Bütün uygulamalar tek bir yerde, app_manager_init fonksiyonunda kaydedilir. main.cpp dosyasına dokunulmaz.</div></div>
+      </div></div>
+<div id="s6" class="clip" data-start="83.25" data-duration="12.50" data-track-index="1">
+      <div class="inner" id="s6-in">
+        <div class="left"><div class="steptitle">Adım 4: Derle ve çalıştır</div></div><div class="stepmeta">6 / 10</div>
+        <div class="shot code" id="s6-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><pre>pio run -e esp32s3_wearable -t clean
+pio run -e esp32s3_wearable -t upload   # cihazda: Launcher&#x27;da yeni kutucuk
+
+// Launcher&#x27;a eklemeden de açılabilir (buton, alarm, başka uygulama, komut):
+app_manager_launch(APP_ID_MYAPP);</pre></div>
+        <div class="caps"><div class="cap" id="s6-c0">Kayıt, uygulamayı çalıştırılabilir yapar. Menüde görünmesi için ana menü ızgarasına bir kutucuk eklenir.</div><div class="cap" id="s6-c1">Kodda her değişiklikten sonra önce clean ile temizleyin, ardından derleyip yükleyin.</div></div>
+      </div></div>
+<div id="s7" class="clip" data-start="95.75" data-duration="20.10" data-track-index="1">
+      <div class="inner" id="s7-in">
+        <div class="left"><div class="steptitle">Uyulması gereken kurallar</div></div><div class="stepmeta">7 / 10</div>
+        <div class="shot list" id="s7-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>Arayüz yalnızca on_start fonksiyonuna verilen ekrana kurulur. Ekran nesnesi saklanıp başka ekranlara dokunulmaz.</li><li>Başka bir görevden yapılan arayüz güncellemeleri ui_service_lock ve unlock çağrıları arasına alınır.</li><li>on_stop, on_start içinde ayrılan her kaynağı (zamanlayıcı, tampon, servis aboneliği) bırakır; çünkü uygulamalar tekrar tekrar açılıp kapanır.</li><li>Servisleri sürekli yoklamayın; olayları dinleyin.</li></ul></div>
+        <div class="caps"><div class="cap" id="s7-c0">Bu dört kural, çok uygulamalı bir sistemde kaynak sızıntısını ve çakışmaları önler.</div></div>
+      </div></div>
+<div id="s8" class="clip" data-start="115.85" data-duration="16.90" data-track-index="1">
+      <div class="inner" id="s8-in">
+        <div class="left"><div class="steptitle">Gerçek örnek: WatchFace on_event</div></div><div class="stepmeta">8 / 10</div>
+        <div class="shot code small" id="s8-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><pre>static bool on_event(const os_event_t* event)
+{
+  if (!event) return false;
+  if (event-&gt;type == EVENT_WEATHER_UPDATE) {
+    // Hava durumu görevi yeni veri yayınladı -&gt; ikonu yenile.
+    // UI task bağlamındayız; doğrudan render güvenli.
+    if (s_activity_icon_cloud)
+      weather_icon_render(s_activity_icon_cloud,
+                          (weather_condition_t)event-&gt;data);
+    return true;   // olay tüketildi
+  }
+  return false;    // ilgilenmiyorum -&gt; diğer dinleyicilere geçsin
+}</pre></div>
+        <div class="caps"><div class="cap" id="s8-c0">Hava durumu görevi yeni veri yayınlar. Kadran bu olayı yakalar, ikonu yeniler ve true dönerek olayı tükettiğini bildirir.</div></div>
+      </div></div>
+<div id="s9" class="clip" data-start="132.75" data-duration="18.30" data-track-index="1">
+      <div class="inner" id="s9-in">
+        <div class="left"><div class="steptitle">Çözünürlük uyumu: ölçü sabitleri</div></div><div class="stepmeta">9 / 10</div>
+        <div class="shot code small" id="s9-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><pre>// launcher_app.cpp — ölçü sabitleri (tek blok, uygulamanın başında)
+#ifdef BOARD_VARIANT_LCD128          // 240×240 yuvarlak LCD
+  #define L_SCR_W    240
+  #define L_CELL_W    88               // grid hücresi
+  #define L_CELL_H    92
+  #define L_ICON      64               // uygulama ikonu
+  #define L_SYM_FONT  (&amp;lv_font_montserrat_28)
+#else                                 // 410×502 AMOLED (varsayılan)
+  #define L_SCR_W    410
+  #define L_CELL_W   120
+  #define L_CELL_H   128
+  #define L_ICON      95
+  #define L_SYM_FONT  (&amp;lv_font_montserrat_36)
+#endif
+// UI kodu her yerde SADECE sabiti kullanır:
+lv_obj_set_size(cell, L_CELL_W, L_CELL_H);</pre></div>
+        <div class="caps"><div class="cap long" id="s9-c0">Her uygulama, ekrana bağlı ölçülerini varyanta göre seçilen tek bir sabit bloğunda tanımlar. Arayüz kodu yalnızca bu sabitleri kullanır.</div><div class="cap long" id="s9-c1">Değişmezlik kuralı: varsayılan dal #else tarafında orijinal değerlerin birebir aynısını taşır. Böylece varsayılan derleme tek bayt bile değişmez.</div></div>
+      </div></div>
+<div id="s10" class="clip" data-start="151.05" data-duration="23.70" data-track-index="1">
+      <div class="inner" id="s10-in">
+        <div class="left"><div class="steptitle">Küçük ekran için pratik notlar</div></div><div class="stepmeta">10 / 10</div>
+        <div class="shot list" id="s10-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>İkon ve daire oranını koruyun. 40 piksellik dairede 24 piksellik sembol, 26 piksellik dairede 16 piksele iner.</li><li>Liste satır aralığını satır yüksekliğinin yaklaşık 8 piksel fazlası olarak ayarlayın. AMOLED değerini olduğu gibi taşımak devasa boşluklar üretir.</li><li>Yuvarlak ekranda üst ve alt kenarlarda görünür genişlik daralır. Başlık ve saat gibi öğeleri yan yana değil alt alta yerleştirin.</li></ul></div>
+        <div class="caps"><div class="cap" id="s10-c0">Basit yükseklik ya da konum farkları için satır içi bir #ifdef de yeterlidir.</div></div>
+      </div></div>
+<div id="end" class="clip" data-start="174.75" data-duration="5.0" data-track-index="1">
+      <div class="card"><div class="k" id="end-k">NARRTOS WEAR</div>
+      <h1 id="end-h">Yeni bir çözünürlük, her uygulamada yalnızca bir sabit bloğu dalı demektir.</h1><p id="end-s">Arayüz mantığına dokunulmaz; varsayılan derlemenin çıktısı değişmez. corezzle.com</p></div></div>
+<div id="outro" class="clip" data-start="179.75" data-duration="10.0" data-track-index="1">
+      <div class="oh" id="outro-h">İzlediğiniz için teşekkürler</div>
+      <div class="obox" id="outro-a" style="left:120px"><span>Sıradaki video</span><b>Sıradaki video</b></div>
+      <div class="obox" id="outro-b" style="left:1060px"><span>Oynatma listesi</span><b>Oynatma listesi</b></div>
+      <div class="osub" id="outro-s"><div class="ocircle"></div><div><b>Abone olun</b><span>Yeni bölümlerden haberdar olun</span></div></div>
+      <img class="ologo" id="outro-logo" src="assets/logo.png" alt="">
+      <div class="olinks" id="outro-l">corezzle.com &nbsp;·&nbsp; github.com/corezzle/NarRTOS-Wear</div></div>
+</div>
+<script>
+  window.__timelines = window.__timelines || {};
+  const tl = gsap.timeline({ paused: true });
+    tl.set("#avatar", {opacity: 0}, 0); tl.to("#avatar", {opacity: 1, duration: .5}, 9.3); tl.to("#avatar", {opacity: 0, duration: .4}, 179.35);
+  tl.fromTo("#intro-logo", {scale: .86, opacity: 0}, {scale: 1, opacity: 1, duration: 1.1, ease: "power3.out"}, .15);
+  tl.to("#intro-logo", {y: -70, duration: .8, ease: "power3.inOut"}, 1.6);
+  tl.fromTo("#intro-series", {y: 30, opacity: 0}, {y: 0, opacity: 1, duration: .7, ease: "power3.out"}, 2.0);
+  tl.to(["#intro-logo","#intro-series"], {opacity: 0, duration: .45, ease: "power2.in"}, 4.0);
+  tl.fromTo("#bar", {scaleX: 0}, {scaleX: 1, duration: 189.75, ease: "none"}, 0);
+  tl.from("#title-devs", {x: 60, opacity: 0, duration: .9, ease: "power3.out"}, 5.1);
+  tl.to(["#tw1-1","#tw2-1"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 6.45);
+  tl.to(["#tw1-2","#tw2-2"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 7.50);
+  tl.to(["#tw1-3","#tw2-3"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 8.55);
+  tl.to("#title-devs", {opacity: 0, duration: .45, ease: "power2.in"}, 9.0);
+  tl.from("#title-k", {y: 30, opacity: 0, duration: .6, ease: "power3.out"}, 4.7);
+  tl.from("#title-h", {y: 40, opacity: 0, duration: .8, ease: "power3.out"}, 4.95);
+  tl.from("#title-s", {y: 30, opacity: 0, duration: .7, ease: "power3.out"}, 5.3);
+  tl.to(["#title-k","#title-h","#title-s"], {opacity: 0, duration: .45, ease: "power2.in"}, 9.0);
+  tl.from("#s1-in", {opacity: 0, duration: .45, ease: "power2.out"}, 9.50);
+  tl.from("#s1-shot", {y: 36, duration: .7, ease: "power3.out"}, 9.50);
+  tl.to("#s1-in", {opacity: 0, duration: .4, ease: "power2.in"}, 23.78);
+  tl.fromTo("#s1-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 10.10);
+  tl.to("#s1-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 15.05);
+  tl.fromTo("#s1-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 15.40);
+  tl.from("#s2-in", {opacity: 0, duration: .45, ease: "power2.out"}, 24.20);
+  tl.from("#s2-shot", {y: 36, duration: .7, ease: "power3.out"}, 24.20);
+  tl.to("#s2-in", {opacity: 0, duration: .4, ease: "power2.in"}, 34.53);
+  tl.fromTo("#s2-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 24.80);
+  tl.to("#s2-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 31.10);
+  tl.fromTo("#s2-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 31.45);
+  tl.from("#s3-in", {opacity: 0, duration: .45, ease: "power2.out"}, 34.95);
+  tl.from("#s3-shot", {y: 36, duration: .7, ease: "power3.out"}, 34.95);
+  tl.to("#s3-in", {opacity: 0, duration: .4, ease: "power2.in"}, 51.83);
+  tl.fromTo("#s3-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 35.55);
+  tl.to("#s3-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 42.30);
+  tl.fromTo("#s3-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 42.65);
+  tl.from("#s4-in", {opacity: 0, duration: .45, ease: "power2.out"}, 52.25);
+  tl.from("#s4-shot", {y: 36, duration: .7, ease: "power3.out"}, 52.25);
+  tl.to("#s4-in", {opacity: 0, duration: .4, ease: "power2.in"}, 65.93);
+  tl.fromTo("#s4-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 52.85);
+  tl.from("#s5-in", {opacity: 0, duration: .45, ease: "power2.out"}, 66.35);
+  tl.from("#s5-shot", {y: 36, duration: .7, ease: "power3.out"}, 66.35);
+  tl.to("#s5-in", {opacity: 0, duration: .4, ease: "power2.in"}, 82.83);
+  tl.fromTo("#s5-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 66.95);
+  tl.to("#s5-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 71.00);
+  tl.fromTo("#s5-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 71.35);
+  tl.from("#s6-in", {opacity: 0, duration: .45, ease: "power2.out"}, 83.25);
+  tl.from("#s6-shot", {y: 36, duration: .7, ease: "power3.out"}, 83.25);
+  tl.to("#s6-in", {opacity: 0, duration: .4, ease: "power2.in"}, 95.33);
+  tl.fromTo("#s6-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 83.85);
+  tl.to("#s6-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 89.70);
+  tl.fromTo("#s6-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 90.05);
+  tl.from("#s7-in", {opacity: 0, duration: .45, ease: "power2.out"}, 95.75);
+  tl.from("#s7-shot", {y: 36, duration: .7, ease: "power3.out"}, 95.75);
+  tl.to("#s7-in", {opacity: 0, duration: .4, ease: "power2.in"}, 115.43);
+  tl.fromTo("#s7-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 96.35);
+  tl.from("#s8-in", {opacity: 0, duration: .45, ease: "power2.out"}, 115.85);
+  tl.from("#s8-shot", {y: 36, duration: .7, ease: "power3.out"}, 115.85);
+  tl.to("#s8-in", {opacity: 0, duration: .4, ease: "power2.in"}, 132.33);
+  tl.fromTo("#s8-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 116.45);
+  tl.from("#s9-in", {opacity: 0, duration: .45, ease: "power2.out"}, 132.75);
+  tl.from("#s9-shot", {y: 36, duration: .7, ease: "power3.out"}, 132.75);
+  tl.to("#s9-in", {opacity: 0, duration: .4, ease: "power2.in"}, 150.63);
+  tl.fromTo("#s9-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 133.35);
+  tl.to("#s9-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 141.90);
+  tl.fromTo("#s9-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 142.25);
+  tl.from("#s10-in", {opacity: 0, duration: .45, ease: "power2.out"}, 151.05);
+  tl.from("#s10-shot", {y: 36, duration: .7, ease: "power3.out"}, 151.05);
+  tl.to("#s10-in", {opacity: 0, duration: .4, ease: "power2.in"}, 174.33);
+  tl.fromTo("#s10-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 151.65);
+  tl.from(["#end-k","#end-h","#end-s"], {y: 30, opacity: 0, duration: .7, stagger: .18, ease: "power3.out"}, 174.95);
+  tl.to(["#end-k","#end-h","#end-s"], {opacity: 0, duration: .45, ease: "power2.in"}, 179.25);
+  tl.from(["#outro-h","#outro-a","#outro-b","#outro-s","#outro-l","#outro-logo"], {y: 30, opacity: 0, duration: .7, stagger: .14, ease: "power3.out"}, 179.90);
+  window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

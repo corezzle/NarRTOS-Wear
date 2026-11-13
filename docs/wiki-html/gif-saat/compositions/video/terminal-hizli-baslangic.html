@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <title>Hızlı başlangıç: dört komut — terminal GIF</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/term-video.css">
+  </head>
+  <body>
+    <div data-hf-id="hf-j14a" id="root" data-composition-id="termv-hizli" data-start="0" data-duration="21" data-width="760" data-height="420" data-fps="15">
+      <div data-hf-id="hf-2xc0" id="bg"></div>
+      <div data-hf-id="hf-7on1" id="win">
+        <div data-hf-id="hf-2to0" id="bar"><div data-hf-id="hf-og9e" class="dot" id="d1"></div><div data-hf-id="hf-ki5d" class="dot" id="d2"></div><div data-hf-id="hf-jqhk" class="dot" id="d3"></div>
+          <div data-hf-id="hf-a9bd" id="title">Terminal</div></div>
+        <div data-hf-id="hf-lj6z" id="out"><div data-hf-id="hf-v0ty" id="lines"></div></div>
+      </div>
+    </div>
+    <script src="assets/term.js"></script>
+    <script>
+      /* Hızlı başlangıç bölümündeki dört komut, tek akışta. Uzun çıktılar
+         kısaltıldı; adım adım hâli Başlarken GIF'lerinde. */
+      buildTerminal("termv-hizli", [
+        { type:"cmd", text:"git clone https://github.com/corezzle/NarRTOS-Wear.git", speed:0.035 },
+        { type:"out", text:"Cloning into 'NarRTOS-Wear'...", dt:0.5 },
+        { type:"out", text:"remote: Enumerating objects: 2148, done.", dt:0.4 },
+        { type:"out", text:"Receiving objects: 100% (2148/2148), 38.6 MiB | 9.8 MiB/s, done.", dt:0.5 },
+        { type:"out", text:"Resolving deltas: 100% (1402/1402), done.", dt:0.6 },
+        { type:"cmd", text:"cd NarRTOS-Wear", enter:0.6 },
+        { type:"cmd", text:"pio run -e esp32s3_wearable -t upload" },
+        { type:"out", text:"Processing esp32s3_wearable (platform: espressif32; framework: espidf)", dt:0.5 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/main.cpp.o", dt:0.18 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/core/app_manager.cpp.o", dt:0.18 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/services/ui_service.cpp.o", dt:0.18 },
+        { type:"out", text:"Compiling .pio/build/esp32s3_wearable/src/apps/watchface/watchface_app.cpp.o", dt:0.18 },
+        { type:"out", text:"Linking .pio/build/esp32s3_wearable/firmware.elf", dt:0.5 },
+        { type:"out", text:"Building .pio/build/esp32s3_wearable/firmware.bin", dt:0.4 },
+        { type:"out", text:"Auto-detected: /dev/cu.usbserial-1420", cls:"hi", dt:0.4 },
+        { type:"out", text:"Writing at 0x00010000... (2 %)", dt:0.45 },
+        { type:"out", text:"Writing at 0x000e2b7f... (50 %)", dt:0.45 },
+        { type:"out", text:"Writing at 0x001ba5e9... (100 %)", dt:0.45 },
+        { type:"out", text:"Hash of data verified.", dt:0.35 },
+        { type:"out", text:"Hard resetting via RTS pin...", dt:0.5 },
+        { type:"out", text:"==================== [SUCCESS] Took 42.61 seconds ====================", cls:"ok", dt:0.8 },
+        { type:"cmd", text:"pio device monitor" },
+        { type:"out", text:"--- Terminal on /dev/cu.usbserial-1420 | 115200 8-N-1", dt:0.5 },
+        { type:"out", text:"I (318) MAIN:  Embedded Wearable OS  v1.4.81", cls:"hi", dt:0.3 },
+        { type:"out", text:"I (361) MAIN: [Core0] UI Task started", dt:0.3 },
+        { type:"out", text:"I (402) MAIN: [Core0] Entering LVGL main loop", cls:"ok" }
+      ], { visible: 11, lineHeight: 28, holdEnd: true });
+    </script>
+  </body>
+</html>

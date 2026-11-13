@@ -1,0 +1,332 @@
+#!/usr/bin/env python3
+"""nar — NarRTOS test/araç projeleri için tek giriş noktası.
+
+Projelere dokunmaz; senin elle yazdığın komutların aynısını (pio / esptool / pyocd) senin yerine
+çalıştırır ve her komutu ekrana yazar. Kullanım:
+  nar                      menü
+  nar test <proje> [env]   derle + yükle + monitör      (--build / --upload / --monitor ile daraltılır)
+  nar monitor [proje]      yalnız monitör
+  nar os [env]             embedded-wear-os (varsayılan nar_esp32s3)
+  nar probe                ESP'yi SWD probuna (esp-usb-bridge) çevir
+  nar slm [--stay]         nRF9151'e SLM yaz (tek oturum), sonra lte'ye dön ve AT'yi doğrula
+  nar modemfw              modem yazılımı PTI -> 2.0.4 (fmfu akışı)
+  nar at                   AT konsolu (lte yazılımı + monitör; 'c' tuşu)
+  nar ports                takılı kartlar ve modları
+  nar list                 projeler
+Her komut --dry-run ile yalnız ne yapacağını gösterir.
+"""
+import glob, os, re, shlex, subprocess, sys, time
+
+HOME = os.path.expanduser('~')
+DESK = os.path.join(HOME, 'Desktop')
+PIO = os.path.join(HOME, '.platformio/penv/bin/pio')
+ESPTOOL = os.path.join(HOME, 'nrf-tools/idfenv/bin/esptool.py')
+IDFPY = os.path.join(HOME, 'nrf-tools/idfenv/bin/python')
+PYOCD = os.path.join(HOME, 'nrf-tools/venv/bin/pyocd')
+NRFPY = os.path.join(HOME, 'nrf-tools/venv/bin/python')
+BRIDGE = os.path.join(HOME, 'nrf-tools/esp-usb-bridge/build')
+SLM = os.path.join(HOME, 'slm-ws/ncs-serial-modem/app/build')
+FMFU = os.path.join(HOME, 'nrf-tools/fmfu/build')
+MFW = os.path.join(HOME, 'nrf-tools/modem/mfw_nrf91x1_2.0.4.zip')
+UPDATE_MODEM = os.path.join(HOME, 'slm-ws/nrf/samples/cellular/fmfu_smp_svr/update_modem.py')
+LOG = os.path.join(HOME, '.nar/last.log')
+
+# kısa ad -> (klasör, env listesi, açıklama). İlk env varsayılan.
+PROJECTS = {
+    'board':   ('narrtos-board-selftest', ['hello_amoled'],            'Kart checklist\'i (AMOLED 2.06 / NAR)'),
+    'lte':     ('narrtos-lte-test',       ['lte', 'lte_low', 'lte_bridge'], 'GSM / nRF9151 (AT konsolu, ölçüm modu, köprü)'),
+    'i2c':     ('narrtos-i2c-test',       ['i2c', 'kurtar'],            'I2C hattı: seviye + tarama + kurtarma'),
+    'pmic':    ('narrtos-pmic-test',      ['pmic'],                     'PMIC AXP2101'),
+    'imu':     ('narrtos-imu-test',       ['imu'],                      'IMU'),
+    'rtc':     ('narrtos-rtc-test',       ['rtc'],                      'RTC PCF85063'),
+    'ntc':     ('narrtos-ntc-test',       ['ntc'],                      'NTC termistör (AXP TS)'),
+    'mem':     ('narrtos-mem-test',       ['mem'],                      'PSRAM / flash'),
+    'audio':   ('narrtos-audio-test',     ['audio'],                    'Ses yolu ES8311 -> NS4150B -> ES7210'),
+    'motor':   ('narrtos-motor-test',     ['motor'],                    'Titreşim motoru'),
+    'display': ('narrtos-display-test',   ['display'],                  'Ekran CO5300 sonda'),
+    'touch':   ('narrtos-touch-test',     ['touch'],                    'Dokunmatik CST820 / FT3168'),
+    'sd':      ('narrtos-sd-test',        ['sd'],                       'SD kart'),
+    'player':  ('narrtos-sdplayer-test',  ['calar'],                    'SD\'den WAV/MP3 çalar'),
+    'ble':     ('narrtos-ble-test',       ['ble'],                      'BLE tarama'),
+    'wifi':    ('narrtos-wifi-test',      ['tamguc', 'kademeli'],       'Wi-Fi TX gücü (tam / kademeli)'),
+    'swd':     ('narrtos-swd-test',       ['swd'],                      'SWD bit-bang testi (ALDO1 döngüsü var, dikkat)'),
+    'csi':     ('narrtos-espcsi',         ['s3_csi', 'c6_csi'],         'ESP CSI'),
+    'drive':   ('narrtos-drive',          ['esp32s3_drive', 'esp32s3_drive_lcd128'], 'NarRTOS-Drive'),
+    'os':      ('embedded-wear-os',       ['nar_esp32s3', 'esp32s3_wearable', 'esp32s3_18inch', 'esp32s3_lcd128'], 'NarRTOS Wear OS'),
+}
+DRY = False
+
+# ---------- yardımcılar ----------
+def say(msg): print(f'\033[36m{msg}\033[0m')
+def warn(msg): print(f'\033[33m{msg}\033[0m')
+def err(msg): print(f'\033[31m{msg}\033[0m')
+def die(msg, code=1): err(msg); sys.exit(code)
+
+def run(cmd, cwd=None, check=True, capture=False, timeout=None):
+    """Komutu ekrana yazar ve çalıştırır. Liste ya da string."""
+    text = cmd if isinstance(cmd, str) else ' '.join(shlex.quote(c) for c in cmd)
+    print(f'\033[2m→ {("cd " + cwd + " && ") if cwd else ""}{text}\033[0m')
+    if DRY:
+        return subprocess.CompletedProcess(cmd, 0, '', '')
+    os.makedirs(os.path.dirname(LOG), exist_ok=True)
+    with open(LOG, 'a') as f: f.write(f'\n$ {text}\n')
+    if capture:
+        r = subprocess.run(cmd, cwd=cwd, shell=isinstance(cmd, str), text=True, capture_output=True, timeout=timeout)
+        with open(LOG, 'a') as f: f.write(r.stdout + r.stderr)
+    else:
+        r = subprocess.run(cmd, cwd=cwd, shell=isinstance(cmd, str), timeout=timeout)
+    if check and r.returncode != 0:
+        raise subprocess.CalledProcessError(r.returncode, cmd, getattr(r, 'stdout', None), getattr(r, 'stderr', None))
+    return r
+
+def ports():
+    return sorted(glob.glob('/dev/cu.usbmodem*'))
+
+def usb_mode():
+    """ESP'nin USB kimliğinden modu: 'native' (kendi yazılımı, USB-JTAG), 'bridge' (prob/köprü), None."""
+    try:
+        out = subprocess.run(['ioreg', '-p', 'IOUSB', '-w0', '-l'], capture_output=True, text=True, timeout=10).stdout
+    except Exception:
+        return None
+    ids = re.findall(r'"idVendor" = (\d+)|"idProduct" = (\d+)', out)
+    vend = [int(v) for v, _ in ids if v]; prod = [int(p) for _, p in ids if p]
+    pairs = list(zip(vend, prod))
+    if (0x303a, 0x1002) in pairs: return 'bridge'
+    if (0x303a, 0x1001) in pairs: return 'native'
+    return None
+
+def port_busy(port):
+    r = subprocess.run(['lsof', port], capture_output=True, text=True)
+    return bool(r.stdout.strip())
+
+def wait_port(timeout=60, msg='Port bekleniyor'):
+    t0 = time.time()
+    while time.time() - t0 < timeout:
+        p = ports()
+        if p: return p[0]
+        print(f'\r{msg}... {int(time.time()-t0)} sn ', end='', flush=True)
+        time.sleep(0.5)
+    print(); return None
+
+def ask(prompt, default=''):
+    """Etkileşimsiz (boru/dry-run) kullanımda varsayılanı döndürür."""
+    if DRY or not sys.stdin.isatty():
+        print(f'{prompt}{default}'); return default
+    try: return input(prompt).strip() or default
+    except EOFError: return default
+
+def pick_port():
+    p = ports()
+    if not p and DRY:
+        return '/dev/cu.usbmodemXXXX'
+    if not p:
+        warn('USB\'de kart yok.'); p0 = wait_port(30)
+        if not p0: die('Kart bulunamadı. USB\'yi tak ve tekrar dene.')
+        return p0
+    if len(p) > 1:
+        print('Birden fazla port var:'); [print(f'  {i+1}) {x}') for i, x in enumerate(p)]
+        i = int(ask('Hangisi? [1]: ', '1')) - 1; return p[i]
+    port = p[0]
+    if port_busy(port):
+        die(f'{port} meşgul: başka bir terminalde monitör açık. Ctrl+C ile kapatıp tekrar dene.')
+    return port
+
+def touch_1200(port):
+    """ESP prob/köprü (TinyUSB CDC) modundayken ROM indirme moduna sokar."""
+    say('ESP köprü modunda: 1200-baud dokunuşuyla indirme moduna alınıyor...')
+    code = ("import serial,time; s=serial.Serial(%r,1200); s.dtr=True; time.sleep(0.5); s.dtr=False; time.sleep(0.2); s.close()" % port)
+    run([IDFPY, '-c', code])
+    time.sleep(4)
+    return wait_port(20, 'ROM portu bekleniyor') or port
+
+def ensure_native_for_upload():
+    """Yüklemeden önce ESP'nin esptool'un resetleyebileceği durumda olmasını sağlar."""
+    port = pick_port()
+    if usb_mode() == 'bridge' and not DRY:
+        port = touch_1200(port)
+    return port
+
+def pio_upload(proj_dir, env, targets):
+    port = ensure_native_for_upload()
+    cmd = [PIO, 'run', '-e', env] + sum([['-t', t] for t in targets], [])
+    if 'upload' in targets: cmd += ['--upload-port', port]
+    if 'monitor' in targets: cmd += ['--monitor-port', port]
+    try:
+        run(cmd, cwd=proj_dir)
+    except subprocess.CalledProcessError:
+        if 'upload' not in targets: raise
+        warn('Yükleme başarısız. ESP indirme moduna girmemiş olabilir.')
+        ask('USB\'yi çıkar, BOOT\'a BASILI TUTARAK tak, sonra ENTER... ')
+        port = wait_port(60) or die('Port gelmedi.')
+        cmd = [c if c != cmd[cmd.index('--upload-port') + 1] else port for c in cmd] if '--upload-port' in cmd else cmd
+        run(cmd, cwd=proj_dir)
+
+def pio_monitor(proj_dir, env):
+    port = pick_port()
+    run([PIO, 'device', 'monitor', '-e', env, '--port', port], cwd=proj_dir, check=False)
+
+def resolve(key):
+    if key not in PROJECTS:
+        die(f'Bilinmeyen proje: {key}. "nar list" ile bak.')
+    d, envs, desc = PROJECTS[key]
+    return os.path.join(DESK, d), envs, desc
+
+def project_from_cwd():
+    cwd = os.path.basename(os.getcwd())
+    for k, (d, _, _) in PROJECTS.items():
+        if d == cwd: return k
+    return None
+
+def choose_env(envs, given, interactive=False):
+    if given:
+        if given not in envs: die(f'Env {given} yok; seçenekler: {", ".join(envs)}')
+        return given
+    if len(envs) == 1 or not interactive:
+        if len(envs) > 1: print(f'(env: {envs[0]}; diğerleri: {", ".join(envs[1:])} — "nar test <proje> <env>")')
+        return envs[0]
+    print('Env:'); [print(f'  {i+1}) {e}' + ('  (varsayılan)' if i == 0 else '')) for i, e in enumerate(envs)]
+    return envs[int(ask('Seçim [1]: ', '1')) - 1]
+
+# ---------- komutlar ----------
+def cmd_list():
+    for k, (d, envs, desc) in PROJECTS.items():
+        print(f'  {k:8s} {d:26s} {", ".join(envs):42s} {desc}')
+
+def cmd_ports():
+    p = ports(); m = usb_mode()
+    print('Portlar:', ', '.join(p) if p else 'yok')
+    print('ESP modu:', {'native': 'normal yazılım (USB-JTAG) — esptool doğrudan yükler',
+                        'bridge': 'SWD probu / köprü (TinyUSB) — yüklemeden önce 1200-baud dokunuşu gerekir',
+                        None: 'bilinmiyor / kart yok'}[m])
+    for x in p:
+        if port_busy(x): warn(f'{x} meşgul (monitör açık)')
+
+def cmd_test(args, interactive=False):
+    key = None; env = None; targets = None
+    for a in args:
+        if a == '--build': targets = []
+        elif a == '--upload': targets = ['upload']
+        elif a == '--monitor': targets = ['monitor']
+        elif key is None: key = a
+        else: env = a
+    key = key or project_from_cwd() or die('Proje adı ver: nar test lte   (ya da proje klasörünün içinden çalıştır)')
+    proj_dir, envs, desc = resolve(key)
+    env = choose_env(envs, env, interactive)
+    say(f'{key} — {desc}  [{env}]')
+    if targets == ['monitor']:
+        pio_monitor(proj_dir, env)
+    elif targets == []:
+        run([PIO, 'run', '-e', env], cwd=proj_dir)
+    else:
+        pio_upload(proj_dir, env, ['upload'] + (['monitor'] if targets is None else []))
+
+def cmd_probe():
+    port = ensure_native_for_upload()
+    say('ESP\'ye SWD prob yazılımı (esp-usb-bridge) yazılıyor... SWCLK=GPIO5->TP1, SWDIO=GPIO4->TP2')
+    run([ESPTOOL, '--chip', 'esp32s3', '--port', port, '--no-stub', 'write_flash', '--flash_mode', 'dio',
+         '--flash_freq', '80m', '--flash_size', '32MB', '0x0', 'bootloader/bootloader.bin',
+         '0x8000', 'partition_table/partition-table.bin', '0x10000', 'bridge.bin'], cwd=BRIDGE)
+    time.sleep(5)
+    r = run([PYOCD, 'list'], capture=True, check=False)
+    if 'CMSIS-DAP' in (r.stdout or ''): say('Prob hazır (CMSIS-DAP görünüyor).')
+    else: warn('Prob görünmedi; USB\'yi çıkarıp takıp "nar ports" ile bak.')
+
+def swd_check():
+    r = run([PYOCD, 'cmd', '-t', 'nrf91', '-f', '100k', '-c', 'readdp 0'], capture=True, check=False)
+    out = (r.stdout or '') + (r.stderr or '')
+    if 'DP register 0x0' in out or 'No cores were discovered' in out:
+        say('nRF9151 SWD\'de cevap veriyor.'); return True
+    err(out.strip().splitlines()[-1] if out.strip() else 'SWD cevap yok')
+    return False
+
+def cmd_slm(args):
+    if usb_mode() != 'bridge':
+        say('ESP prob modunda değil; önce prob yazılımı yükleniyor.'); cmd_probe()
+    if not swd_check():
+        die('Çip SWD\'de cevap vermiyor: DEC0/VCC3V3/RESET ve TP1/TP2 hatlarını ölç (bkz. docs/gsm rehberi).')
+    say('SLM tek oturumda yazılıyor (kilit açma + yazma + doğrulama)...')
+    run([PYOCD, 'flash', '-t', 'nrf91', '-e', 'sector', '-f', '1M',
+         os.path.join(SLM, 'merged_nrf9151dk_nrf9151.hex'), os.path.join(SLM, 'merged_nrf9151dk_nrf9151_ns.hex')])
+    run([PYOCD, 'reset', '-t', 'nrf91', '-f', '100k'], check=False)
+    say('SLM yazıldı.')
+    if '--stay' in args:
+        say('ESP prob modunda bırakıldı (--stay).'); return
+    say('ESP lte test yazılımına döndürülüyor, AT doğrulaması için monitör açılacak.')
+    proj_dir, envs, _ = resolve('lte')
+    pio_upload(proj_dir, 'lte', ['upload', 'monitor'])
+
+def cmd_modemfw():
+    say('Modem yazılımı güncelleme (PTI -> 2.0.4): 1) nRF\'e fmfu  2) ESP köprü  3) aktarım  4) SLM geri')
+    if usb_mode() != 'bridge': cmd_probe()
+    if not swd_check(): die('SWD yok; önce bağlantıyı düzelt.')
+    run([PYOCD, 'erase', '-t', 'nrf91', '--mass', '-f', '1M'])
+    run([PYOCD, 'flash', '-t', 'nrf91', '-e', 'sector', '-f', '1M',
+         os.path.join(FMFU, 'mcuboot/zephyr/zephyr.hex'), os.path.join(FMFU, 'fmfu_smp_svr/zephyr/zephyr.signed.hex')])
+    run([PYOCD, 'reset', '-t', 'nrf91', '-f', '100k'], check=False)
+    proj_dir, _, _ = resolve('lte')
+    pio_upload(proj_dir, 'lte_bridge', ['upload'])
+    time.sleep(6); port = pick_port()
+    say('Modem yazılımı aktarılıyor (~6 dk)...')
+    r = run([NRFPY, UPDATE_MODEM, MFW, port, '115200'], check=False)
+    if r.returncode != 0:
+        err('Aktarım başarısız (log: %s). SLM geri yazılıyor.' % LOG)
+    else:
+        say('Modem yazılımı 2.0.4 yazıldı. SLM geri yazılıyor.')
+    cmd_probe(); swd_check()
+    run([PYOCD, 'erase', '-t', 'nrf91', '--mass', '-f', '1M'])
+    run([PYOCD, 'flash', '-t', 'nrf91', '-e', 'sector', '-f', '1M',
+         os.path.join(SLM, 'merged_nrf9151dk_nrf9151.hex'), os.path.join(SLM, 'merged_nrf9151dk_nrf9151_ns.hex')])
+    run([PYOCD, 'reset', '-t', 'nrf91', '-f', '100k'], check=False)
+    pio_upload(proj_dir, 'lte', ['upload', 'monitor'])
+
+def cmd_at():
+    proj_dir, _, _ = resolve('lte')
+    if usb_mode() == 'bridge':
+        say('ESP prob modunda; lte yazılımı yükleniyor.'); pio_upload(proj_dir, 'lte', ['upload'])
+        time.sleep(3)
+    say("Monitör açılıyor. Test bitince prompt'ta 'c' = AT konsolu. Çıkış: Ctrl+C")
+    pio_monitor(proj_dir, 'lte')
+
+def menu():
+    cmd_ports(); print()
+    keys = list(PROJECTS)
+    for i, k in enumerate(keys):
+        d, envs, desc = PROJECTS[k]; print(f'  {i+1:2d}) {k:8s} {desc}')
+    print('   p) probe   ESP\'yi SWD probuna çevir\n   s) slm     nRF9151\'e SLM yaz\n   m) modemfw modem yazılımı 2.0.4\n   a) at      AT konsolu\n   q) çık')
+    c = ask('Seçim: ').lower()
+    if c == 'q' or not c: return
+    if c == 'p': return cmd_probe()
+    if c == 's': return cmd_slm([])
+    if c == 'm': return cmd_modemfw()
+    if c == 'a': return cmd_at()
+    key = keys[int(c) - 1]
+    print('  1) derle + yükle + monitör   2) sadece monitör   3) sadece derle')
+    w = ask('Seçim [1]: ', '1')
+    cmd_test([key] + ({'2': ['--monitor'], '3': ['--build']}.get(w, [])), interactive=True)
+
+def main():
+    global DRY
+    args = [a for a in sys.argv[1:] if a != '--dry-run']
+    DRY = '--dry-run' in sys.argv
+    if not args: return menu()
+    c, rest = args[0], args[1:]
+    try:
+        if c == 'test': cmd_test(rest)
+        elif c == 'monitor': cmd_test((rest or [project_from_cwd() or 'lte']) + ['--monitor'])
+        elif c == 'os': cmd_test(['os'] + rest)
+        elif c == 'probe': cmd_probe()
+        elif c == 'slm': cmd_slm(rest)
+        elif c == 'modemfw': cmd_modemfw()
+        elif c == 'at': cmd_at()
+        elif c == 'ports': cmd_ports()
+        elif c == 'list': cmd_list()
+        elif c in ('help', '-h', '--help'): print(__doc__)
+        elif c in PROJECTS: cmd_test([c] + rest)
+        else: die(f'Bilinmeyen komut: {c}\n{__doc__}')
+    except KeyboardInterrupt:
+        print(); sys.exit(130)
+    except subprocess.CalledProcessError as e:
+        die(f'Komut başarısız (kod {e.returncode}). Log: {LOG}')
+
+if __name__ == '__main__':
+    main()

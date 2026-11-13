@@ -1,0 +1,83 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "Genel Bakış",
+  "title": "NarRTOS Wear: Genel Bakış",
+  "subtitle": "NarRTOS Wear, ESP32-S3 için geliştirilen açık kaynak bir gömülü işletim sistemidir. FreeRTOS çekirdeği ve LVGL 9 grafik kütüphanesiyle dokunmatik ekranlı akıllı cihazlar için eksiksiz bir çalışma ortamı sunar.",
+  "end_title": "Dokümantasyon haritası",
+  "end_subtitle": "Başlarken, Mimari, Çekirdek ve Servisler, Donanım, Uygulama Geliştirme, Kullanıcı Arayüzü, Komut Arayüzü, Telemetri, OTA ve Sorun Giderme bölümleri corezzle.com adresinde.",
+  "scenes": [
+    {
+      "step": "1",
+      "title": "Tek kod tabanı, iki donanım",
+      "image": "assets/hero-cihazlar.mp4",
+      "captions": [
+        "Telefondan Bluetooth ile gönderilen tek bir komut, NarRTOS'un iki kart varyantında da aynı ekranı açıyor.",
+        "Donanım derleme sırasında seçilir; uygulama kodu iki kartta da aynıdır."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Sayılarla NarRTOS",
+      "items": [
+        "İki çekirdekli, 240 MHz hızında bir ESP32-S3 işlemci",
+        "12 yerleşik uygulama",
+        "20 sistem servisi",
+        "2 kart varyantı",
+        "GPS olmadan yaklaşık 19 metre hassasiyetle konum",
+        "AMOLED sürümünde 2,6 MB boyutunda yazılım"
+      ],
+      "captions": [
+        "Güncel sürüm v1.4.81'dir. Platform ESP32-S3, grafik kütüphanesi LVGL 9, çekirdek FreeRTOS."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "Çift çekirdekli mimari",
+      "image": "assets/cift-cekirdek.png",
+      "captions": [
+        "Arayüz çizimi bir çekirdekte, sensör ve servis işleri diğer çekirdekte çalışır; böylece ikisi birbirini engellemez.",
+        "Servisler birbirini doğrudan çağırmaz. Aralarındaki iletişim, hafif bir yayınla ve abone ol olay veriyolu üzerinden yürür."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Board varyant sistemi",
+      "image": "assets/lcd128-tur.mp4",
+      "captions": [
+        "410×502 AMOLED ekran ile 240×240 yuvarlak LCD ekran aynı kod tabanını kullanır; yalnızca ekran ve dokunmatik donanımı farklıdır.",
+        "Uygulamalar ekran ölçülerini koda sabit yazmaz. Ölçü sabitleri, derlenen kart varyantına göre seçilir."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "GPS'siz konumlandırma",
+      "image": "assets/02-bssid-ile-konum.png",
+      "captions": [
+        "Cihaz, çevresindeki WiFi erişim noktalarının MAC adreslerini sunucuya raporlar; sunucu bu listeden konumu çözer.",
+        "Böylece GPS donanımı olmadan yaklaşık 19 metre hassasiyetle konum elde edilir."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Kablosuz güncelleme",
+      "image": "assets/03-admin-surumler.png",
+      "captions": [
+        "Cihaz kendini sahada günceller. Sırasıyla sürüm bilgisini sorgular, yeni imajı indirir, doğrular ve yedek bölüme geçer.",
+        "Hedef sürüm yönetim panelinden atanır; cihaza fiziksel olarak dokunmak gerekmez."
+      ]
+    },
+    {
+      "step": "7",
+      "title": "Hazır servisler ve komut arayüzü",
+      "items": [
+        "Güç, zaman (RTC ve NTP), WiFi, Bluetooth, ses, sensör ve OTA servisleri hazır gelir.",
+        "Telemetri servisi cihaz sağlığını ve WiFi tabanlı konumu sunucuya raporlar.",
+        "Komut arayüzü, cihazı USB seri bağlantı ya da telefondan Bluetooth ile uzaktan sürmenizi sağlar.",
+        "Modüler uygulama çatısında her uygulama bir yaşam döngüsü arayüzüyle sisteme kaydolur."
+      ],
+      "captions": [
+        "NarRTOS açık kaynaktır. Hata bildirimi, öneri ve katkı için GitHub'da issue ya da pull request açabilirsiniz."
+      ]
+    }
+  ]
+}

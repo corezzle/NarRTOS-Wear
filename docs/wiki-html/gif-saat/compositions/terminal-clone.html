@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>git clone — terminal</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/term.css" />
+  </head>
+  <body>
+    <div id="root" data-composition-id="term-clone" data-start="0" data-duration="10"
+         data-width="760" data-height="420" data-fps="15">
+      <div id="bg"></div>
+      <div id="win">
+        <div id="bar"><div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+          <div id="title">Terminal</div></div>
+        <div id="out"><div id="lines"></div></div>
+      </div>
+    </div>
+    <script src="assets/term.js"></script>
+    <script>
+      buildTerminal("term-clone", [
+        { type:"cmd", text:"mkdir Projeler" },
+        { type:"cmd", text:"cd Projeler", enter:0.5 },
+        { type:"cmd", text:"git clone https://github.com/corezzle/NarRTOS-Wear.git", speed:0.035 },
+        { type:"out", text:"Cloning into 'NarRTOS-Wear'...", dt:0.5 },
+        { type:"out", text:"remote: Enumerating objects: 2148, done.", dt:0.4 },
+        { type:"out", text:"Receiving objects: 100% (2148/2148), 38.6 MiB | 9.8 MiB/s, done.", dt:0.5 },
+        { type:"out", text:"Resolving deltas: 100% (1402/1402), done.", dt:0.6 },
+        { type:"cmd", text:"cd NarRTOS-Wear", enter:0.8 }
+      ]);
+    </script>
+  </body>
+</html>

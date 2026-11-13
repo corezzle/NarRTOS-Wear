@@ -1,0 +1,214 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "Kullanıcı Arayüzü",
+  "title": "Kullanıcı Arayüzü",
+  "subtitle": "Jestler, Control Center, fiziksel butonlar, güç durumları ve yerleşik uygulamalar.",
+  "end_title": "Uygulamalar ekran ölçülerini koda sabit yazmaz.",
+  "end_subtitle": "Ölçü sabitleri kart varyantına göre seçilir. Ayrıntı Uygulama Geliştirme dökümanının Çözünürlük uyumu bölümünde. corezzle.com",
+  "scenes": [
+    {
+      "step": "1",
+      "title": "Üç girdi",
+      "items": [
+        "Dokunmatik ekrandaki kaydırma jestleri",
+        "İki fiziksel buton",
+        "Hareket sensörüyle algılanan bilek kaldırma"
+      ],
+      "captions": [
+        "NarRTOS'ta kullanıcı etkileşimi bu üç girdiye dayanır."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Jest (swipe) sistemi",
+      "items": [
+        "Saat kadranında sağa kaydırma, uygulama menüsü olan Launcher'ı açar.",
+        "Saat kadranında sola, yukarı ve aşağı kaydırmaya bilinçli olarak işlev atanmamıştır; böylece kazara ekran değişimi önlenir.",
+        "Diğer bütün ekranlarda sağa ya da sola kaydırma geri döner. Tek elle kullanım için iki yön de geri anlamına gelir.",
+        "Üst kenardan (ilk 40 piksel) aşağı çekmek Control Center'ı açar.",
+        "Control Center açıkken yukarı, sağa ya da sola kaydırmak veya karartılmış zemine dokunmak paneli kapatır."
+      ],
+      "captions": [
+        "Dokunmatik denetleyici jest verisi göndermez. Kaydırma yazılımda algılanır: parmağın izi takip edilip yön çıkarılır.",
+        "Kaydırma kilidi vardır: parlaklık çubuğu gibi sürüklemeye dayalı bileşenler, sürükleme boyunca sayfa geçişini kilitler."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "Kadranlar arasında geçiş",
+      "image": "assets/kadran-secici.mp4",
+      "captions": [
+        "Kadranlar arasında yatay kaydırma ile geçilir: analog, dijital, activity ve çıkış kontrolü."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Ana ekrandan uygulamaya",
+      "image": "assets/uygulama-acilis.mp4",
+      "captions": [
+        "Ana ekranda bir kutucuğa dokunmak uygulamayı açar. Ekranın sahibi her an yalnızca bir uygulamadır."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Control Center ve butonlar",
+      "items": [
+        "Control Center, üstten aşağı çekilen hızlı ayarlar panelidir. Aktif uygulamanın üzerine çizilir; uygulama ekranı bozulmaz.",
+        "İçinde WiFi, Bluetooth, uçak modu ve el feneri için hızlı anahtarlar bulunur.",
+        "Üst buton (GPIO 0) cihazı uyandırır ve ana ekrana döndürür. Kısa ve uzun basışlar olay veriyoluyla uygulamaya iletilir.",
+        "Alt buton (GPIO 10) cihazı uyandırır; ayrıca uygulamaya özgü bir işlev üstlenebilir."
+      ],
+      "captions": [
+        "Buton basışları olay veriyolu üzerinden iletilir. Uygulama isterse basışa kendi anlamını verir."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Güç durumları ve uyandırma",
+      "items": [
+        "ACTIVE durumunda 30 saniye hareketsizlik ekranı kısar (DIM); 5 saniye sonra ekran kapanır (DISPLAY_OFF).",
+        "Ekran kapalıyken 10 dakika hareketsizlik cihazı derin uykuya (DEEP_SLEEP) alır.",
+        "Dokunma, buton ya da bilek kaldırma sayacı sıfırlar ve ekranı açar.",
+        "Derin uykudan uyandırma buton ya da RTC alarmıyla olur.",
+        "Uyandırma kaynakları günlüklerde ayrı ayrı görünür; sahte uyandırmaların teşhisini kolaylaştırır."
+      ],
+      "captions": [
+        "power_service dört durumlu bir makine işletir. Her kullanıcı etkileşimi sayacı sıfırlar."
+      ]
+    },
+    {
+      "step": "7",
+      "title": "Yerleşik uygulamalar (1/2)",
+      "items": [
+        "WatchFace (0) varsayılan ana ekrandır. Saat, tarih, batarya ve adımı gösterir; olaylarla canlı güncellenir.",
+        "StepCounter (1) adım sayardır; verisini sensor_service'in IMU okumalarından alır.",
+        "Settings (2) WiFi (tarama ve klavyeyle şifre girişi), ekran, OTA ve sistem bilgisi sayfalarını içerir.",
+        "Launcher (3) 3×3 ızgaralı uygulama menüsüdür; kadrandan sağa kaydırınca açılır.",
+        "Weather (6) şehir, sıcaklık ve UV, rüzgâr, nem halkalarını gösterir. weather_service kullanır ve WiFi gerektirir."
+      ],
+      "captions": [
+        "Her uygulama bir yaşam döngüsü arayüzüyle kaydolur. APP_ID sabitleri os_config.h dosyasındadır."
+      ]
+    },
+    {
+      "step": "7",
+      "title": "Yerleşik uygulamalar (2/2)",
+      "items": [
+        "Notifications (8) telefon bildirimlerini Bluetooth ve ANCS üzerinden alır; liste, ayrıntı ve kapatma ekranları vardır.",
+        "Gallery (9) cihaz depolamasındaki görselleri gösterir; WiFi üzerinden yükleme sayfası vardır.",
+        "Alarm (10) alarm listesi ve kurma ekranından oluşur; alarm_service ve audio_service kullanır.",
+        "Store (11) uygulama kataloğudur; yalnızca üst veriyle çalışan bir mimarisi vardır.",
+        "HeartRate (5) ve Timer (7) şimdilik iskelet halindedir; gelecekteki uygulamalardır."
+      ],
+      "captions": [
+        "Bir uygulama Launcher'a eklenmeden de açılabilir: buton olayı, alarm, başka bir uygulama ya da komut arayüzü tetikleyebilir."
+      ]
+    },
+    {
+      "step": "8",
+      "title": "Ekranlar (1/2)",
+      "gallery": [
+        {
+          "image": "assets/kadran-analog.png",
+          "label": "Analog kadran",
+          "sub": "FACE_ANALOG"
+        },
+        {
+          "image": "assets/kadran-dijital.png",
+          "label": "Dijital kadran",
+          "sub": "FACE_DIGITAL"
+        },
+        {
+          "image": "assets/kadran-activity.png",
+          "label": "Activity kadranı",
+          "sub": "FACE_ACTIVITY"
+        },
+        {
+          "image": "assets/kadran-io-control.png",
+          "label": "Çıkış kontrolü",
+          "sub": "FACE_IO_CONTROL"
+        },
+        {
+          "image": "assets/launcher.png",
+          "label": "Ana ekran",
+          "sub": "3×3 launcher"
+        },
+        {
+          "image": "assets/adim-sayar.png",
+          "label": "Adım sayar",
+          "sub": "günlük hedef halkası"
+        },
+        {
+          "image": "assets/hava-durumu.png",
+          "label": "Hava durumu",
+          "sub": "çoklu şehir, canlı veri"
+        },
+        {
+          "image": "assets/galeri.png",
+          "label": "Galeri",
+          "sub": "fotoğraf tarayıcı"
+        }
+      ],
+      "captions": [
+        "410×502 AMOLED varyantının ekranları."
+      ]
+    },
+    {
+      "step": "8",
+      "title": "Ekranlar (2/2)",
+      "gallery": [
+        {
+          "image": "assets/alarm.png",
+          "label": "Alarmlar",
+          "sub": "kurma ekranı"
+        },
+        {
+          "image": "assets/bildirimler.png",
+          "label": "Bildirimler",
+          "sub": "ANCS listesi"
+        },
+        {
+          "image": "assets/bildirim-detay.png",
+          "label": "Bildirim detayı",
+          "sub": "gövde + kapat"
+        },
+        {
+          "image": "assets/store-apps.png",
+          "label": "Mağaza",
+          "sub": "Apps sekmesi"
+        },
+        {
+          "image": "assets/store-detay.png",
+          "label": "Mağaza detayı",
+          "sub": "uygulama kartı"
+        },
+        {
+          "image": "assets/ayarlar.png",
+          "label": "Ayarlar",
+          "sub": "kök menü"
+        },
+        {
+          "image": "assets/guc-raylari.png",
+          "label": "Güç rayları",
+          "sub": "9 toggle + kapat"
+        },
+        {
+          "image": "assets/ota.png",
+          "label": "Yazılım güncelleme",
+          "sub": "OTA akışı"
+        }
+      ],
+      "captions": [
+        "Ayarlar altındaki sayfalar; güç rayları ve OTA akışı da burada."
+      ]
+    },
+    {
+      "step": "9",
+      "title": "Güç rayları",
+      "image": "assets/guc-raylari.mp4",
+      "captions": [
+        "Ayarlar içindeki Power Rails sayfası PMIC raylarını çalışma anında tek tek açıp kapatmanızı sağlar. En altta Soft Power Off bulunur."
+      ]
+    }
+  ]
+}

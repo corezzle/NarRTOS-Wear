@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""YouTube küçük resmi (1280×720): python3 thumb.py <proje>  →  <proje>/out/<proje>-thumbnail.png"""
+import json, sys, os, html, subprocess, shutil, glob
+proj = sys.argv[1]; d = json.load(open(os.path.join(proj, "scenes.json"), encoding="utf-8")); yt = d.get("youtube", {})
+e = html.escape; ep = yt.get("series_no"); title = yt.get("thumb_title", d["title"]); sub = yt.get("thumb_sub", d.get("subtitle", ""))
+page = f'''<!doctype html><html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=1280, height=720"><title>thumb</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+ body {{ margin:0; background:#00102E; font-family:Inter, system-ui, sans-serif; color:#E4F0EE; -webkit-font-smoothing:antialiased; }}
+ #root {{ position:relative; width:1280px; height:720px; overflow:hidden; background:linear-gradient(140deg,#00102E 0%,#00234E 55%,#001B3F 100%); }}
+ .clip {{ position:absolute; inset:0; }}
+ .grid {{ position:absolute; inset:0; opacity:.22; background-image:linear-gradient(#093159 1px,transparent 1px),linear-gradient(90deg,#093159 1px,transparent 1px); background-size:64px 64px; }}
+ .glow {{ position:absolute; left:640px; top:-260px; width:800px; height:800px; border-radius:50%; background:radial-gradient(circle,rgba(0,202,215,.22) 0%,rgba(0,202,215,0) 65%); }}
+ .pill {{ position:absolute; left:64px; top:72px; padding:10px 22px; border-radius:999px; background:#00CAD7; color:#00102E; font-size:26px; font-weight:800; letter-spacing:3px; }}
+ .brand {{ position:absolute; left:64px; top:140px; font-size:24px; font-weight:800; letter-spacing:5px; color:#00CAD7; }}
+ h1 {{ position:absolute; left:64px; top:190px; margin:0; width:660px; font-size:96px; font-weight:800; line-height:1.02; letter-spacing:-3px; text-shadow:0 8px 30px rgba(0,0,0,.5); }}
+ .sub {{ position:absolute; left:64px; top:{470 if len(title) > 16 else 380}px; width:620px; font-size:34px; line-height:1.3; color:#93AEC7; }}
+ .logo {{ position:absolute; left:64px; bottom:40px; width:240px; }}
+ .b1 {{ position:absolute; left:860px; top:96px; width:336px; height:400px; border-radius:72px; background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%); box-shadow:0 30px 70px rgba(0,0,0,.65); }}
+ .c1 {{ position:absolute; left:1196px; top:230px; width:12px; height:58px; border-radius:6px; background:linear-gradient(180deg,#4A4F57,#23262B); }}
+ .w1 {{ position:absolute; left:886px; top:123px; width:285px; height:345px; border-radius:56px; overflow:hidden; background:#000; }}
+ .w1 img {{ width:100%; height:100%; display:block; }}
+ .b2 {{ position:absolute; left:720px; top:380px; width:250px; height:250px; border-radius:50%; background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%); box-shadow:0 24px 60px rgba(0,0,0,.65); }}
+ .w2 {{ position:absolute; left:734px; top:394px; width:222px; height:222px; border-radius:50%; overflow:hidden; background:#000; }}
+ .w2 img {{ width:100%; height:100%; display:block; }}
+ .term {{ position:absolute; left:990px; top:520px; width:260px; padding:16px 18px; border-radius:16px; background:rgba(4,14,30,.92); border:1px solid rgba(0,202,215,.35); font-family:Menlo,monospace; font-size:17px; line-height:1.5; color:#D6E4F0; white-space:pre; box-shadow:0 18px 40px rgba(0,0,0,.5); }}
+ .term b {{ color:#7FD6A6; font-weight:400; }}
+</style></head><body>
+<div id="root" data-composition-id="thumb" data-start="0" data-width="1280" data-height="720" data-duration="1">
+ <div id="s" class="clip" data-start="0" data-duration="1" data-track-index="1">
+  <div class="grid"></div><div class="glow"></div>
+  {f'<div class="pill">BÖLÜM {ep}</div>' if ep else ''}<div class="brand">{e(d["brand"])}</div>
+  <h1>{e(title)}</h1><div class="sub">{e(sub)}</div>
+  <img class="logo" src="assets/logo.png" alt="">
+  <div class="b2"></div><div class="w2"><img src="assets/r240-launcher.png" alt=""></div>
+  <div class="b1"></div><div class="c1"></div><div class="w1"><img src="assets/a410-launcher.png" alt=""></div>
+  {f'<div class="term">{yt["thumb_term"]}</div>' if yt.get("thumb_term") else ''}
+ </div></div>
+<script>window.__timelines = window.__timelines || {{}}; const tl = gsap.timeline({{paused:true}}); tl.to("#s", {{opacity:1, duration:.1}}, 0); window.__timelines["thumb"] = tl;</script>
+</body></html>'''
+open("thumb/index.html", "w", encoding="utf-8").write(page)
+shutil.rmtree("thumb/snapshots", ignore_errors=True)
+subprocess.run(["hyperframes", "snapshot", "--at", "0.5", "--no-end"], cwd="thumb", check=True, capture_output=True)
+src = sorted(glob.glob("thumb/snapshots/frame-*.png"))[0]
+os.makedirs(os.path.join(proj, "out"), exist_ok=True); dst = os.path.join(proj, "out", f"{proj}-thumbnail.png"); shutil.copy(src, dst); print(dst)

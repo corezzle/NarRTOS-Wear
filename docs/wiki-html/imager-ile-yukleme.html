@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Corezzle Imager ile Yükleme · NarRTOS Wiki</title>
+<link rel="stylesheet" href="assets/css/wiki.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brand">NarRTOS <span>Wiki</span></div>
+    <a class="back" href="index.html">← Wiki ana sayfası</a>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="layout">
+<main>
+
+  <div class="hero">
+    <div class="eyebrow">Hazır kurulum</div>
+    <h1>Corezzle Imager ile Yükleme</h1>
+    <p class="lede">
+      Geliştirme aracı kurmadan, kod derlemeden: Corezzle Imager, NarRTOS'un hazır sürümünü
+      USB kablosuyla karta yazar. Kartı tak, kartını seç, düğmeye bas; birkaç dakika sonra
+      saat kadranı ekrana gelir.
+    </p>
+  </div>
+
+  <p>
+    Bu sayfa daha önce hiç yazılım yüklememiş biri için yazıldı. Baştan sona 10 dakika sürer,
+    bunun 2-3 dakikası yazma süresidir. Kodu değiştirmek ya da kendiniz derlemek isterseniz
+    <strong>Başlarken</strong> sayfası oraya götürür; bu sayfa için gerekmez.
+  </p>
+
+  <h2 id="gereksinimler">Neye ihtiyacınız var</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th></th><th></th></tr></thead>
+    <tbody>
+      <tr><td><strong>Bir kart</strong></td><td>NarRTOS Wear kartlarından biri: dikdörtgen ekranlı AMOLED ya da yuvarlak 240×240 LCD</td></tr>
+      <tr><td><strong>USB kablosu</strong></td><td>Karta uygun uçta ve <strong>veri aktaran</strong> bir kablo</td></tr>
+      <tr><td><strong>Bilgisayar</strong></td><td>Windows ya da macOS; internet bağlantısı (sürüm dosyası indirilir)</td></tr>
+      <tr><td><strong>Corezzle Imager</strong></td><td>Corezzle'ın masaüstü uygulaması; aşağıda kuruluyor</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <div class="note-t">Kablo tuzağı</div>
+    <p>Telefon şarj kablolarının bir kısmı yalnız elektrik taşır, veri taşımaz. Böyle bir
+    kabloyla kart bilgisayarda hiç görünmez. Kart listede çıkmıyorsa ilk deneyeceğiniz şey
+    kabloyu değiştirmektir.</p>
+  </div>
+
+  <h2 id="kurulum">Kurulum</h2>
+
+  <h3>1. Corezzle Imager'ı indirip kurun</h3>
+  <p>
+    Corezzle'ın indirme sayfasından işletim sisteminize uygun dosyayı alın.
+  </p>
+  <ul>
+    <li><strong>Windows:</strong> İnen kurulum dosyasını çalıştırın. Windows "Windows protected your PC" (bilgisayarınız korundu) penceresi gösterirse <em>More info</em> → <em>Run anyway</em> deyin; uygulama yeni olduğu için bu uyarı çıkar. Kurulum kendiliğinden tamamlanır ve uygulama açılır.</li>
+    <li><strong>macOS:</strong> İnen <code>.dmg</code> dosyasını açın, Corezzle Imager simgesini Uygulamalar (Applications) klasörüne sürükleyin. İlk açılışta "internetten indirildi" uyarısına <em>Aç</em> deyin.</li>
+  </ul>
+  <figure><img src="assets/img/imager-01-welcome.png" alt="Corezzle Imager açılış ekranı" />
+    <figcaption>Uygulama açıldığında karşınıza gelen ekran. Sol şeritte adımlar, altta NEXT.</figcaption></figure>
+
+  <h3>2. Kartı bilgisayara takın</h3>
+  <p>
+    USB kablosuyla bağlayın; kartın üzerinde küçük bir ışık yanmalı. Kartta CH343 USB çipi var;
+    çoğu bilgisayar bunu kendiliğinden tanır. Tanımazsa üreticinin CH34x sürücüsünü kurup
+    bilgisayarı yeniden başlatın. Bunu ancak 5. adımda kart listede çıkmazsa yapmanız gerekir.
+  </p>
+
+  <h3>3. Kartınızı seçin (Device)</h3>
+  <p>
+    Uygulamayı açın, <strong>NEXT</strong> deyin. Kart listesinde <strong>NarRTOS Wear (ESP32-S3)</strong>
+    kartına tıklayın, <strong>NEXT</strong>.
+  </p>
+  <figure><img src="assets/img/imager-02-device.png" alt="Device adımında NarRTOS Wear kartı seçili" />
+    <figcaption>Device adımı: NarRTOS Wear (ESP32-S3) seçili, sağında onay işareti.</figcaption></figure>
+
+  <h3>4. Sürümü seçin (OS)</h3>
+  <p>Kartınıza göre birini seçin:</p>
+  <ul>
+    <li><strong>NarRTOS Wear · 410×502 AMOLED</strong>: dikdörtgen ekranlı kart.</li>
+    <li><strong>NarRTOS Wear · 240×240 round LCD</strong>: yuvarlak ekranlı kart.</li>
+  </ul>
+  <p>
+    Yanlış seçerseniz zarar olmaz; yazma biter, ekran karanlık kalır, doğru sürümle bir kez
+    daha yazarsınız. Seçince <strong>NEXT</strong>.
+  </p>
+  <figure><img src="assets/img/imager-03-os.png" alt="OS adımında iki sürüm" />
+    <figcaption>OS adımı: iki sürüm, yuvarlak LCD seçili.</figcaption></figure>
+
+  <h3>5. USB portunu seçin ve yazın (USB Port)</h3>
+  <p>
+    Listede kartınız <strong>USB Single Serial</strong> adıyla görünür (altında
+    <code>wchusbserial…</code> ya da <code>COM3</code> gibi bir adres). Ona tıklayın.
+    Görünmüyorsa kabloyu değiştirin, <strong>Refresh List</strong> deyin; hâlâ yoksa 2. adımdaki
+    sürücüyü kurun.
+  </p>
+  <p>
+    Alttaki onay kutusunu işaretleyin: kartın belleği tamamen silinip yeniden yazılacak (ilk
+    kurulumda olması gereken bu). Çıkan soruya <em>OK</em>, sonra <strong>FLASH!</strong>, tekrar
+    <em>OK</em>.
+  </p>
+  <figure><img src="assets/img/imager-04-usb-port.png" alt="USB Port adımı, port seçili ve kutu işaretli" />
+    <figcaption>USB Port adımı: kart "USB Single Serial" olarak seçili, onay kutusu işaretli, FLASH! aktif.</figcaption></figure>
+
+  <h3>6. Bekleyin (Writing)</h3>
+  <p>
+    Ekranda sırasıyla <em>Downloading</em>, <em>Connecting to the board</em>,
+    <em>Erasing flash and writing</em> ve yüzde görünür; 1-2 dakika sürer. Bu sırada kabloyu
+    çekmeyin. En sonda <em>Restarting the board</em> der ve <strong>Done</strong> ekranı gelir.
+  </p>
+  <figure><img src="assets/img/imager-05-writing.png" alt="Writing adımı, yüzde ilerliyor" />
+    <figcaption>Writing adımı: özet kutusu ve ilerleme çubuğu. İlk 30-40 saniye silme sürer, yüzde sonra akar.</figcaption></figure>
+
+  <h3>7. Kartta ne olur</h3>
+  <p>
+    Kart kendini yeniden başlatır; 4-5 saniye sonra ekran ışığı yanar ve saat kadranı gelir.
+    Ekranda sağa kaydırırsanız uygulama menüsü açılır. Bundan sonraki güncellemeleri cihaz
+    kendisi indirir (OTA); Imager'ı yalnız ilk kurulum ya da sıfırlama için kullanırsınız.
+  </p>
+  <figure><img src="assets/img/imager-06-done.png" alt="Done ekranı" />
+    <figcaption>Done ekranı: yazma bitti, kart yeniden başlıyor. CLOSE kapatır, FLASH ANOTHER yeni bir kart için başa döner.</figcaption></figure>
+
+  <h2 id="takilinan-yerler">İlk denemede en sık takılınan yerler</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Gördüğünüz</th><th>Sebebi ve çözümü</th></tr></thead>
+    <tbody>
+      <tr><td>USB Port listesi boş, "No USB serial port found"</td><td>Önce kabloyu değiştirin (en sık sebep), sonra başka bir USB girişi, sonra CH34x sürücüsü. Her denemeden sonra <em>Refresh List</em></td></tr>
+      <tr><td>Listede kartınız görünmüyor ama başka portlar var</td><td>Yalnız <strong>USB Single Serial</strong> satırı karttır; diğerlerini seçmeyin</td></tr>
+      <tr><td>"Expected an ESP32-S3 board, found …"</td><td>Seçtiğiniz port NarRTOS kartı değil; doğru portu seçin</td></tr>
+      <tr><td>Yazma yarıda kesildi, "Flashing failed"</td><td>Kablo oynamış ya da çekilmiş olabilir; takılı olduğundan emin olup <em>RETRY</em> deyin</td></tr>
+      <tr><td>Yazma bitti ama ekran karanlık</td><td>Ya yanlış sürüm seçildi (4. adım), ya da kart yeniden başlamadı: kabloyu çıkarıp takın. Düzelmezse doğru sürümle bir kez daha yazın</td></tr>
+      <tr><td>Windows: "Windows protected your PC"</td><td><em>More info</em> → <em>Run anyway</em>. Uygulama yeni olduğu için gösterilen standart uyarı</td></tr>
+      <tr><td>macOS: "cannot be opened because Apple cannot check it"</td><td>Uygulamaya sağ tıklayıp <em>Open</em> seçin; bir kez yeter</td></tr>
+    </tbody>
+  </table></div>
+
+  <a class="next" href="index.html#hizli-baslangic">
+    <div>
+      <div class="next-k">Sonraki adım</div>
+      <div class="next-t">NarRTOS Wear</div>
+      <div class="next-s">Cihazı tanıyın: arayüz, uygulamalar, komut arayüzü, güncelleme</div>
+    </div>
+    <div class="next-a">→</div>
+  </a>
+
+  <footer>
+    <div>NarRTOS · Corezzle Electronics</div>
+    <div class="sp">Uygulama: <code>Corezzle Imager</code></div>
+  </footer>
+
+</main>
+
+<aside class="toc">
+  <div class="toc-h">Bu sayfada</div>
+  <nav class="toc-list"></nav>
+</aside>
+</div>
+</div>
+
+<script src="assets/js/wiki.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "Donanım ve Board Varyantları",
+  "title": "Donanım ve Board Varyantları",
+  "subtitle": "Desteklenen kartlar, pin haritası, sürücüler, varyant kalıbı ve yeni bir karta taşıma.",
+  "end_title": "Varyant eklemek mevcut donanımın derlemesini etkilemez.",
+  "end_subtitle": "Ölçü sabitleri ve çözünürlük uyumu için Uygulama Geliştirme dökümanına bakın. corezzle.com",
+  "scenes": [
+    {
+      "step": "1",
+      "title": "Desteklenen kartlar",
+      "items": [
+        "Varsayılan ortam esp32s3_wearable: ESP32-S3R8 işlemci, 8 MB flash ve 8 MB Octal PSRAM, 410×502 CO5300 AMOLED ekran, FT3168 dokunmatik, AXP2101 PMIC, PCF85063 RTC ve ICM42670 IMU.",
+        "İkinci ortam esp32s3_lcd128: ESP32-S3 işlemci, 16 MB flash ve 2 MB Quad PSRAM, 240×240 yuvarlak GC9A01A LCD, CST816S dokunmatik. PMIC yoktur; 3,3 volt doğrudan beslenir."
+      ],
+      "captions": [
+        "İki kart tek kod tabanını kullanır. Fark yalnızca derleme ortamında seçilir."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Pin haritası (varsayılan kart)",
+      "code": "#define PIN_DISP_CS     12   // QSPI ekran\n#define PIN_DISP_SCLK   11\n#define PIN_DISP_D0      4   // D0..D3 = 4/5/6/7\n#define PIN_DISP_RST     8\n\n#define PIN_I2C_SDA     15   // paylaşımlı I2C: dokunmatik +\n#define PIN_I2C_SCL     14   //   PMIC + RTC + IMU\n#define PIN_TOUCH_RST    9\n#define PIN_TOUCH_INT   38\n\n#define PIN_BTN_TOP      0   // aktif LOW (boot butonu)\n#define PIN_BTN_BOTTOM  10\n#define PIN_BUZZER      21\n// SD (SDMMC): D0=3, CMD=1, CLK=2",
+      "captions": [
+        "Pin tanımları kodda tek bir yerde, core/os_config.h dosyasında yaşar. Bütün sürücüler buradan okur.",
+        "LCD varyantının pinleri ayrı bir başlık dosyasındadır: core/os_config_lcd128_pins.h. Varyant derlemesinde otomatik seçilir."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "Sürücüler (src/drivers/)",
+      "items": [
+        "display/co5300: QSPI üzerinden sürülen CO5300 AMOLED, varsayılan ekrandır. Parlaklık panel komutuyla ayarlanır.",
+        "display/gc9a01_128: SPI ve DC hattıyla sürülen GC9A01A LCD, 1,28 inç varyantın ekranıdır. Parlaklık arka ışığın LEDC PWM'iyle ayarlanır.",
+        "touch/ft3168 varsayılan dokunmatik, touch/cst816s_128 ise 1,28 inç varyantın dokunmatiğidir; ikisi de I2C kullanır.",
+        "power/axp2101 güç raylarını, batarya ölçümünü ve şarjı yönetir (I2C).",
+        "rtc/pcf85063 gerçek zaman saatidir; güç kesilse de saat korunur (I2C).",
+        "imu/icm42670 ivme ve jiroskop sensörüdür; adım sayar ve jestler için kullanılır (I2C)."
+      ],
+      "captions": [
+        "Dokunmatik, PMIC, RTC ve IMU aynı I2C veriyolunu paylaşır."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Varyant kalıbı: aynı sembol seti",
+      "code": "// gc9a01_128_driver.cpp\n#ifdef DISPLAY_VARIANT_LCD128   // yalnız LCD varyantında derlenir\n  ... co5300_init(), co5300_lvgl_flush_cb(), ...  // aynı isimler\n#endif\n\n// co5300_driver.cpp'deki guard, LCD build'ında onu boşaltır ->\n// linker her ortamda TEK sembol seti görür;\n// main.cpp / ui_service DEĞİŞMEZ.",
+      "captions": [
+        "Alternatif ekran sürücüleri, varsayılan sürücüyle birebir aynı fonksiyon imzalarını dışa verir.",
+        "Bunların tamamı kendi derleme koruması içindedir. Bağlayıcı her ortamda tek bir sembol seti görür; üst katmanlar değişmez."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Yeni karta taşıma (porting)",
+      "items": [
+        "1. Ekran sürücüsü: aynı fonksiyon setini kendi koruması içinde yazın. Çözünürlük CO5300_H_RES ve V_RES bayraklarından gelir.",
+        "2. Dokunmatik sürücüsü: aynı kalıp, aynı imzalar ve kendi koruması.",
+        "3. Pin haritası: core/os_config_<yeni>_pins.h dosyası; os_config.h kart korumasına göre doğru dosyayı seçer.",
+        "4. Derleme ortamı: platformio.ini içinde varsayılandan miras alan yeni bir ortam.",
+        "5. ESP-IDF yapılandırması: PSRAM tipi ve flash boyutu için sdkconfig.esp32s3_yeniboard dosyası.",
+        "6. Arayüz ölçü sabitleri: Uygulama Geliştirme dökümanının Çözünürlük uyumu bölümü."
+      ],
+      "captions": [
+        "Bu, gerçekten yapılmış bir taşımanın (1,28 inç yuvarlak LCD) izlediği yoldur."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Build ortamı örneği",
+      "code": "[env:esp32s3_yeniboard]\nextends = env:esp32s3_wearable      ; ortak her şeyi miras al\nboard_build.flash_size = 16MB       ; donanıma göre\nboard_build.psram_type = qio\nupload_speed = 460800               ; USB köprüsü kararsızsa düşür\nbuild_flags =\n  ${env:esp32s3_wearable.build_flags}\n  -DCO5300_H_RES=240 -DCO5300_V_RES=240\n  -DDISPLAY_VARIANT_YENI=1\n  -DBOARD_VARIANT_YENI=1",
+      "captions": [
+        "Yeni ortam varsayılan ortamı extends ile miras alır. Yalnızca donanıma özgü değerler ve varyant bayrakları eklenir."
+      ]
+    },
+    {
+      "step": "7",
+      "title": "Kontrol listesi",
+      "items": [
+        "Ekran ve dokunmatik sürücü çifti aynı sembol setiyle, kendi koruması içinde yazıldı.",
+        "Pin başlığı, platformio ortamı ve sdkconfig dosyası eklendi.",
+        "Her iki ortam da derleniyor ve varsayılan derlemenin çıktısı değişmedi.",
+        "Açılış günlükleri temiz; dokunmatik, ekran ve servisler cihaz üzerinde doğrulandı."
+      ],
+      "captions": [
+        "Değişmezlik kuralı: yeni kodun tamamı koruma içinde kalır, varsayılan dal orijinal değerlerini korur."
+      ]
+    },
+    {
+      "step": "8",
+      "title": "Yuvarlak panelde aynı sistem",
+      "image": "assets/lcd128-tur.mp4",
+      "captions": [
+        "Aynı kod tabanı, yalnızca derleme zamanındaki seçimle yuvarlak GC9A01A panelde çalışır.",
+        "Yerleşim yazılımdan gelir: içerik sütunu 204 piksel, ana listede satır adımı 60, güç raylarında 50, ana menü hücresi 88×92 piksel.",
+        "Kısıt şudur: 204 piksellik bir satır ancak yaklaşık 180. piksele kadar dairenin içinde kalır. Bu yüzden ana listede aynı anda iki satır tam görünür."
+      ]
+    },
+    {
+      "step": "9",
+      "title": "Yuvarlak panel ekranları",
+      "gallery": [
+        {
+          "image": "assets/r240-kadran-dijital.png",
+          "label": "Dijital kadran",
+          "sub": "Rubik Black 100"
+        },
+        {
+          "image": "assets/r240-launcher.png",
+          "label": "Ana ekran",
+          "sub": "hücre 88×92, ikon 64"
+        },
+        {
+          "image": "assets/r240-ayarlar.png",
+          "label": "Ayarlar",
+          "sub": "içerik 204 px, STEP 60"
+        },
+        {
+          "image": "assets/r240-guc-raylari.png",
+          "label": "Güç rayları",
+          "sub": "STEP 50"
+        },
+        {
+          "image": "assets/r240-adim-sayar.png",
+          "label": "Adım sayar",
+          "sub": "hedef halkası"
+        },
+        {
+          "image": "assets/r240-hava-durumu.png",
+          "label": "Hava durumu",
+          "sub": "tek şehir"
+        }
+      ],
+      "captions": [
+        "240×240 yuvarlak varyantın ekranları. Ölçüler varyant bloğundan gelir."
+      ]
+    }
+  ]
+}

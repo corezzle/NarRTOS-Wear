@@ -1,0 +1,75 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "Corezzle Imager ile Yükleme",
+  "title": "Corezzle Imager ile NarRTOS Yükleme",
+  "subtitle": "Kod derlemeden, yalnızca bir USB kablosuyla, on dakikadan kısa sürede.",
+  "end_title": "Hazır. Kartınızda NarRTOS çalışıyor.",
+  "end_subtitle": "Adımların yazılı hali ve sorun giderme tablosu NarRTOS Wear dökümanında. corezzle.com",
+  "scenes": [
+    {
+      "step": "1",
+      "title": "Corezzle Imager'ı indirip kurun",
+      "image": "assets/imager-01-welcome.png",
+      "captions": [
+        "Corezzle'ın indirme sayfasından işletim sisteminize uygun dosyayı indirin.",
+        "Windows'ta \"Windows protected your PC\" uyarısı çıkarsa More info, ardından Run anyway seçeneğine tıklayın.",
+        "macOS'ta uygulamayı Applications klasörüne sürükleyin. İlk açılıştaki uyarıda Aç deyin.",
+        "Uygulama açıldığında bu ekranı görürsünüz. Sol şeritte adımlar, altta NEXT düğmesi bulunur."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Kartı bilgisayara takın",
+      "image": "assets/imager-01-welcome.png",
+      "captions": [
+        "Kartı USB kablosuyla bilgisayara bağlayın. Üzerindeki küçük ışık yanmalıdır.",
+        "Kablonun veri taşıyan bir kablo olması gerekir. Yalnızca şarj için üretilen kablolarla kart hiç görünmez."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "Kartınızı seçin (Device)",
+      "image": "assets/imager-02-device.png",
+      "captions": [
+        "NEXT düğmesine basın. Listeden NarRTOS Wear (ESP32-S3) kartına tıklayın ve yeniden NEXT deyin."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Sürümü seçin (OS)",
+      "image": "assets/imager-03-os.png",
+      "captions": [
+        "Dikdörtgen ekranlı kart için 410×502 AMOLED, yuvarlak ekranlı kart için 240×240 round LCD sürümünü seçin.",
+        "Yanlış sürümü seçerseniz karta zarar gelmez. Ekran karanlık kalır; doğru sürümle bir kez daha yazarsınız. Ardından NEXT."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "USB portunu seçin ve yazın",
+      "image": "assets/imager-04-usb-port.png",
+      "captions": [
+        "Kartınız listede USB Single Serial adıyla görünür. Ona tıklayın.",
+        "Listede görünmüyorsa kabloyu değiştirip Refresh List düğmesine basın.",
+        "Onay kutusunu işaretleyin. Bu, kartın belleğinin silinip yeniden yazılacağını onaylar. Sırayla OK, FLASH! ve OK deyin."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Bekleyin (Writing)",
+      "image": "assets/imager-05-writing.png",
+      "captions": [
+        "Ekranda sırasıyla Downloading, Connecting to the board ve Erasing flash and writing yazıları görünür.",
+        "İlk yarım dakika yüzde sıfırda kalması normaldir. İşlem bir iki dakika sürer; bu sırada kabloyu çekmeyin."
+      ]
+    },
+    {
+      "step": "7",
+      "title": "Bitti (Done)",
+      "image": "assets/imager-06-done.png",
+      "captions": [
+        "Done ekranı gelir. Kart kendini yeniden başlatır ve birkaç saniye sonra saat kadranı açılır.",
+        "Sonraki güncellemeleri cihaz kendisi indirir. Imager yalnızca ilk kurulum ve sıfırlama için kullanılır."
+      ]
+    }
+  ]
+}

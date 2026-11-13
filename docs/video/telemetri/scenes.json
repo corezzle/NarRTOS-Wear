@@ -1,0 +1,114 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "Telemetri ve Konumlandırma",
+  "title": "Telemetri ve Konumlandırma",
+  "subtitle": "Cihaz sağlık verilerini ve çevredeki WiFi taramasını raporlar; sunucu bu veriden konumu çözer. GPS donanımı yoktur, hassasiyet yaklaşık 19 metredir.",
+  "end_title": "Telemetri konuma bağımlı değildir.",
+  "end_subtitle": "Sunucu tarafı için Sunucu Kurulumu dökümanına bakın. corezzle.com",
+  "scenes": [
+    {
+      "step": "1",
+      "title": "Nasıl çalışır",
+      "image": "assets/boru-hatti.mp4",
+      "captions": [
+        "Zincir beş adımdan oluşur. Cihaz yalnızca ilk ikisinden sorumludur: ölçmek ve göndermek.",
+        "Konum çözümü ve dış sistemlere yayın sunucu tarafında yapılır."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Periyot, tarama, hata davranışı",
+      "items": [
+        "Rapor periyodu 60 saniyedir. WiFi bağlıysa her turda bir rapor gönderilmeye çalışılır.",
+        "Tarama beş turda bir yapılır. Çevredeki BSSID listesi tazelenir ve önbelleğe alınır.",
+        "Hata durumunda gönder ve unut ilkesi geçerlidir. Ağ ya da sunucu yoksa rapor atlanır; cihaz bundan etkilenmez."
+      ],
+      "captions": [
+        "Aktif WiFi taraması bağlantıyı yaklaşık 20 saniye keser. Tarama ve rapor bu yüzden ayrı turlarda yapılır."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Tarama ve rapor döngüsü",
+      "image": "assets/tarama-dongusu.mp4",
+      "captions": [
+        "Döngü altı turdan oluşur. Tarama turu yalnızca listeyi tazeler; gönderim sonraki turlara bırakılır.",
+        "Aynı turda hem tarama hem gönderim yapılsaydı rapor her seferinde başarısız olurdu."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "telemetry_task",
+      "code": "#define TELEMETRY_PERIOD_MS          (60 * 1000)  // rapor periyodu\n#define TELEMETRY_SCAN_EVERY_CYCLES  5            // 5 turda bir tarama\n\nstatic void telemetry_task(void* arg) {\n  uint32_t cycle = 0;\n  for (;;) {\n    if (wifi_service_is_connected()) {\n      if (cycle % TELEMETRY_SCAN_EVERY_CYCLES == 0)\n        refresh_wifi_scan();   // BSSID listesini önbelleğe al\n      else                     // (bu tur rapor YOK — bağlantı toparlansın)\n        send_report();         // önbellekli listeyle temiz HTTP POST\n    }\n    cycle++;\n    vTaskDelay(pdMS_TO_TICKS(TELEMETRY_PERIOD_MS));\n  }\n}",
+      "captions": [
+        "Basit bir sayaç yeter: her beşinci turda tarama yapılır, diğer turlarda önbellekteki listeyle temiz bir HTTP POST gönderilir."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "Konum: SSID ile değil, BSSID ile",
+      "image": "assets/02-bssid-ile-konum.png",
+      "captions": [
+        "SSID benzersiz değildir; binlerce modem aynı ismi taşır. MAC adresi ise tekildir.",
+        "Sağlayıcının veritabanı hangi MAC adresli modemin hangi koordinatta olduğunu tutar. Konum, sinyal güçlerine göre ağırlıklı kesişimle bulunur.",
+        "Tarama için ağlara bağlanmak gerekmez. Şifre kullanılmaz, SSID gönderilmez."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "İki tuzak",
+      "items": [
+        "Bluetooth açıkken tarama yaparken scan_time alanı sıfır bırakılmalıdır. Sürücü, iki radyonun birlikte çalışmasına uygun varsayılanı kendisi seçer.",
+        "Ayarlardaki ağ listesi farklı bir API kullanır. Asenkron tarama kullanıcının okuması için SSID döndürür; konumlandırma ise senkron API ile BSSID ister."
+      ],
+      "captions": [
+        "İki farklı amaç için iki farklı çağrı kullanılır."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Rapor anatomisi",
+      "code": "// Cihazın gönderdiği ham rapor:\n{\n  \"device_id\": \"E4B063A764CC\",\n  \"wifi_rssi\": -55,\n  \"wifi\": [ {\"mac\": \"A4:B1:C2:D3:E4:F5\", \"rssi\": -53}, ... ],\n  \"uptime_s\": 887,\n  \"firmware_version\": \"1.4.81\",\n  \"heap_free\": 970288\n}\n// Sunucunun aynı kayda gömdüğü konum:\n\"geo\": {\n  \"lat\": 41.0289898, \"lng\": 29.2229154,\n  \"accuracy_m\": 18.9,\n  \"fallback\": null,        // null = GERÇEK WiFi çözümü; \"ipf\" = IP tahmini\n  \"provider\": \"www.googleapis.com\"\n}",
+      "captions": [
+        "Cihaz ham veriyi gönderir; sunucu konum çözümünü aynı kayda ekler.",
+        "fallback alanı null ise gerçek bir WiFi çözümüdür. Değeri ipf ise IP adresine dayalı bir tahmindir."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Veri dürüstlüğü kuralı",
+      "image": "assets/04-veri-durustlugu.png",
+      "captions": [
+        "Sağlayıcı erişim noktalarını tanımazsa IP tabanlı kaba bir tahmine düşer. Bu tahminin sapması 25 kilometreye varabilir.",
+        "Böyle bir sonuç koordinat alanlarına yazılmaz ve konum kuyruğuna asla gönderilmez. Bu, paneldeki bir seçenek değil, koda gömülü bir kuraldır."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Maliyet koruması",
+      "image": "assets/05-maliyet-korumasi.png",
+      "captions": [
+        "Önlem alınmasaydı her rapor bir API çağrısı olurdu; bu, cihaz başına ayda yaklaşık 43 bin istek demektir.",
+        "Sıralanmış MAC listesi önbellek anahtarı olarak kullanılır ve 10 dakika saklanır. Sabit duran bir cihaz ayda yalnızca birkaç yüz çağrı yapar."
+      ]
+    },
+    {
+      "step": "7",
+      "title": "Panelde nasıl görünür",
+      "image": "assets/01-admin-telemetri.png",
+      "captions": [
+        "Konum sütunu bu kuralı yansıtır. Gerçek çözümler tıklanabilir koordinat, IP tahminleri gri metin olarak görünür.",
+        "İletim rozetleri iletim durumunu gösterir. dry_run hazırlanıp gönderilmedi, sent kuyruğa iletildi, dropped denendi ama başarısız oldu demektir."
+      ]
+    },
+    {
+      "step": "8",
+      "title": "Cihazda ekranı yoktur",
+      "code": "I (12034)  telemetry: init OK (device_id=E4B063A764CC)\nI (12040)  telemetry: telemetry loop started (period=60 s, url=...)\nI (72118)  telemetry: wifi scan refreshed: 7 AP\nI (132204) telemetry: report sent (HTTP 200, rssi=-53)",
+      "captions": [
+        "Telemetri ve konumlandırma arka planda çalışan servislerdir; saatte bunları gösteren bir uygulama yoktur. Tek görünür çıktı seri günlüğüdür.",
+        "Hava Durumu uygulamasındaki şehir bu değildir. O, weather_service'in IP tabanlı konum sonucudur ve hassasiyeti kilometrelerle ölçülür."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+{
+  "brand": "COREZZLE",
+  "doc": "VS Code Kurulumu",
+  "title": "VS Code Kurulumu",
+  "subtitle": "Windows, macOS ve Linux'ta sıfırdan kurulum: ilk açılış, terminal, eklentiler ve git.",
+  "end_title": "VS Code hazır.",
+  "end_subtitle": "NarRTOS projesini VS Code'da açmak için NarRTOS için VS Code Kurulumu dökümanına geçin. corezzle.com",
+  "scenes": [
+    {
+      "step": "0",
+      "title": "VS Code nedir, ne değildir",
+      "items": [
+        "VS Code ücretsiz ve açık kaynak bir kod editörüdür; Windows, macOS ve Linux'ta çalışır.",
+        "Dosyaları, terminali ve eklentileri tek bir pencerede toplar.",
+        "Programları kendisi derlemez. Bu işi eklentiler ve terminaldeki araçlar yapar.",
+        "Visual Studio ile karıştırmayın. O, yalnızca Windows'ta çalışan, ayrı ve çok daha büyük bir programdır."
+      ],
+      "captions": [
+        "Kurulum yaklaşık 10 dakika sürer ve hiçbir ön bilgi gerektirmez.",
+        "Sonunda VS Code açık, bir klasör içinde çalışır durumda ve terminal kullanıma hazır olur."
+      ]
+    },
+    {
+      "step": "1",
+      "title": "İndirin",
+      "image": "assets/vscode-indirme.png",
+      "captions": [
+        "code.visualstudio.com adresine gidin. Büyük Download düğmesi işletim sisteminizi kendisi tanır.",
+        "Düğmede sizde Windows ya da Linux yazabilir; bu görüntüde macOS görünüyor."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Kurun: Windows",
+      "items": [
+        "İndirilen .exe dosyasını çalıştırın. Lisansı kabul edin ve kurulum yerini olduğu gibi bırakın.",
+        "Select Additional Tasks ekranında şu kutuları işaretleyin: Add \"Open with Code\" (dosya ve klasör için), Register Code as an editor ve Add to PATH.",
+        "Install düğmesine, ardından Finish düğmesine basın. VS Code açılır."
+      ],
+      "captions": [
+        "\"Open with Code\" seçenekleri, herhangi bir klasöre sağ tıklayıp doğrudan VS Code ile açmanızı sağlar."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Kurun: macOS",
+      "items": [
+        "İndirilen .zip dosyasına çift tıklayın; Visual Studio Code uygulaması ortaya çıkar.",
+        "Simgeyi Uygulamalar (Applications) klasörüne sürükleyin. İndirilenler klasöründe bırakmayın.",
+        "Launchpad'den açın. \"İnternetten indirilen uygulama\" uyarısında Aç deyin.",
+        "Terminalden code komutunu kullanmak için ⇧⌘P ile komut paletini açıp Shell Command: Install 'code' command in PATH seçeneğini çalıştırın."
+      ],
+      "captions": [
+        "Uygulamayı İndirilenler klasöründe bırakırsanız güncellemeler sorun çıkarır."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Kurun: Linux",
+      "items": [
+        "Ubuntu ve Debian'da .deb dosyasını indirip sudo apt install ./code_*.deb komutuyla kurun.",
+        "Fedora ve RHEL'de .rpm dosyasını indirip sudo dnf install ./code-*.rpm komutuyla kurun.",
+        "Snap kullanan dağıtımlarda sudo snap install code --classic komutu yeter."
+      ],
+      "captions": [
+        ".deb yöntemi Microsoft'un paket deposunu da ekler; sonraki güncellemeler apt ile gelir."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "İlk açılış",
+      "image": "assets/vscode-welcome.png",
+      "captions": [
+        "Karşınıza Welcome sekmesi gelir. Koyu ya da açık tema seçebilirsiniz.",
+        "Arayüz İngilizcedir. Dokümanların çoğu İngilizce menü adlarını kullandığı için başlangıçta öyle bırakmak takibi kolaylaştırır.",
+        "Güncellemeler kendiliğinden iner. Sağ altta Restart to update yazısını görünce yeniden başlatın."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "Türkçe istiyorsanız",
+      "image": "assets/vscode-extensions-tr.png",
+      "captions": [
+        "Soldaki dikey şeritteki dört kare simgesi Extensions görünümünü açar. Kısayolu Ctrl, Shift ve X tuşlarıdır.",
+        "Arama kutusuna Turkish Language Pack yazın. Microsoft'un paketi çıkar; mavi Install düğmesine basın."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "Dili değiştirin",
+      "image": "assets/vscode-dil-degistir.png",
+      "captions": [
+        "Sağ altta dil değişikliği sorusu çıkar. Change Language and Restart deyin; VS Code Türkçe açılır.",
+        "Soru çıkmadıysa Ctrl, Shift ve P ile komut paletini açın, Configure Display Language yazın ve Türkçe'yi seçin."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Pencereyi tanıyın",
+      "image": "assets/vscode-pencere.png",
+      "captions": [
+        "1 numaralı Activity Bar görünümler arasında geçiş sağlar. 2 numaralı Sidebar seçili görünümün içeriğini, Explorer'da dosya ağacını gösterir.",
+        "3 numaralı Editor dosyaları sekmeler halinde açar. 4 numaralı Panel terminali, hataları ve çıktıları barındırır.",
+        "5 numaralı Status Bar satır numarası, dosya türü ve git dalını gösterir. 6 numaralı Command Palette ile her komuta adını yazarak ulaşırsınız."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Bir klasör açın (macOS)",
+      "image": "assets/vscode-open-folder.png",
+      "captions": [
+        "VS Code dosyalarla değil klasörlerle çalışır. File menüsünden Open Folder ile proje klasörünüzü seçin.",
+        "\"Do you trust the authors?\" diye sorabilir. Kendi projeleriniz için Yes deyin."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Bir klasör açın (Windows / Linux)",
+      "image": "assets/vscode-win-open-folder.png",
+      "captions": [
+        "Windows ve Linux'ta menü şeridi pencerenin içinde, en üsttedir. File menüsünden Open Folder'ı seçin.",
+        "Daha önce açtığınız klasörlere File menüsündeki Open Recent ile geri dönersiniz."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Terminali kullanın (macOS)",
+      "image": "assets/vscode-new-terminal.png",
+      "captions": [
+        "Terminal menüsünden New Terminal, alt panelde bir terminal açar. Kısayolu Ctrl ve ` tuşlarıdır.",
+        "Terminal, o an açık olan klasörün içinde başlar. Komutları başka bir yere gitmeden doğrudan yazarsınız."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Terminali kullanın (Windows / Linux)",
+      "image": "assets/vscode-win-new-terminal.png",
+      "captions": [
+        "Windows'ta PowerShell, macOS'ta zsh, Linux'ta bash çalışır.",
+        "Sağ üstteki artı işareti ikinci bir terminal açar. Yanındaki ok menüsünden Select Default Profile ile varsayılan kabuğu değiştirebilirsiniz."
+      ]
+    },
+    {
+      "step": "7",
+      "title": "Eklentiler",
+      "image": "assets/vscode-eklenti-onerisi.png",
+      "captions": [
+        "Dil desteği, tema ve araç entegrasyonu gibi her şey eklentiyle gelir. Extensions görünümünde arayıp Install deyin.",
+        "Kullandığınız dilin resmi eklentisi başlangıç için yeter. Diğerlerini ihtiyaç doğduğunda kurun.",
+        "Bir proje kendi eklentisini önerirse bu balon çıkar. Projenin dökümanı ne diyorsa onu yapın; emin değilseniz kapatın."
+      ]
+    },
+    {
+      "step": "8",
+      "title": "Git ile birlikte",
+      "items": [
+        "Source Control görünümü ve çoğu proje, git programının kurulu olmasını bekler.",
+        "Windows'ta git-scm.com/download/win adresinden kurulum dosyasını indirin ve bütün ekranlarda Next deyin.",
+        "macOS'ta terminale xcode-select --install yazın. Apple'ın komut satırı araçları git'i de içerir.",
+        "Linux'ta sudo apt install git komutu yeter.",
+        "Kurulumdan sonra VS Code'u tamamen kapatıp yeniden açın."
+      ],
+      "captions": [
+        "VS Code \"Git not found\" uyarısı veriyorsa git'i kurun ve uygulamayı yeniden başlatın."
+      ]
+    },
+    {
+      "step": "!",
+      "title": "Sık karşılaşılan sorunlar",
+      "items": [
+        "Mac'te \"Apple cannot check it for malicious software\" uyarısı çıkarsa uygulamaya sağ tıklayıp Open deyin. Bir kez yeter.",
+        "Windows'ta terminal code komutunu tanımıyorsa kurulumda Add to PATH işaretlenmemiştir. Terminali yeniden açın; gerekirse kurulumu tekrar çalıştırın.",
+        "Mac'te code komutu yoksa ⇧⌘P ile paleti açıp Shell Command: Install 'code' command in PATH seçeneğini çalıştırın.",
+        "\"Git not found\" uyarısı için git'i kurun ve VS Code'u yeniden başlatın.",
+        "Yazılar çok küçük ya da büyükse View menüsünden Appearance, ardından Zoom In ya da Zoom Out seçin."
+      ],
+      "captions": [
+        "Yanlışlıkla kapattığınız bir paneli View menüsünden ya da komut paletine adını yazarak geri getirebilirsiniz."
+      ]
+    }
+  ]
+}

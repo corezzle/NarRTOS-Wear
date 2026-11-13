@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NarRTOS Wiki</title>
+<link rel="stylesheet" href="assets/css/wiki.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brand">NarRTOS <span>Wiki</span></div>
+    <div class="ver mono">v1.4.81 · ESP32-S3 · LVGL 9</div>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="layout">
+<main>
+
+  <div class="hero">
+    <div class="eyebrow">Corezzle Electronics</div>
+    <h1>NarRTOS</h1>
+    <p class="lede">
+      ESP32-S3 için açık kaynak gömülü işletim sistemi. FreeRTOS çekirdeği üzerinde,
+      LVGL 9 grafik kütüphanesiyle dokunmatik ekranlı akıllı cihazlar — giyilebilir
+      cihazlar, izleme cihazları, kontrol panelleri — için eksiksiz bir çalışma ortamı.
+    </p>
+  </div>
+
+  <figure class="hero-media">
+    <img src="assets/gif/hero-cihazlar.gif" alt="Telefondan BLE ile gönderilen komut, NarRTOS'un iki board varyantında da aynı ekranı açıyor" />
+  </figure>
+
+  <div class="stats">
+    <div class="stat"><b>2</b><span>çekirdek<br />240 MHz ESP32-S3</span></div>
+    <div class="stat"><b>12</b><span>yerleşik<br />uygulama</span></div>
+    <div class="stat"><b>20</b><span>sistem<br />servisi</span></div>
+    <div class="stat"><b>2</b><span>board<br />varyantı</span></div>
+    <div class="stat"><b>±19 m</b><span>GPS'siz<br />konum</span></div>
+    <div class="stat"><b>2.6 MB</b><span>firmware<br />(AMOLED)</span></div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <span class="k">Çekirdek</span>
+      <h4>Çift çekirdekli mimari</h4>
+      <p>Arayüz çizimi ile sensör ve servis işleri ayrı çekirdeklerde, çakışmadan.</p>
+    </div>
+    <div class="card">
+      <span class="k">Donanım</span>
+      <h4>Board varyant sistemi</h4>
+      <p>410×502 AMOLED ve 240×240 yuvarlak LCD — tek kod tabanı, uygulama kodu değişmez.</p>
+    </div>
+    <div class="card">
+      <span class="k">Konum</span>
+      <h4>GPS'siz konumlandırma</h4>
+      <p>Çevre WiFi erişim noktalarının MAC adreslerinden yaklaşık ±19 m hassasiyet.</p>
+    </div>
+    <div class="card">
+      <span class="k">Bakım</span>
+      <h4>Kablosuz güncelleme</h4>
+      <p>Cihaz kendini alandan günceller — A/B partisyon, fiziksel müdahale yok.</p>
+    </div>
+  </div>
+
+  <h2 id="hizli-baslangic">Hızlı başlangıç</h2>
+  <div class="note">
+    <div class="note-t">Kod derlemeden, hazır sürümü yüklemek isteyenler</div>
+    <p><strong>Corezzle Imager</strong> masaüstü uygulaması NarRTOS'un hazır sürümünü karta yazar:
+    kartı tak, kartını seç, düğmeye bas. Adım adım anlatım:
+    <a href="imager-ile-yukleme.html">Corezzle Imager ile Yükleme</a>. Aşağıdaki adımlar yalnız
+    kodu kendisi derleyip değiştirmek isteyenler için.</p>
+  </div>
+  <div class="note">
+    <div class="note-t">Kuruluma başlamadan önce</div>
+    <p>Bilgisayarınızda VS Code yüklü değilse önce onu kurun:
+    <a href="vs-code.html">VS Code Kurulumu</a>. VS Code kurulu ama projeyi içinde nasıl
+    indirip açacağınızı bilmiyorsanız <a href="vscode-kurulumu.html">NarRTOS için VS Code
+    Kurulumu</a> sayfası, aşağıdaki ilk komutu nereye yapıştıracağınızı adım adım gösterir.
+    Sonra buraya dönün.</p>
+  </div>
+  <p>Bilgisayarınızda PlatformIO kuruluysa ve kart bağlıysa dört komut yeter:</p>
+<pre><code>git clone https://github.com/corezzle/NarRTOS-Wear.git
+cd NarRTOS-Wear
+pio run -e esp32s3_wearable -t upload
+pio device monitor</code></pre>
+  <p>Sırasıyla: projeyi indirir, klasörüne girer, derleyip karta yükler, cihazın
+  çıktısını dinler.</p>
+  <figure class="terminal"><img src="assets/gif/terminal-hizli-baslangic.gif" alt="Dört komutun terminaldeki akışı" />
+    <figcaption>Dört komut uçtan uca: indirme, klasöre giriş, derleyip yükleme, açılış kaydı. Çıktılar kısaltıldı.</figcaption></figure>
+  <div class="note">
+    <div class="note-t">İlk kez mi kuruyorsunuz?</div>
+    <p>Bu dört komut, gerekli programların zaten kurulu olduğunu varsayar. Hiç
+    yapmadıysanız <strong>Başlarken</strong> bölümünden gidin. Python ve PlatformIO
+    kurulumundan kabloyu takmaya kadar her adım tek tek anlatılıyor.</p>
+  </div>
+
+<!-- WIKI:BASLA -->
+      <h2 id="baslarken">Başlarken</h2>
+      <p>Bu sayfa daha önce hiç gömülü yazılım derlememiş biri için yazıldı. Sırayla takip ederseniz elinizdeki karta NarRTOS kurulmuş olur. İlk seferinde 20-30 dakika sürer; bunun büyük kısmı bir kereye mahsus program kurulumlarıdır. İkinci seferde iki komutla bitirirsiniz.</p>
+      <h3>Neye ihtiyacınız var</h3>
+      <div class="tablewrap"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>Bir kart</strong></td><td>Desteklenen ESP32-S3 kartlarından biri (bkz. Donanım ve Board Varyantları)</td></tr><tr><td><strong>USB kablosu</strong></td><td>Karta uygun uçta ve <strong>veri aktaran</strong> bir kablo</td></tr><tr><td><strong>Bilgisayar</strong></td><td>Windows, macOS ya da Linux; üçü de olur</td></tr></tbody></table></div>
+      <div class="note"><div class="note-t">Kablo tuzağı</div><p>Telefon şarj kablolarının bir kısmı yalnız elektrik taşır, veri taşımaz. Böyle bir kabloyla kart bilgisayarda hiç görünmez ve &quot;kart bozuk&quot; sanırsınız. Kart görünmüyorsa denenmesi en kolay ve en sık işe yarayan şey kabloyu değiştirmektir.</p></div>
+      <h3>1. Terminali açın</h3>
+      <p>Bütün kurulum yazıyla komut girilen bir pencereden yapılır. Buna terminal denir.</p>
+      <ul><li><strong>macOS:</strong> Spotlight&#x27;ı açın (⌘ + boşluk), <code>Terminal</code> yazıp Enter</li><li><strong>Windows:</strong> Başlat menüsüne <code>PowerShell</code> yazıp Enter</li><li><strong>Linux:</strong> Ctrl + Alt + T</li></ul>
+      <p>Açılan siyah (ya da beyaz) pencereye komutları tek tek yazıp her birinin sonunda Enter&#x27;a basacaksınız. Bir komut çalışırken bekleyin, iş bitince satır başına geri döner.</p>
+            <figure><img src="assets/img/spotlight-terminal.png" alt="Spotlight'ta Terminal" />
+        <figcaption>macOS: Spotlight'a <code>Terminal</code> yazın; ilk sonuç Terminal uygulamasıdır.</figcaption></figure>
+      <figure><img src="assets/img/windows-baslat-powershell.png" alt="Windows Başlat aramasında PowerShell" />
+        <figcaption>Windows: Başlat menüsüne <code>PowerShell</code> yazın; ilk sonuç Windows PowerShell (çizim).</figcaption></figure>
+      <h3>2. Python kurulu mu, kontrol edin</h3>
+      <p>Kullanacağımız derleme aracı Python ile yazılmış, o yüzden önce Python lazım. Terminale şunu yazın:</p>
+      <pre><code>python3 --version</code></pre>
+      <p><code>Python 3.9.6</code> gibi bir sürüm numarası görüyorsanız kurulu demektir, 3. adıma geçin. <code>command not found</code> benzeri bir hata görüyorsanız <a href="https://www.python.org/downloads/">python.org/downloads</a> adresinden indirip kurun.</p>
+      <div class="note warn"><div class="note-t">Windows&#x27;ta kurulum sırasında dikkat</div><p>Kurulum penceresinin en altındaki <strong>&quot;Add Python to PATH&quot;</strong> kutusunu mutlaka işaretleyin. İşaretlemezseniz Python kurulur ama terminal onu bulamaz ve sonraki adımlarda hata alırsınız.</p></div>
+      <p>Windows&#x27;ta komut <code>python3</code> yerine <code>python</code> olabilir; ikisini de deneyin.</p>
+      <h3>3. PlatformIO&#x27;yu kurun</h3>
+      <p>PlatformIO, kaynak kodu karta yüklenebilir bir dosyaya çeviren araçtır. Derleyiciyi ve ESP32 araç zincirini kendisi indirir, siz ayrıca bir şey kurmazsınız.</p>
+      <pre><code>pip3 install platformio</code></pre>
+      <p>Kurulum birkaç dakika sürebilir. Bitince doğrulayın:</p>
+      <pre><code>pio --version</code></pre>
+      <p><code>PlatformIO Core, version 6.x.x</code> gibi bir çıktı görmelisiniz.</p>
+      <div class="note"><div class="note-t"><code>pio: command not found</code> diyorsa</div><p>program kurulmuştur ama terminal nereye kurulduğunu bilmiyordur. Tam yoluyla çağırarak devam edebilirsiniz: macOS ve Linux&#x27;ta <code>~/.platformio/penv/bin/pio</code>, Windows&#x27;ta <code>%USERPROFILE%\.platformio\penv\Scripts\pio.exe</code>. Bundan sonraki her komutta <code>pio</code> yerine bu yolu yazın.</p></div>
+            <figure class="terminal"><img src="assets/gif/terminal-kurulum.gif" alt="Python kontrolü ve PlatformIO kurulumu" />
+        <figcaption>2. ve 3. adım terminalde: Python sürümü, PlatformIO kurulumu ve doğrulama. Sürüm numaraları sizde farklı olabilir.</figcaption></figure>
+      <h3>4. USB sürücüsünü kurun</h3>
+      <p>Kartın üzerinde, USB&#x27;yi kartın anlayacağı sinyale çeviren küçük bir yonga vardır. Bilgisayarın bu yongayla konuşabilmesi için bir sürücü gerekir.</p>
+      <p>Çoğu bilgisayarda bu sürücü zaten vardır. <strong>Önce 6. adımı deneyin.</strong> Kart görünüyorsa bu adımı atlayın. Görünmüyorsa kartınızdaki yongaya göre sürücüyü kurun; en yaygın olanı CH340/CH341 ailesidir ve üreticinin sitesinden indirilebilir. Kurulumdan sonra bilgisayarı yeniden başlatın.</p>
+      <h3>5. Proje dosyalarını indirin</h3>
+      <pre><code>git clone https://github.com/corezzle/NarRTOS-Wear.git
+cd NarRTOS-Wear</code></pre>
+      <p>İlk satır projeyi bilgisayarınıza kopyalar, ikincisi o klasörün içine girer. Bundan sonraki bütün komutları bu klasörün içindeyken çalıştıracaksınız.</p>
+      <p><code>git: command not found</code> hatası alırsanız git kurulu değildir. Kurmak istemiyorsanız GitLab sayfasındaki <strong>Code → Download source code → zip</strong> bağlantısından indirip klasörü açabilir, sonra terminalde o klasöre girebilirsiniz.</p>
+      <h3>6. Kartı bağlayın ve göründüğünü doğrulayın</h3>
+      <p>Kartı USB kablosuyla bilgisayara takın. Kartın üzerinde küçük bir ışık yanmalıdır.</p>
+      <p>Bilgisayarın kartı gördüğünü doğrulayın:</p>
+      <pre><code>pio device list</code></pre>
+      <p>Çıktıda <code>/dev/cu.usbserial-...</code> (macOS), <code>/dev/ttyUSB0</code> (Linux) ya da <code>COM3</code> (Windows) gibi bir satır görmelisiniz. Bu, kartın adresidir.</p>
+      <p>Hiçbir şey çıkmıyorsa sırayla deneyin: <strong>başka bir USB kablosu</strong> (en sık sebep), başka bir USB portu, 4. adımdaki sürücü kurulumu.</p>
+            <figure class="terminal"><img src="assets/gif/terminal-cihaz-listesi.gif" alt="pio device list çıktısı" />
+        <figcaption>Kart görünüyorsa <code>pio device list</code> böyle bir satır verir. Adres (<code>/dev/cu.usbserial-…</code>, <code>COM3</code>) sizde farklı olur.</figcaption></figure>
+      <h3>7. Derleyin ve karta yükleyin</h3>
+      <p>Tek komut hem derler hem yükler:</p>
+      <pre><code>pio run -e esp32s3_wearable -t upload</code></pre>
+      <p><strong>İlk derleme uzun sürer.</strong> Derleyici ve kütüphaneler indirileceği için birkaç dakika alır. Ekranda uzun uzun satırlar akar, bu normaldir. Sonraki derlemeler, temizlemeden yapılırsa 15 saniye kadar sürer.</p>
+      <p>Sonunda <code>SUCCESS</code> yazısını görürseniz olmuştur; kart kendini yeniden başlatır ve NarRTOS açılır.</p>
+      <p>İleride kodda bir değişiklik yapıp yeniden yüklerken önce temizleyin, sonra derleyin:</p>
+      <pre><code>pio run -e esp32s3_wearable -t clean
+pio run -e esp32s3_wearable -t upload</code></pre>
+      <p>İlk komut önceki derlemenin ürettiği dosyaları siler, ikincisi sıfırdan derleyip karta yükler. Böylece eski dosyalardan kaynaklanan &quot;değişiklik cihaza yansımadı&quot; sorunu yaşanmaz. Temiz derleme, ilk seferki gibi birkaç dakika sürer.</p>
+      <p>Kartınız 1.28 inç yuvarlak ekranlıysa komutun ortasındaki ortam adını değiştirin:</p>
+      <pre><code>pio run -e esp32s3_lcd128 -t upload</code></pre>
+      <p>Hangi kartın hangi ada karşılık geldiği Donanım ve Board Varyantları sayfasındadır.</p>
+            <figure class="terminal"><img src="assets/gif/terminal-derleme.gif" alt="Derleme ve karta yükleme" />
+        <figcaption>Derleme ve yükleme akışı. Uzun satırlar akar, sonda <code>SUCCESS</code> görünür ve kart yeniden başlar.</figcaption></figure>
+      <h3>8. Çalıştığını görün</h3>
+      <p>Ekranda saat kadranı belirmelidir. Parmağınızı ekranda sağa kaydırırsanız uygulama menüsü açılır.</p>
+      <p>Cihazın içeride ne yaptığını görmek isterseniz seri monitörü açın:</p>
+      <pre><code>pio device monitor</code></pre>
+      <p>Açılış kayıtları akmaya başlar. Monitör açıkken klavyeden <code>help</code> yazıp Enter&#x27;a basarsanız cihazı komutlarla sürebilirsiniz (bkz. Komut Arayüzü). Monitörden çıkmak için Ctrl + C.</p>
+            <figure class="terminal"><img src="assets/gif/terminal-monitor.gif" alt="Seri monitörde açılış kaydı" />
+        <figcaption>Seri monitörde açılış kaydı. Son satır arayüzün başladığını gösterir; çıkmak için Ctrl + C.</figcaption></figure>
+      <h3>İlk denemede en sık takılınan yerler</h3>
+      <div class="tablewrap"><table><thead><tr><th>Gördüğünüz</th><th>Sebebi ve çözümü</th></tr></thead><tbody><tr><td><code>pio: command not found</code></td><td>PlatformIO kuruldu ama terminal bulamıyor; 3. adımdaki tam yolu kullanın</td></tr><tr><td><code>pio device list</code> boş çıkıyor</td><td>Büyük ihtimalle kablo yalnız şarj kablosudur; önce kabloyu değiştirin, sonra sürücüyü kurun</td></tr><tr><td>Yükleme sırasında checksum hatası</td><td>Bazı USB köprüleri yüksek hızda kararsızdır (bkz. Sorun Giderme)</td></tr><tr><td>Monitörde hiç yazı yok</td><td>Yanlış hız seçilmiş olabilir; <code>pio device monitor</code> komutu doğru hızı kendisi ayarlar</td></tr><tr><td>Ekran açık ama görüntü yok</td><td>Yanlış kart ortamıyla derlenmiş olabilir; 7. adımdaki ortam adını kontrol edin</td></tr></tbody></table></div>
+      <p>Listede olmayan bir sorunla karşılaşırsanız Sorun Giderme sayfasına bakın.</p>
+      <h3>İlk açılışta ne olur?</h3>
+      <ol><li>Sistem servisleri sırayla ayağa kalkar (NVS → I2C → PMIC → olay veriyolu → …)</li><li>Ekran parlaklığı 0&#x27;dan yumuşak açılır (görsel &quot;açılış&quot; anı)</li><li>Saat kadranı (WatchFace) yüklenir, dokunmatik ve butonlar aktiftir</li><li>WiFi kullanıcı tercihi açıksa kayıtlı ağa otomatik bağlanır</li></ol>
+      <hr />
+      <h3>Build ortamları</h3>
+      <p>Yukarıdaki komutlarda geçen <code>-e esp32s3_wearable</code> kısmı, hangi karta derleneceğini söyler. Desteklenen ortamlar:</p>
+      <div class="tablewrap"><table><thead><tr><th>Env</th><th>Board</th><th>Öne çıkan ayarlar</th></tr></thead><tbody><tr><td><code>esp32s3_wearable</code></td><td>ESP32-S3R8 + CO5300 AMOLED</td><td>8 MB flash QIO, Octal PSRAM, upload 921600</td></tr><tr><td><code>esp32s3_lcd128</code></td><td>240×240 yuvarlak LCD kartı</td><td>16 MB flash, Quad PSRAM, upload 460800, 240×240</td></tr></tbody></table></div>
+      <p>Her ortamın kendi <code>sdkconfig.&lt;env&gt;</code> dosyası vardır (PSRAM tipi, flash boyutu gibi ESP-IDF ayarları). Partisyon düzeni A/B OTA&#x27;ya göre kurgulanmıştır: iki uygulama bölümü (app0/app1) + NVS + varlık (assets) bölümü.</p>
+      <h3>Yapılandırma</h3>
+      <p>Sistemin tek merkezi yapılandırma dosyası <code>src/core/os_config.h</code>: sürüm, pin haritası, görev çekirdeği/öncelikleri, ekran tamponu, dış servis adresleri.</p>
+      <p>Tüm tanımlar <code>#ifndef</code> korumalıdır, yani <code>platformio.ini</code>&#x27;den derleme bayrağıyla ezilebilir:</p>
+      <pre><code>build_flags =
+    &#x27;-DOTA_BACKEND_HOST=<span class="c-str">&quot;http://192.168.1.50:3001&quot;</span>&#x27;</code></pre>
+      <h3>Sonraki adımlar</h3>
+      <ul><li>Sistemin nasıl çalıştığını anlamak → Mimari</li><li>Kendi uygulamanızı yazmak → Uygulama Geliştirme</li><li>Cihazı uzaktan sürmek → Komut Arayüzü</li><li>Takıldıysanız → Sorun Giderme</li></ul>
+
+      <h2 id="mimari">Mimari</h2>
+      <h3>Katmanlar</h3>
+      <pre><code>+--------------------------------------------------------------+
+|  UYGULAMALAR (apps/)     watchface, launcher, settings, ...   |
++--------------------------------------------------------------+
+|  ÇEKİRDEK (core/)        app_manager, event_bus,              |
+|                          button_handler, os_config            |
++--------------------------------------------------------------+
+|  SERVİSLER (services/)   ui, power, time, wifi, ble, audio,   |
+|                          sensor, ota, ...                     |
++--------------------------------------------------------------+
+|  SÜRÜCÜLER (drivers/)    display, touch, power(PMIC), rtc,    |
+|                          imu, audio                           |
++--------------------------------------------------------------+
+|  FreeRTOS + ESP-IDF + LVGL 9                                  |
++--------------------------------------------------------------+</code></pre>
+      <p>Yukarı katman aşağıyı çağırır; <strong>aşağıdan yukarıya iletişim olay veriyolu ile olur.</strong> Servisler birbirine doğrudan bağımlı değildir — bu, tek bir servisin çıkarılıp değiştirilebilmesini sağlar.</p>
+      <h3>Görev (Task) dağılımı</h3>
+      <div class="tablewrap"><table><thead><tr><th>Görev</th><th>Çekirdek</th><th>Öncelik</th><th>İş</th></tr></thead><tbody><tr><td>UI görevi</td><td>Core 0</td><td>5</td><td>LVGL render döngüsü (<code>ui_service_tick</code>)</td></tr><tr><td>Sensör görevi</td><td>Core 1</td><td>4</td><td>IMU/adım sayar örnekleme, olay üretimi</td></tr><tr><td>Güç görevi</td><td>—</td><td>6</td><td>Batarya izleme, ekran uyku/uyandırma akışı</td></tr><tr><td>Servis görevleri</td><td>Core 1</td><td>3</td><td>WiFi, OTA, telemetri, komut arayüzü gibi arka plan işleri</td></tr></tbody></table></div>
+      <p>Arayüz çizimi ile sensör/servis işlerinin farklı çekirdeklerde olması, ağır bir ağ işleminin arayüzü dondurmasını engeller.</p>
+      <h3>LVGL eşzamanlılık modeli</h3>
+      <p>LVGL thread-safe <strong>değildir</strong>. NarRTOS&#x27;ta LVGL mutex&#x27;inin sahibi <code>ui_service</code>&#x27;tir; UI görevinin dışından yapılacak her <code>lv_*</code> çağrısı kilit altında yapılmak zorundadır:</p>
+      <pre><code>ui_service_lock();                        // LVGL mutex&#x27;ini al
+lv_label_set_text(lbl, <span class="c-str">&quot;merhaba&quot;</span>);
+ui_service_unlock();                      // bırak
+
+<span class="c-cmt">// UI görevi kendi döngüsünde:</span>
+uint32_t next = ui_service_tick();        // mutex içinde lv_timer_handler</code></pre>
+      <p>Bir servis callback&#x27;inden arayüzü güncellemenin diğer güvenli yolu <code>lv_async_call</code> ile işi LVGL görevine devretmektir.</p>
+      <h3>Boot (açılış) akışı</h3>
+      <p><code>src/main.cpp</code> içindeki <code>app_main()</code> sistemi katman katman ayağa kaldırır. <strong>Sıra önemlidir</strong> — her adım bir öncekinin kurduğu altyapıya dayanır:</p>
+      <pre><code>1.  nvs_flash_init()            // kalıcı ayar deposu (NVS)
+2.  i2c_bus_init()              // paylaşımlı I2C veriyolu
+3.  axp2101_init()              // PMIC: güç raylarını aç (varsa)
+4.  event_bus_init()            // pub/sub altyapısı
+5.  button_handler_init()       // fiziksel butonlar
+6.  pcf85063_init()             // RTC oku -&gt; sistem saati
+    time_service_init()         // NTP senkron daemon&#x27;u
+7.  wifi_service_init()         // WiFi (kullanıcı tercihi NVS&#x27;ten okunur)
+8.  co5300_init()               // ekran denetleyicisi (parlaklık 0&#x27;da başlar)
+9.  ui_service_init()           // LVGL + display driver + mutex
+10. ft3168_init()               // dokunmatik -&gt; LVGL input device
+11. app_manager_init()          // uygulama çatısı + uygulama kayıtları
+12. alarm_service_init()        // LVGL timer tabanlı zamanlayıcı
+13. audio_service_init()        // buzzer/ses
+14. app_manager_launch(...)     // ilk ekran devralınır
+    -&gt; parlaklık ramp ile açılır (görsel <span class="c-str">&quot;açılış&quot;</span> anı)
+15. icm42670_init()             // IMU
+    sensor_service_init()       // sensör görevi (Core 1)
+16. power_service_init()        // güç/uyku yönetimi
+17. ota_service_init()          // güncelleme denetleyicisi</code></pre>
+      <h4>Hata toleransı ilkesi</h4>
+      <p>Çevre birim init&#x27;leri (dokunmatik, RTC, IMU, PMIC) başarısız olsa bile <strong>sistem boot&#x27;a devam eder</strong> — hata loglanır, ilgili özellik devre dışı kalır. Cihaz, tek bir çevre biriminin arızasıyla açılamaz duruma düşmez.</p>
+      <h3>Proje yapısı</h3>
+      <pre><code>NarRTOS-ESP32S3/
+├── platformio.ini              # build ortamları (env&#x27;ler)
+├── partitions_custom.csv       # A/B OTA partisyon düzeni
+├── sdkconfig.*                 # ESP-IDF konfigürasyonları (env başına)
+├── src/
+│   ├── main.cpp                # boot akışı (app_main)
+│   ├── core/                   # ÇEKİRDEK
+│   │   ├── os_config.h         #   sürüm, pin haritası, görev ayarları
+│   │   ├── app_manager.{h,cpp} #   uygulama yaşam döngüsü
+│   │   ├── event_bus.{h,cpp}   #   pub/sub olay veriyolu
+│   │   └── button_handler.*    #   fiziksel buton yönetimi
+│   ├── services/               # SERVİSLER
+│   ├── drivers/                # SÜRÜCÜLER (display, touch, power, rtc, imu)
+│   ├── hal/                    # donanım soyutlama (I2C bus)
+│   ├── apps/                   # uygulama katmanı
+│   └── assets/  fonts/  utils/
+└── docs/                       # dokümantasyon</code></pre>
+      <figure><img src="assets/img/mimari-katmanlar.png" alt="Katmanlı mimari" />
+        <figcaption>Beş katman — yukarı katman aşağıyı çağırır, aşağıdan yukarı iletişim olay veriyolu ile olur</figcaption></figure>
+      <figure><img src="assets/img/cift-cekirdek.png" alt="Çift çekirdekli görev dağılımı" />
+        <figcaption>Görevlerin çekirdeklere ve önceliklere dağılımı</figcaption></figure>
+
+      <h2 id="cekirdek-ve-servisler">Çekirdek ve Servisler</h2>
+      <h3>Çekirdek bileşenler (<code>src/core/</code>)</h3>
+      <h4>event_bus — pub/sub olay veriyolu</h4>
+      <p>Görevler arası iletişimin tek yolu. Her abone kendi FreeRTOS kuyruğuna sahiptir; yayınlanan olay tüm abone kuyruklarına dağıtılır ve <strong>abonenin kendi görev bağlamında</strong> işlenir (ISR-güvenli yayın).</p>
+      <pre><code><span class="c-cmt">// Olay grupları (event_bus.h):</span>
+EVENT_BATTERY_LEVEL / EVENT_CHARGING_STATE / EVENT_LOW_BATTERY   // güç
+EVENT_STEP_COUNT / EVENT_GESTURE_WRIST_UP / EVENT_SHAKE          // sensör
+EVENT_TOUCH_DOWN / EVENT_BTN_TOP / EVENT_BTN_BOTTOM              // girdi
+EVENT_TIME_UPDATED / EVENT_APP_SWITCH / EVENT_WEATHER_UPDATE     // sistem
+
+void event_bus_publish(event_type_t type, uint32_t data);</code></pre>
+      <p>Bir uygulamayı başka bir görevden açmanın thread-safe yolu da budur: <code>event_bus_publish(EVENT_APP_SWITCH, APP_ID_WEATHER)</code> → <code>app_manager</code> kendi zamanlayıcısında (LVGL görevi) uygulamayı açar.</p>
+      <h4>app_manager — uygulama yaşam döngüsü</h4>
+      <p>Her uygulama bir <code>app_interface_t</code> vtable&#x27;ı uygular; aynı anda yalnızca bir uygulama aktiftir (LVGL ekranının sahibi odur):</p>
+      <pre><code>typedef struct {
+    void (*on_start)(lv_obj_t* screen); // ilk açılış: UI&#x27;yi bu ekrana kur
+    void (*on_resume)(void);            // arka plandan öne gelme
+    void (*on_pause)(void);             // başka uygulama devraldı
+    void (*on_stop)(void);              // tamamen kapat, kaynakları bırak
+    bool (*on_event)(const os_event_t*);// aktif uygulamaya olay teslimi
+    const char* name;                   // log için isim
+} app_interface_t;
+
+void app_manager_register(app_id_t id, const app_interface_t* app);
+void app_manager_launch(app_id_t id);   // geçiş animasyonlu
+void app_manager_back(void);            // önceki uygulamaya dön
+app_id_t app_manager_current_id(void);</code></pre>
+      <p>Ayrıca 50 ms&#x27;lik bir olay zamanlayıcısı çalıştırır: jestleri okur, olay kuyruklarını boşaltır ve aktif uygulamaya iletir.</p>
+      <h4>button_handler</h4>
+      <p>İki fiziksel butonu (üst/alt, aktif LOW) debounce edip kısa/uzun basış ayrımıyla <code>EVENT_BTN_TOP</code> / <code>EVENT_BTN_BOTTOM</code> olarak yayınlar.</p>
+      <hr />
+      <h3>Servis katmanı (<code>src/services/</code>)</h3>
+      <div class="tablewrap"><table><thead><tr><th>Servis</th><th>Görev</th></tr></thead><tbody><tr><td><code>ui_service</code></td><td>LVGL başlatma, render döngüsü, LVGL mutex sahipliği, dokunmatik girdi kaydı</td></tr><tr><td><code>power_service</code></td><td>Batarya izleme, ekran uyku/uyandırma, aktivite takibi</td></tr><tr><td><code>time_service</code></td><td>RTC&#x27;den saat okuma + WiFi varken NTP senkronu; <code>EVENT_TIME_UPDATED</code> yayını</td></tr><tr><td><code>wifi_service</code></td><td>Bağlantı yönetimi, asenkron ağ taraması, kullanıcı tercihi (NVS&#x27;te kalıcı)</td></tr><tr><td><code>ble_service</code></td><td>BLE altyapısı (NimBLE GATT sunucu) — bildirim köprüsü ve komut arayüzünün temeli</td></tr><tr><td><code>audio_service</code></td><td>Buzzer/ses çıkışı (alarm ve bildirim sesleri)</td></tr><tr><td><code>sensor_service</code></td><td>IMU örnekleme görevi (Core 1); adım/jest olayları üretir</td></tr><tr><td><code>ota_service</code></td><td>Sürüm manifest&#x27;i sorgulama, imaj indirme, A/B güncelleme</td></tr><tr><td><code>alarm_service</code></td><td>Zamanlayıcı/alarm çekirdeği (LVGL timer tabanlı)</td></tr><tr><td><code>telemetry_service</code></td><td>Periyodik sağlık + WiFi tarama raporu (bkz. Telemetri ve Konumlandırma)</td></tr><tr><td><code>command_service</code></td><td>USB/BLE komut arayüzü (bkz. Komut Arayüzü)</td></tr></tbody></table></div>
+      <h4>ui_service API&#x27;si (en sık kullanılan)</h4>
+      <pre><code>void     ui_service_init(void);        // LVGL + display driver + mutex
+void     ui_service_register_touch();  // dokunmatiği LVGL&#x27;e bağla
+uint32_t ui_service_tick(void);        // UI görev döngüsü (mutex içinde
+                                       <span class="c-cmt">//   lv_timer_handler)</span>
+void     ui_service_lock(void);        // görevler arası UI güncellemesi için
+void     ui_service_unlock(void);</code></pre>
+      <h4>Yeni servis eklemek</h4>
+      <p>Servisler <strong>opsiyoneldir ve genişletilebilir</strong>: <code>services/</code> altına bir çift dosya ekleyip boot akışında (<code>main.cpp</code>) init çağırmak yeterlidir. Servis, sonucunu event bus&#x27;a yayınlar; kimse kimseyi doğrudan çağırmaz.</p>
+      <pre><code><span class="c-cmt">// services/my_service.cpp</span>
+esp_err_t my_service_init(void) {
+    xTaskCreatePinnedToCore(my_task, <span class="c-str">&quot;my_svc&quot;</span>, 4096, NULL, 3, NULL, 1 /* Core 1 */);
+    return ESP_OK;
+}</code></pre>
+      <div class="screen-row">
+        <figure class="gif-cell"><img src="assets/gif/guc-raylari.gif" alt="Güç rayları toggle kontrolü" />
+          <figcaption>Ayarlar → Power Rails</figcaption></figure>
+        <div class="screen-txt"><p><code>power_service</code>, AXP2101 PMIC raylarını çalışma anında tek tek açıp kapatabilir. Ayarlardaki bu sayfa <strong>dokuz rayı</strong> ayrı anahtarlara bağlar; en altta saati tamamen kapatan <em>Soft Power Off</em> eylemi onay dialog'u arkasındadır.</p><p>Etiketler cihaz üstünde fiziksel testle doğrulanmıştır — örneğin ALDO1 ses değil <strong>sensör</strong> rayıdır (kapatınca dokunmatik ölür), ALDO2 ve DCDC2 ekranı besler.</p><div class="note warn"><div class="note-t">DCDC1 listelenmez</div><p>Sistem 3.3V rayıdır; kapatılması ESP32'yi öldürür — bunu zaten Soft Power Off yapar, iki ayrı kontrol kafa karıştırıcı olurdu.</p></div></div>
+      </div>
+
+      <h2 id="donanim-ve-board-varyantlari">Donanım ve Board Varyantları</h2>
+      <h3>Desteklenen board&#x27;lar</h3>
+      <div class="tablewrap"><table><thead><tr><th>Özellik</th><th><code>esp32s3_wearable</code> (varsayılan)</th><th><code>esp32s3_lcd128</code></th><th><code>nar_esp32s3</code></th></tr></thead><tbody><tr><td>MCU</td><td>ESP32-S3R8 (çift çekirdek, 240 MHz)</td><td>ESP32-S3 (240×240 yuvarlak LCD kartı)</td><td>ESP32-S3R16V SiP (240 MHz, 16 MB PSRAM dahili)</td></tr><tr><td>Flash / PSRAM</td><td>8 MB QIO / 8 MB Octal PSRAM</td><td>16 MB / 2 MB Quad PSRAM</td><td>32 MB / 16 MB Octal PSRAM</td></tr><tr><td>Ekran</td><td>CO5300 AMOLED, QSPI, 410×502</td><td>GC9A01A LCD, SPI, 240×240 yuvarlak</td><td>CO5300 AMOLED, QSPI, 410×502</td></tr><tr><td>Dokunmatik</td><td>FT3168 (I2C)</td><td>CST816S (I2C)</td><td>CST820 (I2C)</td></tr><tr><td>PMIC</td><td>AXP2101</td><td>yok (3V3 doğrudan)</td><td>AXP2101 (0x47 lineer varyant)</td></tr><tr><td>RTC / IMU</td><td>PCF85063 / ICM42670</td><td>board&#x27;a göre</td><td>PCF85063 (SiP içinde) / ICM42670</td></tr><tr><td>Ek</td><td>—</td><td>—</td><td>ES8311/ES7210 ses, <strong>nRF9151 hücresel</strong> (GSM/LTE-M/NB-IoT + GNSS)</td></tr></tbody></table></div>
+      <h3>NAR-ESP32S3: ses ve hücresel (nRF9151)</h3>
+      <p><code>nar_esp32s3</code> varyantı AMOLED 2.06 kartla aynı ekran/dokunmatik ailesini kullanır ama ek olarak <strong>ses</strong> (ES8311 kodek + ES7210 mik ADC + NS4150B amfi) ve <strong>hücresel bağlantı</strong> taşır: üzerindeki &quot;NAR9151&quot; modülü aslında bir <strong>Nordic nRF9151</strong> SiP&#x27;tir (LTE-M / NB-IoT + GNSS + gömülü SIM).</p>
+      <ul><li><strong>AT arayüzü:</strong> nRF9151 UART ile ESP&#x27;ye bağlı (nRF P0.11 TX → GPIO43, P0.12 RX → GPIO44). AT için nRF&#x27;e Nordic SLM yazılımı yüklenir; <code>AT → OK</code> doğrulandı. (GPIO43/44 = ESP U0TXD/U0RXD; kullanmadan önce ROM&#x27;un UART0 ikincil çıkışı pinlerden koparılmalı.)</li><li><strong>Modem firmware:</strong> SiP fabrikadan test görüntüsüyle (PTI) gelir ve şebeke/CFUN desteklemez; tam sürüm (<code>mfw_nrf91x1_2.0.4</code>) yüklenir, sonra <code>AT+CFUN=1 → OK</code>. J-Link yoksa ESP, SWD köprüsü (pyocd) + seri fmfu aracı olarak kullanılır.</li><li><strong>eSIM:</strong> gömülü <strong>ST4SIM</strong> (MFF2) 1GLOBAL profiliyle gelir; ICCID okunup operatör portalında aktive edilir (ST AN5740). Entegrasyon sürüyor.</li><li><strong>PMIC 0x47:</strong> NAR&#x27;ın AXP2101&#x27;i lineer şarj varyantıdır; LDO&#x27;lar kapalı açılır, I2C kilidi kör-yazma ile açılır, sürücü her açılışta rayları yazar.</li></ul>
+      <h3>Açılış donanım self-test&#x27;i</h3>
+      <p>Soğuk açılışta (deep-sleep uyanışı hariç) OS, çevrebirimleri sırayla sınayıp <strong>seri monitöre</strong> bir checklist tablosu basar (<code>selftest_service</code>) — ekrana çizmez, launcher normal açılır. Test edilenler: PSRAM/flash, I2C taraması, PMIC, güç rayları, USB/pil, IMU, sıcaklık, RTC, dokunmatik çip, kodek, ekran, SD. NAR varyantında ek olarak ses loopback, Wi-Fi, titreşim motoru ve <strong>GSM/nRF9151 (AT → IMEI)</strong>. Her satır PASS / FAIL / UYARI / ATLA döner; donanımı/derlemesi olmayan satırlar ATLA görünür. Aynı test motoru (<code>selftest_ext</code>) narrtos-board-selftest ve narrtos-lte-test ile birebir ortaktır.</p>
+            <figure><img src="assets/img/acilis-selftest.svg" alt="Açılış donanım self-test'i seri monitör çıktısı" />
+        <figcaption>Soğuk açılışta seri monitöre basılan self-test tablosu — sağlam bir kartta tüm satırlar PASS döner (eksik/derlenmemiş çevrebirim olursa o satır FAIL yerine ATLA/UYARI).</figcaption></figure>
+      <h3>Pin haritası (varsayılan board)</h3>
+      <p>Pin tanımları kodda tek yerde yaşar (<code>core/os_config.h</code>) ve tüm sürücüler buradan okur:</p>
+      <pre><code><span class="c-cmt">#define PIN_DISP_CS     12      // QSPI ekran</span>
+<span class="c-cmt">#define PIN_DISP_SCLK   11</span>
+<span class="c-cmt">#define PIN_DISP_D0      4      // D0..D3 = 4/5/6/7</span>
+<span class="c-cmt">#define PIN_DISP_RST     8</span>
+<span class="c-cmt">#define PIN_I2C_SDA     15      // paylaşımlı I2C: dokunmatik + PMIC + RTC + IMU</span>
+<span class="c-cmt">#define PIN_I2C_SCL     14</span>
+<span class="c-cmt">#define PIN_TOUCH_RST    9</span>
+<span class="c-cmt">#define PIN_TOUCH_INT   38</span>
+<span class="c-cmt">#define PIN_BTN_TOP      0      // aktif LOW (boot butonu)</span>
+<span class="c-cmt">#define PIN_BTN_BOTTOM  10</span>
+<span class="c-cmt">#define PIN_BUZZER      21</span>
+<span class="c-cmt">// SD (SDMMC): D0=3, CMD=1, CLK=2</span></code></pre>
+      <p>LCD varyantının pinleri ayrı başlıktadır: <code>core/os_config_lcd128_pins.h</code> — varyant derlemesinde otomatik seçilir.</p>
+      <h3>Sürücüler (<code>src/drivers/</code>)</h3>
+      <div class="tablewrap"><table><thead><tr><th>Sürücü</th><th>Çip</th><th>Arayüz</th><th>Not</th></tr></thead><tbody><tr><td><code>display/co5300</code></td><td>CO5300 AMOLED</td><td>QSPI</td><td>Varsayılan ekran; parlaklık panel komutuyla</td></tr><tr><td><code>display/gc9a01_128</code></td><td>GC9A01A LCD</td><td>SPI + DC</td><td>1.28&quot; varyant; parlaklık LEDC PWM (arka ışık)</td></tr><tr><td><code>touch/ft3168</code></td><td>FT3168</td><td>I2C</td><td>Varsayılan dokunmatik</td></tr><tr><td><code>touch/cst816s_128</code></td><td>CST816S</td><td>I2C</td><td>1.28&quot; varyant dokunmatiği</td></tr><tr><td><code>power/axp2101</code></td><td>AXP2101 PMIC</td><td>I2C</td><td>Güç rayları, batarya ölçümü, şarj</td></tr><tr><td><code>rtc/pcf85063</code></td><td>PCF85063</td><td>I2C</td><td>Gerçek zaman saati (güç kesilse de saat korunur)</td></tr><tr><td><code>imu/icm42670</code></td><td>ICM42670</td><td>I2C</td><td>İvme/jiroskop — adım sayar ve jestler</td></tr></tbody></table></div>
+      <h3>Varyant kalıbı: aynı sembol seti</h3>
+      <p>Alternatif ekran sürücüleri, varsayılan sürücüyle <strong>birebir aynı fonksiyon imzalarını</strong> (<code>co5300_*</code>) dışa verir ve tamamı kendi derleme guard&#x27;ı içindedir:</p>
+      <pre><code><span class="c-cmt">// gc9a01_128_driver.cpp</span>
+<span class="c-cmt">#ifdef DISPLAY_VARIANT_LCD128        // yalnız LCD varyantında derlenir</span>
+...  co5300_init(), co5300_lvgl_flush_cb(), ...   // aynı isimler
+<span class="c-cmt">#endif</span>
+<span class="c-cmt">// co5300_driver.cpp&#x27;deki guard, LCD build&#x27;ında onu boşaltır -&gt;</span>
+<span class="c-cmt">// linker her ortamda TEK sembol seti görür; main.cpp / ui_service DEĞİŞMEZ.</span></code></pre>
+      <h3>Yeni board&#x27;a taşıma (porting)</h3>
+      <p>Gerçekte yapılmış bir taşımanın (1.28&quot; yuvarlak LCD) izlediği yol:</p>
+      <p><strong>1. Ekran sürücüsü</strong> — <code>drivers/display/&lt;yeni&gt;_driver.cpp</code> Varsayılan sürücünün dışa verdiği aynı fonksiyon setini uygula, dosyanın tamamını kendi guard&#x27;ına al (<code>#ifdef DISPLAY_VARIANT_X</code>). Çözünürlüğü sabit yazma — <code>CO5300_H_RES</code> / <code>V_RES</code> bayraklarından al.</p>
+      <p><strong>2. Dokunmatik sürücüsü</strong> — <code>drivers/touch/&lt;yeni&gt;_driver.cpp</code> Aynı kalıp: varsayılan dokunmatik sürücüsünün imzaları + guard.</p>
+      <p><strong>3. Pin haritası</strong> — <code>core/os_config_&lt;yeni&gt;_pins.h</code> <code>os_config.h</code>, board guard&#x27;ına göre doğru başlığı seçer.</p>
+      <p><strong>4. Build ortamı</strong> — <code>platformio.ini</code></p>
+      <pre><code>[env:esp32s3_yeniboard]
+extends = env:esp32s3_wearable        ; ortak her şeyi miras al
+board_build.flash_size = 16MB         ; donanıma göre
+board_build.psram_type = qio
+upload_speed = 460800                 ; USB köprüsü kararsızsa düşür
+build_flags =
+    ${env:esp32s3_wearable.build_flags}
+    -DCO5300_H_RES=240 -DCO5300_V_RES=240
+    -DDISPLAY_VARIANT_YENI=1
+    -DBOARD_VARIANT_YENI=1</code></pre>
+      <p><strong>5. ESP-IDF konfigürasyonu</strong> — <code>sdkconfig.esp32s3_yeniboard</code> PSRAM tipi (quad/octal), flash boyutu gibi çip-seviyesi ayarlar env&#x27;e özel dosyada.</p>
+      <p><strong>6. UI ölçü sabitleri</strong> — bkz. Uygulama Geliştirme › Çözünürlük uyumu.</p>
+      <h4>Kontrol listesi</h4>
+      <ul><li>[ ] Ekran + dokunmatik sürücü çifti aynı sembol setiyle, kendi guard&#x27;ında</li><li>[ ] Pin başlığı + platformio env + sdkconfig</li><li>[ ] Her iki ortam da derleniyor; <strong>varsayılan build&#x27;ın binary&#x27;si DEĞİŞMEDİ</strong></li><li>[ ] Boot logları temiz; dokunmatik/ekran/servisler cihazda doğrulandı</li></ul>
+      <div class="note warn"><div class="note-t">Değişmezlik kuralı</div><p>Varyant eklemek, mevcut donanımın derlemesini asla etkilememelidir. Yeni kodun tamamı guard içinde olmalı, varsayılan dal orijinal değerlerini korumalıdır.</p></div>
+      <h3>240×240 yuvarlak panelde aynı sistem</h3>
+      <p>Aynı kod tabanı, yalnızca derleme zamanı seçimiyle yuvarlak GC9A01A panelde çalışır. Yerleşim değerleri firmware'den gelir: içerik sütunu <code>204 px</code> (kenarlardan 18 px içeride), ana listede <code>STEP 60</code>, güç raylarında <code>STEP 50</code>, launcher hücresi <code>88×92</code>.</p>
+      <div class="note warn">
+        <div class="note-t">Yuvarlak panelin kısıtı</div>
+        <p>204 px genişliğindeki satır ancak <strong>y ≈ 180</strong>'e kadar daire içinde kalır; altına inen satırlar kırpılır. Bu yüzden ana listede aynı anda iki satır tam görünür, güç rayları satırları 180 px'e daraltılır.</p>
+      </div>
+      <div class="device-gifs">
+        <figure><img src="assets/gif/lcd128-tur.gif" alt="240×240 panel turu" />
+          <figcaption>Yuvarlak panelde ekranlar arası geçiş</figcaption></figure>
+      </div>
+      <div class="screens">
+        <figure class="screen round">
+          <img src="assets/saat-240/kadran-dijital.png" alt="Dijital kadran" />
+          <b>Dijital kadran</b><span>Rubik Black 100</span>
+        </figure>
+        <figure class="screen round">
+          <img src="assets/saat-240/launcher.png" alt="Ana ekran" />
+          <b>Ana ekran</b><span>hücre 88×92, ikon 64</span>
+        </figure>
+        <figure class="screen round">
+          <img src="assets/saat-240/ayarlar.png" alt="Ayarlar" />
+          <b>Ayarlar</b><span>içerik 204 px, STEP 60</span>
+        </figure>
+        <figure class="screen round">
+          <img src="assets/saat-240/guc-raylari.png" alt="Güç rayları" />
+          <b>Güç rayları</b><span>STEP 50</span>
+        </figure>
+        <figure class="screen round">
+          <img src="assets/saat-240/adim-sayar.png" alt="Adım sayar" />
+          <b>Adım sayar</b><span>hedef halkası</span>
+        </figure>
+        <figure class="screen round">
+          <img src="assets/saat-240/hava-durumu.png" alt="Hava durumu" />
+          <b>Hava durumu</b><span>çoklu şehir</span>
+        </figure>
+      </div>
+
+      <h2 id="uygulama-gelistirme">Uygulama Geliştirme</h2>
+      <p>Sisteme yeni bir uygulama eklemek <strong>4 adımdır</strong>. Aşağıdaki örnek &quot;MyApp&quot; adında boş bir uygulamayı uçtan uca ekler.</p>
+      <h3>Adım 1 — Uygulama dosyalarını yaz: <code>src/apps/myapp/</code></h3>
+      <p>Her uygulama iki dosyadan oluşur ve dışarıya tek bir fonksiyon verir: <code>*_get_interface()</code> (yerleşik uygulamaların tamamı bu kalıptadır).</p>
+      <pre><code><span class="c-cmt">// src/apps/myapp/myapp_app.h</span>
+<span class="c-cmt">#pragma once</span>
+<span class="c-cmt">#include &quot;../../core/app_manager.h&quot;</span>
+const app_interface_t* myapp_get_interface(void);</code></pre>
+      <pre><code><span class="c-cmt">// src/apps/myapp/myapp_app.cpp</span>
+<span class="c-cmt">#include &quot;myapp_app.h&quot;</span>
+
+static void my_on_start(lv_obj_t* screen) {
+    lv_obj_t* lbl = lv_label_create(screen);
+    lv_label_set_text(lbl, <span class="c-str">&quot;Merhaba NarRTOS&quot;</span>);
+    lv_obj_center(lbl);
+    app_manager_enable_gestures(screen);   // swipe&#x27;ların ekrana ulaşması için
+}
+
+static void my_on_stop(void) { /* on_start&#x27;ta ayrılan kaynakları bırak */ }
+
+static bool my_on_event(const os_event_t* e) {
+    <span class="c-cmt">// örn. EVENT_TIME_UPDATED geldiğinde etiketi tazele</span>
+    return false;                          // true = olayı tükettim
+}
+
+static const app_interface_t my_app = {
+    .on_start  = my_on_start,
+    .on_resume = NULL, .on_pause = NULL,
+    .on_stop   = my_on_stop,
+    .on_event  = my_on_event,
+    .name      = <span class="c-str">&quot;myapp&quot;</span>,
+};
+
+const app_interface_t* myapp_get_interface(void) { return &amp;my_app; }</code></pre>
+      <h3>Adım 2 — Kimlik tanımla: <code>core/os_config.h</code></h3>
+      <pre><code>typedef enum {
+    APP_ID_WATCHFACE    = 0,
+    ...
+    APP_ID_STORE        = 11,
+    APP_ID_MYAPP        = 12,   // &lt;-- YENİ: her zaman APP_ID_COUNT&#x27;tan önce
+    APP_ID_COUNT
+} app_id_t;</code></pre>
+      <h3>Adım 3 — Merkezî kayda ekle: <code>core/app_manager.cpp</code></h3>
+      <p>Tüm uygulamalar tek yerde, <code>app_manager_init()</code> içinde kaydedilir — <code>main.cpp</code>&#x27;ye dokunulmaz:</p>
+      <pre><code><span class="c-cmt">#include &quot;../apps/myapp/myapp_app.h&quot;</span>
+
+void app_manager_init(void) {
+    ...
+    app_manager_register(APP_ID_WATCHFACE, watchface_app_get_interface());
+    ...
+    app_manager_register(APP_ID_MYAPP,     myapp_get_interface());   // &lt;-- YENİ
+}</code></pre>
+      <h3>Adım 4 — (İsteğe bağlı) Launcher&#x27;a kutucuk ekle</h3>
+      <p>Kayıt, uygulamayı <strong>çalıştırılabilir</strong> yapar; menüde görünmesi için <code>src/apps/launcher/launcher_app.cpp</code>&#x27;deki grid tanımına bir kutucuk (isim + ikon sembolü + APP_ID) eklenir. Launcher&#x27;a eklemeden de uygulama başka bir yerden (buton olayı, alarm, başka uygulama, Komut Arayüzü) açılabilir:</p>
+      <pre><code>app_manager_launch(APP_ID_MYAPP);</code></pre>
+      <h3>Derle ve çalıştır</h3>
+      <p>Kodda her değişiklikten sonra önce temizleyin, sonra derleyip yükleyin:</p>
+      <pre><code>pio run -e esp32s3_wearable -t clean
+pio run -e esp32s3_wearable -t upload    # cihazda: Launcher&#x27;da yeni kutucuk</code></pre>
+      <p>Temizlik önceki derlemenin kalıntılarını siler; ikinci komut sıfırdan derleyip karta yükler. Temiz derleme birkaç dakika sürer, karşılığında eski nesne dosyalarından kaynaklanan &quot;değişiklik yansımadı&quot; sorunları yaşanmaz.</p>
+      <hr />
+      <h3>Uyulması gereken kurallar</h3>
+      <ol><li><strong>UI yalnızca <code>on_start</code>&#x27;a verilen ekrana kurulur</strong> — ekran nesnesini saklayıp başka ekranlara dokunulmaz.</li><li><strong>Başka görevden UI güncellemesi</strong> <code>ui_service_lock/unlock</code> ile sarılır (bkz. Mimari › LVGL eşzamanlılık).</li><li><strong><code>on_stop</code>, <code>on_start</code>&#x27;ta ayrılan her kaynağı bırakmalıdır</strong> (timer, buffer, servis aboneliği) — uygulamalar tekrar tekrar açılıp kapanır.</li><li><strong>Servisleri doğrudan yoklamayın, olayları dinleyin.</strong> Gerçek örnek (WatchFace):</li></ol>
+      <pre><code>static bool on_event(const os_event_t* event)
+{
+    if (!event) return false;
+    if (event-&gt;type == EVENT_WEATHER_UPDATE) {
+        <span class="c-cmt">// Hava durumu arka plan görevi yeni veri yayınladı -&gt; ikonu yenile.</span>
+        <span class="c-cmt">// UI task bağlamındayız; doğrudan render güvenli.</span>
+        if (s_activity_icon_cloud) {
+            weather_icon_render(s_activity_icon_cloud,
+                                (weather_condition_t)event-&gt;data);
+        }
+        return true;    // olay tüketildi
+    }
+    return false;       // ilgilenmiyorum -&gt; diğer dinleyicilere geçsin
+}</code></pre>
+      <hr />
+      <h3>Çözünürlük uyumu (ölçü sabitleri kalıbı)</h3>
+      <p>Uygulamaların iki çözünürlükte de (410×502 / 240×240) <strong>yeniden yazılmadan</strong> çalışmasını sağlayan kalıp: her uygulama ekrana bağlı ölçülerini <strong>tek bir varyant-korumalı sabit bloğunda</strong> tanımlar; UI kodu yalnızca bu sabitleri kullanır.</p>
+      <pre><code><span class="c-cmt">// launcher_app.cpp — ölçü sabitleri (tek blok, uygulamanın başında)</span>
+<span class="c-cmt">#ifdef BOARD_VARIANT_LCD128          // 240×240 yuvarlak LCD</span>
+<span class="c-cmt">#define L_SCR_W         240</span>
+<span class="c-cmt">#define L_CELL_W        88           // grid hücresi</span>
+<span class="c-cmt">#define L_CELL_H        92</span>
+<span class="c-cmt">#define L_ICON          64           // uygulama ikonu</span>
+<span class="c-cmt">#define L_SYM_FONT      (&amp;lv_font_montserrat_28)</span>
+<span class="c-cmt">#else                                // 410×502 AMOLED (varsayılan)</span>
+<span class="c-cmt">#define L_SCR_W         410</span>
+<span class="c-cmt">#define L_CELL_W        120</span>
+<span class="c-cmt">#define L_CELL_H        128</span>
+<span class="c-cmt">#define L_ICON          95</span>
+<span class="c-cmt">#define L_SYM_FONT      (&amp;lv_font_montserrat_36)</span>
+<span class="c-cmt">#endif</span>
+
+<span class="c-cmt">// UI kodu her yerde SADECE sabiti kullanır:</span>
+lv_obj_set_size(cell, L_CELL_W, L_CELL_H);</code></pre>
+      <p>Basit yükseklik/konum farkları için satır-içi hali de kullanılır:</p>
+      <pre><code><span class="c-cmt">#ifdef BOARD_VARIANT_LCD128</span>
+<span class="c-cmt">#define VIEW_SCR_H     240</span>
+<span class="c-cmt">#else</span>
+<span class="c-cmt">#define VIEW_SCR_H     502</span>
+<span class="c-cmt">#endif</span>
+lv_obj_set_size(sbox, LV_PCT(100), VIEW_SCR_H);</code></pre>
+      <div class="note"><div class="note-t">Değişmezlik kuralı</div><p>Varsayılan (AMOLED) dal, <code>#else</code> tarafında orijinal değerlerin birebir aynısını taşır — böylece varyant eklemek, preprocessor sonrası varsayılan build&#x27;ın binary&#x27;sini <strong>tek byte değiştirmez.</strong> Yeni bir çözünürlük desteklemek = her uygulamanın sabit bloğuna bir dal eklemek; UI mantığına dokunulmaz.</p></div>
+      <h4>Küçük ekran için pratik notlar</h4>
+      <ul><li>İkon/daire oranını koru (ör. 40 px dairede 24 px sembol → 26 px dairede 16 px).</li><li>Liste satır aralığını (<code>STEP</code>) satır yüksekliği + ~8 px olarak kur; AMOLED değerini olduğu gibi taşımak devasa boşluklar üretir.</li><li>Yuvarlak ekranda üst/alt kenarlarda görünür genişlik daralır — başlık ve saat gibi öğeleri yan yana değil, <strong>alt alta</strong> yerleştirmek gerekebilir.</li></ul>
+
+      <h2 id="kullanici-arayuzu">Kullanıcı Arayüzü</h2>
+      <p>NarRTOS&#x27;un kullanıcı etkileşimi üç girdiye dayanır: <strong>dokunmatik jestler</strong>, <strong>iki fiziksel buton</strong> ve <strong>hareket</strong> (bilek kaldırma).</p>
+      <h3>Jest (swipe) sistemi</h3>
+      <p>Dokunmatik denetleyici donanımsal jest verisi göndermediği için swipe algılama <strong>yazılımda</strong> yapılır: dokunma okuma geri çağrısı parmak izini takip edip yön çıkarır ve global <code>g_swipe_dir</code> değişkenine yazar (-1 sol, +1 sağ, -2 yukarı, +2 aşağı). <code>app_manager</code>&#x27;ın 50 ms&#x27;lik olay zamanlayıcısı bu değeri okuyup navigasyona çevirir.</p>
+      <div class="tablewrap"><table><thead><tr><th>Bağlam</th><th>Jest</th><th>Davranış</th></tr></thead><tbody><tr><td>Saat kadranı</td><td>Sağa swipe</td><td>Launcher&#x27;ı açar (uygulama menüsü)</td></tr><tr><td>Saat kadranı</td><td>Sola / yukarı / aşağı</td><td>Bilinçli olarak atanmamıştır (kazara ekran değişimini önler)</td></tr><tr><td>Diğer tüm ekranlar</td><td>Sağa veya sola swipe</td><td>Geri — tek elle kullanım için iki yön de geri çalışır</td></tr><tr><td>Üst kenar (y ≤ 40 px)</td><td>Aşağı çekme</td><td>Control Center&#x27;ı açar</td></tr><tr><td>Control Center açıkken</td><td>Yukarı/sağa/sola swipe veya karartılmış zemine dokunma</td><td>Paneli kapatır</td></tr></tbody></table></div>
+      <p>Kod karşılığı (<code>app_manager.cpp</code>, sadeleştirilmiş):</p>
+      <pre><code>static void check_swipe(void)              // 50 ms&#x27;lik olay zamanlayıcısında
+{
+    if (ui_service_is_swipe_locked()) { g_swipe_dir = 0; return; }
+    if (g_swipe_dir == 0) return;
+    int8_t dir = g_swipe_dir;  g_swipe_dir = 0;      // okundu, sıfırla
+
+    if (control_center_is_open()) { control_center_close(); return; }
+
+    switch (dir) {
+        case -1:  // sağa swipe
+            if (s_current == APP_ID_WATCHFACE)
+                app_manager_launch(APP_ID_LAUNCHER); // kadran -&gt; menü
+            else
+                app_manager_back();                  // diğerlerinde: geri
+            break;
+        case +1:  // sola swipe: kadranda no-op, diğerlerinde geri
+            if (s_current != APP_ID_WATCHFACE) app_manager_back();
+            break;
+    }
+}</code></pre>
+      <p><strong>Swipe kilidi:</strong> Sürükleme tabanlı widget&#x27;lar (ör. parlaklık çubuğu) sürükleme boyunca swipe navigasyonunu kilitler (<code>ui_service_is_swipe_locked</code>) — slider kullanırken yanlışlıkla &quot;geri&quot; tetiklenmez.</p>
+      <h3>Control Center</h3>
+      <p>Üstten aşağı çekilen hızlı ayarlar paneli. Aktif uygulamanın <strong>üzerine</strong> çizilir (<code>lv_layer_top()</code>) — uygulama ekranı bozulmaz. İçerik: <strong>WiFi | Bluetooth | Uçak modu | El feneri</strong> hızlı anahtarları.</p>
+      <h3>Fiziksel butonlar</h3>
+      <div class="tablewrap"><table><thead><tr><th>Buton</th><th>Pin</th><th>Rol</th></tr></thead><tbody><tr><td>Üst buton</td><td>GPIO 0</td><td>Uyandırma / ana ekrana dönüş (kısa-uzun basış olay veriyoluyla uygulamaya iletilir)</td></tr><tr><td>Alt buton</td><td>GPIO 10</td><td>Uyandırma / uygulamaya özgü işlev</td></tr></tbody></table></div>
+      <h3>Güç durumları ve uyandırma</h3>
+      <p><code>power_service</code> dört durumlu bir makine işletir; her kullanıcı etkileşimi sayacı sıfırlar:</p>
+      <pre><code>ACTIVE --(30 sn hareketsizlik)--&gt; DIM --(5 sn)--&gt; DISPLAY_OFF
+   ^                                                  |
+   +---- dokunma / buton / bilek kaldırma (WOM) ------+
+
+DISPLAY_OFF --(10 dk hareketsizlik)--&gt; DEEP_SLEEP
+   (derin uykudan uyandırma: buton, RTC alarmı)</code></pre>
+      <p>Uyandırma kaynakları loglarda ayırt edilir (dokunma, üst/alt buton, bilek kaldırma) — sahte uyandırmaların teşhisi için. Bilek kaldırma, IMU&#x27;nun hareket-ile-uyandırma (WOM) kesmesiyle gelir.</p>
+      <h3>Yerleşik uygulamalar</h3>
+      <div class="tablewrap"><table><thead><tr><th>Uygulama</th><th>APP_ID</th><th>Ne yapar / kullandığı servisler</th></tr></thead><tbody><tr><td>WatchFace</td><td>0</td><td>Varsayılan ana ekran: saat, tarih, batarya, adım. Olaylarla canlı güncellenir</td></tr><tr><td>StepCounter</td><td>1</td><td>Adım sayar ekranı — <code>sensor_service</code>&#x27;in IMU verisi</td></tr><tr><td>Settings</td><td>2</td><td>Çok sayfalı ayarlar: WiFi (tarama + el yazısı/klavye şifre girişi), ekran, OTA, sistem bilgisi</td></tr><tr><td>Launcher</td><td>3</td><td>3×3 grid uygulama menüsü (kadrandan sağa swipe)</td></tr><tr><td>HeartRate</td><td>5</td><td>İskelet (gelecek uygulama)</td></tr><tr><td>Weather</td><td>6</td><td>Şehir + sıcaklık + UV/rüzgâr/nem halkaları; <code>weather_service</code> (WiFi gerekir)</td></tr><tr><td>Timer</td><td>7</td><td>İskelet (gelecek uygulama)</td></tr><tr><td>Notifications</td><td>8</td><td>Telefon bildirimleri (BLE/ANCS): liste + detay + dismiss</td></tr><tr><td>Gallery</td><td>9</td><td>Cihaz depolamasındaki görseller; WiFi üzerinden yükleme sayfası</td></tr><tr><td>Alarm</td><td>10</td><td>Alarm listesi + kurma ekranı; <code>alarm_service</code> + <code>audio_service</code></td></tr><tr><td>Store</td><td>11</td><td>Uygulama kataloğu (metadata-only mimari)</td></tr></tbody></table></div>
+      <div class="note"><div class="note-t">Tasarım notu</div><p>Uygulamalar ekran ölçülerini sabit yazmaz; ölçü sabitleri board varyantına göre seçilir. Bkz. Uygulama Geliştirme › Çözünürlük uyumu.</p></div>
+      <div class="device-gifs">
+        <figure><img src="assets/gif/kadran-secici.gif" alt="Kadran seçici" />
+          <figcaption>Kadranlar arasında yatay kaydırma</figcaption></figure>
+        <figure><img src="assets/gif/uygulama-acilis.gif" alt="Uygulama açılışı" />
+          <figcaption>Ana ekrandan uygulamaya ve geri</figcaption></figure>
+      </div>
+      <div class="screens">
+        <figure class="screen">
+          <img src="assets/saat/kadran-analog.png" alt="Analog kadran" />
+          <b>Analog kadran</b><span>FACE_ANALOG</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/kadran-dijital.png" alt="Dijital kadran" />
+          <b>Dijital kadran</b><span>FACE_DIGITAL</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/kadran-activity.png" alt="Activity kadranı" />
+          <b>Activity kadranı</b><span>FACE_ACTIVITY</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/kadran-io-control.png" alt="Çıkış kontrolü" />
+          <b>Çıkış kontrolü</b><span>FACE_IO_CONTROL</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/launcher.png" alt="Ana ekran" />
+          <b>Ana ekran</b><span>3×3 launcher</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/adim-sayar.png" alt="Adım sayar" />
+          <b>Adım sayar</b><span>günlük hedef halkası</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/hava-durumu.png" alt="Hava durumu" />
+          <b>Hava durumu</b><span>çoklu şehir, canlı veri</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/galeri.png" alt="Galeri" />
+          <b>Galeri</b><span>fotoğraf tarayıcı</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/alarm.png" alt="Alarmlar" />
+          <b>Alarmlar</b><span>kurma ekranı</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/bildirimler.png" alt="Bildirimler" />
+          <b>Bildirimler</b><span>ANCS listesi</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/bildirim-detay.png" alt="Bildirim detayı" />
+          <b>Bildirim detayı</b><span>gövde + kapat</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/store-apps.png" alt="Mağaza" />
+          <b>Mağaza</b><span>Apps sekmesi</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/store-detay.png" alt="Mağaza detayı" />
+          <b>Mağaza detayı</b><span>uygulama kartı</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/ayarlar.png" alt="Ayarlar" />
+          <b>Ayarlar</b><span>kök menü</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/guc-raylari.png" alt="Güç rayları" />
+          <b>Güç rayları</b><span>9 toggle + kapat</span>
+        </figure>
+        <figure class="screen">
+          <img src="assets/saat/ota.png" alt="Yazılım güncelleme" />
+          <b>Yazılım güncelleme</b><span>OTA akışı</span>
+        </figure>
+      </div>
+
+      <h2 id="komut-arayuzu">Komut Arayüzü</h2>
+      <p>Cihaz, dışarıdan metin komutlarıyla yönetilebilir — test, demo, otomasyon ve uzaktan kontrol için. Tek bir <strong>taşıyıcı-bağımsız parser çekirdeği</strong> iki kanaldan beslenir; komutlar yeni ekran kodu içermez, mevcut iç API&#x27;lere köprüdür.</p>
+      <pre><code>USB seri (UART0 RX) ──┐        yanıtlar reply-sink ile geri döner:
+BLE <span class="c-str">&quot;NarRTOS CMD&quot;</span>   ──┴─► parser ──► USB&#x27;den gelen -&gt; seriye (printf)
+                                     BLE&#x27;den gelen -&gt; telefona (notify)</code></pre>
+      <h3>Komut seti</h3>
+      <div class="tablewrap"><table><thead><tr><th>Komut</th><th>Etkisi</th></tr></thead><tbody><tr><td><code>help</code> / <code>info</code></td><td>Komut listesi / durum JSON&#x27;u (sürüm, uptime, heap, wifi, aktif uygulama)</td></tr><tr><td><code>app launch &lt;isim|id&gt;</code></td><td>Uygulama açar (<code>EVENT_APP_SWITCH</code> ile — LVGL görevinde, thread-safe)</td></tr><tr><td><code>app back</code> / <code>current</code> / <code>list</code></td><td>Geri • aktif uygulama • isim→id tablosu</td></tr><tr><td><code>swipe left|right|up|down</code></td><td>Jest enjeksiyonu — ekranlar arası gezinme</td></tr><tr><td><code>brightness 0-255</code></td><td>Ekran parlaklığı</td></tr><tr><td><code>set wifi|bt on|off</code></td><td>WiFi tercihi (NVS, kalıcı) + bağlan/kopar • BLE advertise/kes</td></tr><tr><td><code>get wifi|bt</code> / <code>toggle wifi|bt</code></td><td>Durum okuma / tersine çevirme</td></tr><tr><td><code>set rail &lt;isim&gt; on|off</code> / <code>get rails</code></td><td>AXP2101 güç rayları (aldo1-4, dcdc2-4, bldo1-2)</td></tr><tr><td><code>wake</code> / <code>reboot</code></td><td>Ekranı uyandır / yeniden başlat</td></tr></tbody></table></div>
+      <div class="note"><p><code>set rail</code> yalnızca PMIC&#x27;li board&#x27;da çalışır; PMIC yoksa komut dürüst bir hata döner. <code>DCDC1</code> (sistem rayı) bilinçli olarak listede yoktur — kapatmak cihazı öldürür.</p></div>
+      <h3>USB kullanımı</h3>
+      <p>Seri terminale (115200) satır yazın:</p>
+      <pre><code>pio device monitor
+<span class="c-cmt"># sonra:</span>
+help
+app launch weather
+brightness 30</code></pre>
+      <p>Yanıtlar <code>[cmd]</code> önekiyle döner:</p>
+      <pre><code>&gt; app launch weather
+[cmd] OK: launch weather (id=6)
+&gt; brightness 30
+[cmd] OK: brightness=30
+&gt; get wifi
+[cmd] OK: wifi connected=yes pref=on</code></pre>
+      <div class="note"><p>⚠ <strong>macOS + CH34x köprüsü:</strong> port her açılışta cihaza reset atar. Portu <strong>bir kez</strong> açıp aynı oturumda çalışın; her komut için yeniden bağlanmayın.</p></div>
+      <h3>Telefon kullanımı (BLE — özel uygulama gerekmez)</h3>
+      <pre><code>GATT servisi <span class="c-str">&quot;NarRTOS CMD&quot;</span>:
+  Service : 4E010063-6D64-004E-4152-52544F530001
+  RX      : ...530002  (Write / WriteNoRsp)  &lt;- UTF-8 komut satırı yaz
+  TX      : ...530003  (Notify)              &lt;- yanıtlar buraya düşer</code></pre>
+      <p><strong>nRF Connect ile:</strong></p>
+      <ol><li>&quot;NarRTOS Watch&quot;a bağlan</li><li><code>...530003</code> characteristic&#x27;inde <strong>Notify</strong>&#x27;ı aç (yanıtları görmek için)</li><li><code>...530002</code>&#x27;ye <strong>UTF-8 text</strong> olarak komut yaz: <code>app launch weather</code></li><li>Saatte uygulama açılır; yanıt notify&#x27;da düşer</li></ol>
+      <p>BLE&#x27;de USB&#x27;deki port-reset sorunu yoktur; cihaz koldayken bile komut gönderilebilir.</p>
+      <div class="note"><p>⚠ <code>set bt off</code> komutunu <strong>telefondan</strong> gönderirseniz kendi bağlantınızı da kesersiniz. Eşleştirme bozulursa (iOS &quot;Peer removed pairing information&quot;): telefonda cihazı unut → yeniden bağlan.</p></div>
+      <h3>Mimari notlar</h3>
+      <ul><li><strong>Thread-safety:</strong> Uygulama açma doğrudan <code>app_manager_launch</code> çağırmaz — <code>EVENT_APP_SWITCH</code> yayınlar, <code>app_manager</code> kendi LVGL görevinde açar. Geri işlemi <code>lv_async_call</code> ile LVGL görevine devredilir.</li><li><strong>Ekran uyandırma:</strong> Komut öncesi <code>power_service_user_activity</code> çağrılır; ekran kapalıyken geçiş animasyonu tamamlanmaz.</li><li><strong>Eşzamanlılık:</strong> USB ve BLE aynı anda komut gönderebilir — parser mutex ile serileşir.</li><li><strong>Dosyalar:</strong> <code>services/command_service.{h,cpp}</code> (çekirdek + USB), <code>services/ble_cmd_service.{h,cpp}</code> (GATT taşıyıcı).</li></ul>
+      <h3>Yeni taşıyıcı eklemek</h3>
+      <p>Satırı <code>command_service_exec_ex(line, reply_fn, ctx)</code>&#x27;e besleyen küçük bir adaptör yeterlidir — parser ve komut seti aynen çalışır (ör. HTTP endpoint, MQTT konusu).</p>
+
+
+      <h2 id="derinlemesine">Telemetri, Konum ve Sunucu</h2>
+      <p>
+        Telemetri ve konumlandırma, kendi ayrı sayfalarında ayrıntılı olarak anlatılıyor —
+        animasyonlu akış şemaları, etkileşimli örnekler ve panel ekran görüntüleriyle.
+      </p>
+
+      <div class="cards">
+        <a class="card" href="telemetri-ve-konumlandirma.html">
+          <span class="k">Cihaz tarafı</span>
+          <h4>Telemetri ve Konumlandırma →</h4>
+          <p>
+            60 saniyelik rapor döngüsü, BSSID taraması, GPS'siz ±19 m konum çözümü,
+            veri dürüstlüğü kuralı ve maliyet koruması.
+          </p>
+        </a>
+        <a class="card" href="sunucu-kurulumu.html">
+          <span class="k">Sunucu tarafı</span>
+          <h4>Sunucu Kurulumu →</h4>
+          <p>
+            Backend'i sıfırdan kurun: veritabanı ve şema, ortam değişkenleri,
+            konum sağlayıcısı, mesaj kuyrukları ve admin paneli.
+          </p>
+        </a>
+      </div>
+
+      <figure>
+        <img src="assets/gif/tarama-dongusu.gif" alt="Tarama ve rapor döngüsü" />
+        <figcaption>
+          Tarama ve rapor neden ayrı turlarda? —
+          <a href="telemetri-ve-konumlandirma.html#dongu">ayrıntılı anlatım</a>
+        </figcaption>
+      </figure>
+
+
+      <h2 id="ota-guncelleme">OTA Güncelleme</h2>
+      <p>NarRTOS cihazları yeni yazılımı <strong>kablosuz olarak</strong> indirip kendilerini güncelleyebilir — fiziksel müdahale gerekmez.</p>
+      <h3>Akış</h3>
+      <pre><code>1. Manifest sorgusu  -&gt;  sunucudaki güncel sürüm nedir?
+2. Karşılaştırma     -&gt;  OS_VERSION_CODE&#x27;dan büyük mü?
+3. İndirme           -&gt;  yeni imaj WiFi üzerinden yedek bölüme yazılır
+4. Doğrulama         -&gt;  bütünlük kontrolü
+5. Yeniden başlatma  -&gt;  yeni sürüm aktif olur</code></pre>
+      <p>Kullanıcı arayüzü: <strong>Ayarlar → General → Software Updates</strong>. Otomatik kontrol açıksa arka planda periyodik olarak manifest sorgulanır.</p>
+      <h3>Sürüm karşılaştırması</h3>
+      <p>Sürüm bilgisi tek bir tam sayıya indirgenir — string ayrıştırma tuzaklarına düşmemek için:</p>
+      <pre><code><span class="c-cmt">#define OS_VERSION_MAJOR 1</span>
+<span class="c-cmt">#define OS_VERSION_MINOR 4</span>
+<span class="c-cmt">#define OS_VERSION_PATCH 81</span>
+<span class="c-cmt">#define OS_VERSION_STR   &quot;1.4.81&quot;</span>
+<span class="c-cmt">// OS_VERSION_CODE = MAJOR*10000 + MINOR*100 + PATCH   -&gt; 10481</span></code></pre>
+      <div class="note"><p>String karşılaştırmada <code>&quot;0.10&quot; &lt; &quot;0.2&quot;</code> çıkar — integer karşılaştırma bu hatayı önler.</p></div>
+      <h3>Manifest formatı</h3>
+      <pre><code>{
+  <span class="c-str">&quot;version&quot;</span>:      <span class="c-str">&quot;1.5.0&quot;</span>,
+  <span class="c-str">&quot;version_code&quot;</span>: 10500,
+  <span class="c-str">&quot;url&quot;</span>:          <span class="c-str">&quot;https://sunucu/firmware/narrtos-1.5.0.bin&quot;</span>,
+  <span class="c-str">&quot;size&quot;</span>:         2480000,
+  <span class="c-str">&quot;notes&quot;</span>:        <span class="c-str">&quot;Hata düzeltmeleri ve yeni özellikler&quot;</span>
+}</code></pre>
+      <p>Manifest adresi derleme bayrağıyla verilir; cihaz kimliği ve mevcut sürüm sorgu parametresi olarak eklenir — sunucu uygun sürümü seçebilir ya da cihaz zaten güncelse <code>204 No Content</code> döndürebilir.</p>
+      <h3>A/B partisyon düzeni</h3>
+      <pre><code>app0  →  çalışan sürüm
+app1  →  yeni imaj buraya yazılır</code></pre>
+      <p>Güncelleme başarısız olursa ya da yeni sürüm açılışta çökerse cihaz <strong>eski sürüme döner</strong> (anti-crash-loop koruması). Partisyon tablosu <code>partitions_custom.csv</code> içinde tanımlıdır: iki uygulama bölümü + NVS + varlık (assets) bölümü.</p>
+      <h3>Yapılandırma</h3>
+      <pre><code><span class="c-cmt"># platformio.ini</span>
+build_flags =
+    &#x27;-DOTA_BACKEND_HOST=<span class="c-str">&quot;https://sunucunuz.example.com&quot;</span>&#x27;</code></pre>
+      <p><code>os_config.h</code> içindeki tüm OTA adresleri <code>#ifndef</code> korumalıdır; env üzerinden ezilebilir.</p>
+      <h3>Güncelleme yaşam döngüsü telemetrisi</h3>
+      <p>Cihaz, güncelleme olaylarını (başladı / başarılı / başarısız) sunucuya raporlar. Bu best-effort&#x27;tur: sunucuya erişilemezse OTA akışı bozulmaz, olay sessizce atlanır.</p>
+      <h3>Güvenlik notu</h3>
+      <p>Üretim ortamında manifest ve imaj dağıtımı <strong>HTTPS</strong> üzerinden yapılmalıdır. Geliştirme sırasında HTTP&#x27;ye izin veren yapılandırma kullanılır; sertifika sabitleme (pinning) yol haritasındadır.</p>
+      <div class="screen-row">
+        <figure class="screen"><img src="assets/saat/ota.png" alt="Yazılım güncelleme" /><b>Yazılım güncelleme</b><span>Ayarlar → Software Update</span></figure>
+        <div class="screen-txt"><p>Cihaz manifest'i sorgular, yeni sürüm varsa boyutuyla birlikte gösterir. İndirme yedek partisyona yazılır; doğrulama başarılıysa bir sonraki açılışta yeni imaj devreye girer.</p><figure><img src="assets/img/02-admin-cihazlar.png" alt="Admin paneli cihaz listesi" /><figcaption>Panelden hedef sürüm atama — <em>Push Update</em> ile cihaza zorunlu sürüm işaretlenir</figcaption></figure></div>
+      </div>
+
+      <h2 id="sorun-giderme">Sorun Giderme</h2>
+      <h3>Derleme ve yükleme</h3>
+      <div class="tablewrap"><table><thead><tr><th>Belirti</th><th>Neden / Çözüm</th></tr></thead><tbody><tr><td>Yükleme sırasında checksum hatası (<code>Failed to write to target RAM</code>)</td><td>Bazı USB-seri köprüler 921600&#x27;de kararsızdır → <code>upload_speed</code>&#x27;i <strong>460800</strong>&#x27;e düşürün</td></tr><tr><td><code>pio</code> bulunamıyor</td><td>PlatformIO Core kurulu değil: <code>pip install platformio</code></td></tr><tr><td>Port bulunamıyor</td><td>USB-seri sürücüsü (ör. CH34x) kurulu mu? <code>ls /dev/cu.*</code> ile kontrol edin</td></tr><tr><td>Yanlış board derleniyor</td><td><code>-e &lt;env&gt;</code> parametresini verin: <code>pio run -e esp32s3_lcd128</code></td></tr><tr><td>Yaptığım değişiklik cihaza yansımıyor</td><td>Önce temizleyin, sonra derleyin: <code>pio run -e esp32s3_wearable -t clean</code>, ardından aynı komutun <code>-t upload</code> hali</td></tr></tbody></table></div>
+      <h3>Seri monitör</h3>
+      <div class="tablewrap"><table><thead><tr><th>Belirti</th><th>Neden / Çözüm</th></tr></thead><tbody><tr><td>Monitörde hiç çıktı yok (0 bayt)</td><td>Okuma aracı DTR/RTS hatlarını yanlış sürüyor olabilir → portu <code>DTR=false</code> ile açıp RTS ile reset darbesi verin</td></tr><tr><td>Her bağlanışta cihaz yeniden başlıyor</td><td>macOS + CH34x köprüsünün bilinen davranışı. Portu <strong>bir kez</strong> açıp aynı oturumda çalışın</td></tr><tr><td>Loglar bozuk/anlamsız</td><td>Baud hızı 115200 olmalı</td></tr></tbody></table></div>
+      <p>DTR/RTS sorunu için çalışan Python örneği:</p>
+      <pre><code>import serial, time
+ser = serial.Serial()
+ser.port, ser.baudrate, ser.timeout = <span class="c-str">&quot;/dev/cu.usbserial-XXXX&quot;</span>, 115200, 1
+ser.dtr = False; ser.rts = False      # açılışta hatları ASSERT ETME
+ser.open()
+ser.setDTR(False)                     # GPIO0 = high -&gt; normal boot
+ser.setRTS(True);  time.sleep(0.15)   # EN = low  -&gt; reset&#x27;te tut
+ser.setRTS(False)                     # bırak -&gt; cihaz app&#x27;i boot eder
+while True:
+    print(ser.readline().decode(<span class="c-str">&quot;utf-8&quot;</span>, <span class="c-str">&quot;replace&quot;</span>), end=<span class="c-str">&quot;&quot;</span>)</code></pre>
+      <h3>Açılış (boot)</h3>
+      <div class="tablewrap"><table><thead><tr><th>Belirti</th><th>Neden / Çözüm</th></tr></thead><tbody><tr><td>Boot&#x27;ta dokunmatik I2C hatası</td><td>Normal olabilir — cihaz geç hazırlanıyor; sürücü yine de kaydedilir ve ilk dokunuşla toparlar</td></tr><tr><td>PMIC bulunamadı uyarısı</td><td>PMIC&#x27;siz board&#x27;da beklenen davranış; sistem boot&#x27;a devam eder</td></tr><tr><td>RTC bulunamadı</td><td>Dahili saat kullanılır; NTP ile senkronlanır</td></tr><tr><td>Ekran açık ama görüntü yok</td><td>Parlaklık ramp&#x27;i başlamadan hata olmuş olabilir; boot loglarında ekran sürücüsü ve <code>ui_service</code> satırlarına bakın</td></tr></tbody></table></div>
+      <div class="note"><div class="note-t">Hata toleransı ilkesi</div><p>Çevre birim init&#x27;leri başarısız olsa bile sistem boot&#x27;a devam eder. Tek bir çevre biriminin arızası cihazı açılamaz duruma düşürmez.</p></div>
+      <h3>WiFi</h3>
+      <div class="tablewrap"><table><thead><tr><th>Belirti</th><th>Neden / Çözüm</th></tr></thead><tbody><tr><td>Açılışta bağlanmıyor</td><td>Kullanıcı tercihi NVS&#x27;te OFF olabilir (bilinçli davranış) — Ayarlar&#x27;dan açılır</td></tr><tr><td>Sürekli <code>retry 1/5 … 5/5</code></td><td>Ağ menzil dışında ya da şifre yanlış; Ayarlar → WiFi&#x27;dan yeniden bağlanın</td></tr><tr><td>Tarama sırasında bağlantı kopuyor</td><td>Beklenen — aktif tarama bağlantıyı kısa süre böler (bkz. Telemetri ve Konumlandırma)</td></tr></tbody></table></div>
+      <h3>Telemetri akışı durdu</h3>
+      <p>Kontrol sırası:</p>
+      <ol><li><strong>Sunucunun IP&#x27;si değişti mi?</strong> En sık neden. Geliştirme makinesinin DHCP IP&#x27;si değişince cihaz ölü adrese POST atar. Kalıcı çözüm: router&#x27;da <strong>statik DHCP rezervasyonu</strong>. Geçici çözüm: derleme bayrağındaki <code>OTA_BACKEND_HOST</code>&#x27;u güncelleyip yeniden flash.</li><li><strong>Sunucu ayakta mı?</strong> <code>curl http://&lt;ip&gt;:3001/api/wear-os/health</code></li><li><strong>Cihaz açık ve WiFi&#x27;da mı?</strong> Seri log kontrolü.</li></ol>
+      <h3>Komut arayüzü</h3>
+      <div class="tablewrap"><table><thead><tr><th>Belirti</th><th>Neden / Çözüm</th></tr></thead><tbody><tr><td>Komut yazıyorum, yanıt yok</td><td>Cihaz boot ortasında olabilir — <code>CmdSvc: init OK</code> satırını bekleyin</td></tr><tr><td><code>app current</code> → <code>id=-1</code> döndü</td><td>Uygulama geçişi tamamlanmadı; ekran kapalıysa animasyon bitmez (komut öncesi <code>wake</code> gönderin)</td></tr><tr><td>BLE&#x27;de &quot;Peer removed pairing information&quot;</td><td>Bond uyuşmazlığı → telefonda cihazı unut, uygulamayı yeniden başlat, tekrar bağlan</td></tr><tr><td><code>set rail</code> → <code>NOT_SUPPORTED</code></td><td>Board&#x27;da PMIC yok — beklenen dürüst hata</td></tr></tbody></table></div>
+      <h3>UI / düzen</h3>
+      <div class="tablewrap"><table><thead><tr><th>Belirti</th><th>Neden / Çözüm</th></tr></thead><tbody><tr><td>Küçük ekranda ikonlar orantısız</td><td>İkon/daire oranını koruyun (40 px dairede 24 px sembol → 26 px dairede 16 px)</td></tr><tr><td>Satır araları aşırı açık</td><td>Liste <code>STEP</code> değeri satır yüksekliği + ~8 px olmalı; büyük ekran değerini taşımayın</td></tr><tr><td>Başlık ile saat çakışıyor</td><td>Yuvarlak ekranda üst kenarda görünür genişlik dardır — öğeleri yan yana değil alt alta yerleştirin</td></tr><tr><td>Metin taşıyor / kırpılıyor</td><td>Ölçü sabitlerini varyant bloğunda tanımlayın (bkz. Uygulama Geliştirme)</td></tr></tbody></table></div>
+      <h3>Yardım alma</h3>
+      <p>Sorun devam ediyorsa: seri boot logunu, kullandığınız build ortamını (<code>-e ...</code>) ve board modelini ekleyerek issue açın.</p>
+      <!-- WIKI:BITIS -->
+
+  <footer>
+    <div>NarRTOS — Corezzle Electronics</div>
+    <div class="sp">Generative Hardware, SiP, Edge AI &amp; IoT Solutions</div>
+  </footer>
+
+</main>
+
+<aside class="toc">
+  <div class="toc-h">Bu sayfada</div>
+  <nav class="toc-list"></nav>
+</aside>
+</div>
+</div>
+
+<script src="assets/js/wiki.js"></script>
+</body>
+</html>

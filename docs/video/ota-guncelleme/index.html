@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<title>OTA Güncelleme</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  body { margin:0; background:#00102E; font-family:Inter, system-ui, sans-serif; color:#E4F0EE; -webkit-font-smoothing:antialiased; }
+  #root { position:relative; width:1920px; height:1080px; overflow:hidden; }
+  .clip { position:absolute; inset:0; }
+  #bg { background:linear-gradient(140deg,#00102E 0%,#00234E 55%,#001B3F 100%); }
+  .grid { position:absolute; inset:0; opacity:.22;
+    background-image:linear-gradient(#093159 1px,transparent 1px),linear-gradient(90deg,#093159 1px,transparent 1px); background-size:80px 80px; }
+  .glow { position:absolute; left:1100px; top:-260px; width:900px; height:900px; border-radius:50%;
+    background:radial-gradient(circle,rgba(0,202,215,.16) 0%,rgba(0,202,215,0) 65%); }
+  .brand { position:absolute; left:80px; top:52px; font-size:20px; font-weight:800; letter-spacing:3px; color:#00CAD7; }
+  .doc { position:absolute; right:80px; top:50px; font-size:22px; color:#93AEC7; }
+  .progress { position:absolute; left:0; bottom:0; width:1920px; height:6px; background:rgba(255,255,255,.08); }
+  .bar { width:1920px; height:6px; background:#00CAD7; transform-origin:left center; }
+  .card { position:absolute; left:160px; top:0; width:1600px; height:1080px; display:flex; flex-direction:column; justify-content:center; }
+  .k { font-size:24px; font-weight:800; letter-spacing:4px; color:#00CAD7; }
+  h1 { margin:22px 0 0; font-size:88px; font-weight:800; line-height:1.08; letter-spacing:-1.5px; max-width:1400px; }
+  #title h1 { max-width:960px; }  #title .card p { max-width:900px; }
+  .devs { position:absolute; left:1120px; top:0; width:800px; height:1080px; }
+  .devs .b1 { position:absolute; left:0; top:262px; width:400px; height:476px; border-radius:86px; background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%); box-shadow:0 34px 80px rgba(0,0,0,.65); }
+  .devs .c1 { position:absolute; left:400px; top:426px; width:14px; height:68px; border-radius:7px; background:linear-gradient(180deg,#4A4F57,#23262B); }
+  .devs .w1 { position:absolute; left:30px; top:294px; width:340px; height:412px; border-radius:68px; overflow:hidden; background:#000; }
+  .devs .b2 { position:absolute; left:400px; top:500px; width:300px; height:300px; border-radius:50%; background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%); box-shadow:0 28px 70px rgba(0,0,0,.65); }
+  .devs .w2 { position:absolute; left:417px; top:517px; width:266px; height:266px; border-radius:50%; overflow:hidden; background:#000; }
+  .devs img { position:absolute; left:0; top:0; width:100%; height:100%; opacity:0; }
+  .devs img[id$="-0"] { opacity:1; }
+  .card p { margin:28px 0 0; font-size:34px; line-height:1.45; color:#93AEC7; max-width:1200px; }
+  .inner { position:absolute; inset:0; }
+  .left { position:absolute; left:80px; top:112px; width:1560px; }
+  .steptitle { font-size:50px; font-weight:800; line-height:1.15; letter-spacing:-.5px; white-space:nowrap; }
+  .stepmeta { position:absolute; right:80px; top:128px; font-size:24px; color:#93AEC7; }
+  .shot { position:absolute; border-radius:22px; overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.10); background:#0B1622; }
+  .shot img, .shot video { width:100%; height:100%; object-fit:contain; display:block; }
+  .shot.list { background:rgba(4,14,30,.72); padding:44px 64px; box-sizing:border-box; }
+  .shot.list ul { margin:0; padding:0; list-style:none; }
+  .shot.list li { position:relative; padding:0 0 0 44px; margin:0 0 26px; font-size:36px; line-height:1.4; color:#E4F0EE; }
+  .shot.list li::before { content:""; position:absolute; left:0; top:16px; width:18px; height:18px; border-radius:50%; background:#00CAD7; }
+  .shot.gallery { background:rgba(4,14,30,.72); padding:26px 30px; box-sizing:border-box; display:grid;
+    grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:14px 18px; }
+  .shot.gallery figure { margin:0; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; }
+  .shot.gallery img { width:auto; height:200px; object-fit:contain; border-radius:16px; display:block; }
+  .shot.gallery b { display:block; margin-top:10px; font-size:22px; font-weight:800; color:#E4F0EE; }
+  .shot.gallery span { display:block; margin-top:2px; font-size:16px; color:#93AEC7; }
+  .shot.code { background:#0B1622; padding:34px 40px; box-sizing:border-box; display:flex; align-items:center; }
+  .shot.code pre { margin:0; font-family:Menlo,Consolas,monospace; font-size:24px; line-height:1.5; color:#D6E4F0; white-space:pre; }
+  .shot.code.small pre { font-size:19px; line-height:1.45; }
+  .shot.list.dense { padding:44px 56px; }
+  .shot.list.dense li { font-size:30px; line-height:1.35; margin-bottom:22px; padding-left:38px; }
+  .shot.list.dense li::before { top:12px; width:15px; height:15px; }
+  .caps { position:absolute; left:80px; right:330px; bottom:58px; height:150px; }
+  .cap.long { font-size:33px; line-height:1.35; padding:18px 30px; }
+  .cap.xlong { font-size:29px; }
+  .ilogo { position:absolute; left:460px; top:330px; width:1000px; }
+  .iseries { position:absolute; left:0; right:0; top:690px; text-align:center; }
+  .iseries b { display:block; font-size:30px; font-weight:800; letter-spacing:6px; color:#00CAD7; }
+  .iseries span { display:block; margin-top:14px; font-size:26px; color:#93AEC7; }
+  .oh { position:absolute; left:0; right:0; top:110px; text-align:center; font-size:44px; font-weight:800; }
+  .obox { position:absolute; top:225px; width:740px; height:416px; border-radius:22px; box-sizing:border-box; padding:28px 34px;
+    border:2px dashed rgba(0,202,215,.45); background:rgba(4,14,30,.55); display:flex; flex-direction:column; justify-content:flex-end; }
+  .obox span { font-size:22px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:#00CAD7; }
+  .obox b { margin-top:10px; font-size:38px; font-weight:800; color:#E4F0EE; }
+  .osub { position:absolute; left:0; right:0; top:700px; display:flex; justify-content:center; align-items:center; gap:28px; }
+  .ocircle { width:170px; height:170px; border-radius:50%; border:2px dashed rgba(0,202,215,.45); background:rgba(4,14,30,.55); }
+  .osub b { display:block; font-size:36px; font-weight:800; }
+  .osub span { display:block; margin-top:8px; font-size:24px; color:#93AEC7; }
+  .ologo { position:absolute; left:80px; bottom:52px; width:300px; }
+  .olinks { position:absolute; right:80px; bottom:60px; font-size:26px; color:#93AEC7; }
+  .avatar { position:absolute; right:60px; bottom:34px; width:220px; height:220px; border-radius:50%; overflow:hidden;
+    border:4px solid #00CAD7; box-shadow:0 20px 50px rgba(0,0,0,.55); background:#0B1622; }
+  .avatar img { width:100%; height:100%; display:block; }
+  .cap { position:absolute; left:0; right:0; bottom:0; margin:0 auto; max-width:1400px; padding:22px 34px; border-radius:18px;
+    background:rgba(4,14,30,.82); border:1px solid rgba(255,255,255,.08); font-size:38px; line-height:1.4; text-align:center; opacity:0; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="141.45" data-fps="30">
+<div id="bg" class="clip" data-start="0" data-duration="141.45" data-track-index="0">
+      <div class="grid"></div><div class="glow"></div>
+      <div class="brand">NARRTOS WEAR</div><div class="doc">OTA Güncelleme</div>
+      <div class="progress"><div id="bar" class="bar"></div></div>
+      <div class="avatar" id="avatar"><img src="assets/avatar.svg" alt=""></div></div>
+<div id="intro" class="clip" data-start="0" data-duration="4.5" data-track-index="1">
+      <img class="ilogo" id="intro-logo" src="assets/logo.png" alt="">
+      <div class="iseries" id="intro-series"><b>NARRTOS WEAR</b><span>Dökümantasyon Serisi</span></div></div>
+<div id="title" class="clip" data-start="4.5" data-duration="5.0" data-track-index="1">
+      <div class="card"><div class="k" id="title-k">NARRTOS WEAR</div>
+      <h1 id="title-h">OTA Güncelleme</h1><p id="title-s">Cihaz yeni yazılımı kablosuz olarak indirir ve kendini günceller. Fiziksel müdahale gerekmez.</p></div>
+      <div class="devs" id="title-devs">
+        <div class="b1"></div><div class="c1"></div><div class="w1"><img id="tw1-0" src="assets/a410-kadran-analog.png" alt=""><img id="tw1-1" src="assets/a410-launcher.png" alt=""><img id="tw1-2" src="assets/a410-hava-durumu.png" alt=""><img id="tw1-3" src="assets/a410-adim-sayar.png" alt=""></div>
+        <div class="b2"></div><div class="w2"><img id="tw2-0" src="assets/r240-kadran-dijital.png" alt=""><img id="tw2-1" src="assets/r240-launcher.png" alt=""><img id="tw2-2" src="assets/r240-hava-durumu.png" alt=""><img id="tw2-3" src="assets/r240-adim-sayar.png" alt=""></div>
+      </div></div>
+<div id="s1" class="clip" data-start="9.50" data-duration="16.10" data-track-index="1">
+      <div class="inner" id="s1-in">
+        <div class="left"><div class="steptitle">Akış</div></div><div class="stepmeta">1 / 8</div>
+        <div class="shot code" id="s1-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><pre>1. Manifest sorgusu   -&gt; sunucudaki güncel sürüm nedir?
+2. Karşılaştırma      -&gt; OS_VERSION_CODE&#x27;dan büyük mü?
+3. İndirme            -&gt; yeni imaj WiFi üzerinden yedek bölüme yazılır
+4. Doğrulama          -&gt; bütünlük kontrolü
+5. Yeniden başlatma   -&gt; yeni sürüm aktif olur</pre></div>
+        <div class="caps"><div class="cap" id="s1-c0">Güncelleme beş adımdan oluşur: sunucuya sor, sürümleri karşılaştır, indir, doğrula ve yeniden başla.</div><div class="cap long" id="s1-c1">Cihazda bu akış Ayarlar, General ve Software Updates menüsünden başlatılır. Otomatik kontrol açıksa manifest belirli aralıklarla sorgulanır.</div></div>
+      </div></div>
+<div id="s2" class="clip" data-start="25.60" data-duration="14.90" data-track-index="1">
+      <div class="inner" id="s2-in">
+        <div class="left"><div class="steptitle">Sürüm karşılaştırması</div></div><div class="stepmeta">2 / 8</div>
+        <div class="shot code" id="s2-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><pre>#define OS_VERSION_MAJOR 1
+#define OS_VERSION_MINOR 4
+#define OS_VERSION_PATCH 81
+#define OS_VERSION_STR   &quot;1.4.81&quot;
+// OS_VERSION_CODE = MAJOR*10000 + MINOR*100 + PATCH -&gt; 10481
+
+// String karşılaştırmada &quot;0.10&quot; tuzağı çıkar;
+// integer karşılaştırma bu hatayı önler.</pre></div>
+        <div class="caps"><div class="cap" id="s2-c0">Sürüm bilgisi tek bir tam sayıya indirgenir. Böylece metin karşılaştırmasının tuzaklarına düşülmez.</div></div>
+      </div></div>
+<div id="s3" class="clip" data-start="40.50" data-duration="18.30" data-track-index="1">
+      <div class="inner" id="s3-in">
+        <div class="left"><div class="steptitle">Manifest formatı</div></div><div class="stepmeta">3 / 8</div>
+        <div class="shot code" id="s3-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><pre>{
+  &quot;version&quot;:      &quot;1.5.0&quot;,
+  &quot;version_code&quot;: 10500,
+  &quot;url&quot;:   &quot;https://sunucu/firmware/narrtos-1.5.0.bin&quot;,
+  &quot;size&quot;:  2480000,
+  &quot;notes&quot;: &quot;Hata düzeltmeleri ve yeni özellikler&quot;
+}
+
+// Manifest adresi derleme bayrağıyla verilir:
+// platformio.ini
+build_flags = &#x27;-DOTA_BACKEND_HOST=&quot;https://sunucunuz.example.com&quot;&#x27;</pre></div>
+        <div class="caps"><div class="cap long" id="s3-c0">Cihaz kimliği ve mevcut sürüm, isteğe sorgu parametresi olarak eklenir. Sunucu uygun sürümü seçer ya da güncelleme yoksa 204 No Content yanıtı döner.</div><div class="cap" id="s3-c1">os_config.h içindeki bütün OTA adresleri #ifndef ile korunur; derleme ortamından farklı bir adres verilebilir.</div></div>
+      </div></div>
+<div id="s4" class="clip" data-start="58.80" data-duration="17.30" data-track-index="1">
+      <div class="inner" id="s4-in">
+        <div class="left"><div class="steptitle">A/B partisyon düzeni</div></div><div class="stepmeta">4 / 8</div>
+        <div class="shot list" id="s4-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>Çalışan sürüm app0 bölümündedir; yeni imaj app1 bölümüne yazılır.</li><li>Güncelleme başarısız olursa ya da yeni sürüm açılışta çökerse cihaz eski sürüme geri döner. Bu, çökme döngüsüne karşı korumadır.</li><li>Bölüm tablosu partitions_custom.csv dosyasındadır: iki uygulama bölümü, NVS ve varlık (assets) bölümü.</li></ul></div>
+        <div class="caps"><div class="cap" id="s4-c0">Yedek bölüm sayesinde başarısız bir güncelleme cihazı hiçbir zaman açılamaz duruma düşürmez.</div></div>
+      </div></div>
+<div id="s5" class="clip" data-start="76.10" data-duration="12.90" data-track-index="1">
+      <div class="inner" id="s5-in">
+        <div class="left"><div class="steptitle">Cihazda güncelleme ekranı</div></div><div class="stepmeta">5 / 8</div>
+        <div class="shot" id="s5-shot" style="left:641px;top:277px;width:418px;height:506px"><img src="assets/ota.png" alt="Cihazda güncelleme ekranı" /></div>
+        <div class="caps"><div class="cap" id="s5-c0">Cihaz manifest&#x27;i sorgular; yeni bir sürüm varsa boyutuyla birlikte ekranda gösterir.</div><div class="cap" id="s5-c1">İndirilen imaj yedek bölüme yazılır. Doğrulama başarılıysa bir sonraki açılışta yeni sürüm devreye girer.</div></div>
+      </div></div>
+<div id="s6" class="clip" data-start="89.00" data-duration="9.85" data-track-index="1">
+      <div class="inner" id="s6-in">
+        <div class="left"><div class="steptitle">Panelden sürüm yönetimi</div></div><div class="stepmeta">6 / 8</div>
+        <div class="shot" id="s6-shot" style="left:80px;top:222px;width:1540px;height:615px"><img src="assets/03-admin-surumler.png" alt="Panelden sürüm yönetimi" /></div>
+        <div class="caps"><div class="cap long" id="s6-c0">Sürümler sekmesinde kanal, boyut, aktiflik ve yayın durumu görünür. Yazılım dosyası panelden yüklenir; sha256 özeti ve boyutu otomatik hesaplanır.</div></div>
+      </div></div>
+<div id="s7" class="clip" data-start="98.85" data-duration="10.30" data-track-index="1">
+      <div class="inner" id="s7-in">
+        <div class="left"><div class="steptitle">Cihaza hedef sürüm atama</div></div><div class="stepmeta">7 / 8</div>
+        <div class="shot" id="s7-shot" style="left:118px;top:215px;width:1463px;height:630px"><img src="assets/02-admin-cihazlar.png" alt="Cihaza hedef sürüm atama" /></div>
+        <div class="caps"><div class="cap long" id="s7-c0">Cihazlar sekmesinde son görülme zamanı, mevcut sürüm ve hedef sürüm yer alır. Push Update ile cihaza zorunlu bir sürüm atanır.</div></div>
+      </div></div>
+<div id="s8" class="clip" data-start="109.15" data-duration="17.30" data-track-index="1">
+      <div class="inner" id="s8-in">
+        <div class="left"><div class="steptitle">Yaşam döngüsü telemetrisi ve güvenlik</div></div><div class="stepmeta">8 / 8</div>
+        <div class="shot list" id="s8-shot" style="left:80px;top:215px;width:1540px;min-height:300px;max-height:630px"><ul><li>Cihaz, güncellemenin başladığını, başarılı ya da başarısız olduğunu sunucuya raporlar.</li><li>Bu raporlama en iyi çaba ilkesiyle çalışır: sunucuya erişilemezse güncelleme akışı bozulmaz, olay sessizce atlanır.</li><li>Üretimde manifest ve imaj HTTPS üzerinden dağıtılır. Geliştirme ortamında HTTP&#x27;ye izin veren bir yapılandırma vardır.</li></ul></div>
+        <div class="caps"><div class="cap" id="s8-c0">Sertifika sabitleme (pinning) yol haritasındadır.</div></div>
+      </div></div>
+<div id="end" class="clip" data-start="126.45" data-duration="5.0" data-track-index="1">
+      <div class="card"><div class="k" id="end-k">NARRTOS WEAR</div>
+      <h1 id="end-h">Üretimde manifest ve imaj HTTPS üzerinden dağıtılır.</h1><p id="end-s">Sertifika sabitleme yol haritasında. Sunucu tarafı için Sunucu Kurulumu dökümanına bakın. corezzle.com</p></div></div>
+<div id="outro" class="clip" data-start="131.45" data-duration="10.0" data-track-index="1">
+      <div class="oh" id="outro-h">İzlediğiniz için teşekkürler</div>
+      <div class="obox" id="outro-a" style="left:120px"><span>Sıradaki video</span><b>Sıradaki video</b></div>
+      <div class="obox" id="outro-b" style="left:1060px"><span>Oynatma listesi</span><b>Oynatma listesi</b></div>
+      <div class="osub" id="outro-s"><div class="ocircle"></div><div><b>Abone olun</b><span>Yeni bölümlerden haberdar olun</span></div></div>
+      <img class="ologo" id="outro-logo" src="assets/logo.png" alt="">
+      <div class="olinks" id="outro-l">corezzle.com &nbsp;·&nbsp; github.com/corezzle/NarRTOS-Wear</div></div>
+</div>
+<script>
+  window.__timelines = window.__timelines || {};
+  const tl = gsap.timeline({ paused: true });
+    tl.set("#avatar", {opacity: 0}, 0); tl.to("#avatar", {opacity: 1, duration: .5}, 9.3); tl.to("#avatar", {opacity: 0, duration: .4}, 131.05);
+  tl.fromTo("#intro-logo", {scale: .86, opacity: 0}, {scale: 1, opacity: 1, duration: 1.1, ease: "power3.out"}, .15);
+  tl.to("#intro-logo", {y: -70, duration: .8, ease: "power3.inOut"}, 1.6);
+  tl.fromTo("#intro-series", {y: 30, opacity: 0}, {y: 0, opacity: 1, duration: .7, ease: "power3.out"}, 2.0);
+  tl.to(["#intro-logo","#intro-series"], {opacity: 0, duration: .45, ease: "power2.in"}, 4.0);
+  tl.fromTo("#bar", {scaleX: 0}, {scaleX: 1, duration: 141.45, ease: "none"}, 0);
+  tl.from("#title-devs", {x: 60, opacity: 0, duration: .9, ease: "power3.out"}, 5.1);
+  tl.to(["#tw1-1","#tw2-1"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 6.45);
+  tl.to(["#tw1-2","#tw2-2"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 7.50);
+  tl.to(["#tw1-3","#tw2-3"], {opacity: 1, duration: .4, ease: "power2.inOut"}, 8.55);
+  tl.to("#title-devs", {opacity: 0, duration: .45, ease: "power2.in"}, 9.0);
+  tl.from("#title-k", {y: 30, opacity: 0, duration: .6, ease: "power3.out"}, 4.7);
+  tl.from("#title-h", {y: 40, opacity: 0, duration: .8, ease: "power3.out"}, 4.95);
+  tl.from("#title-s", {y: 30, opacity: 0, duration: .7, ease: "power3.out"}, 5.3);
+  tl.to(["#title-k","#title-h","#title-s"], {opacity: 0, duration: .45, ease: "power2.in"}, 9.0);
+  tl.from("#s1-in", {opacity: 0, duration: .45, ease: "power2.out"}, 9.50);
+  tl.from("#s1-shot", {y: 36, duration: .7, ease: "power3.out"}, 9.50);
+  tl.to("#s1-in", {opacity: 0, duration: .4, ease: "power2.in"}, 25.18);
+  tl.fromTo("#s1-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 10.10);
+  tl.to("#s1-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 15.95);
+  tl.fromTo("#s1-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 16.30);
+  tl.from("#s2-in", {opacity: 0, duration: .45, ease: "power2.out"}, 25.60);
+  tl.from("#s2-shot", {y: 36, duration: .7, ease: "power3.out"}, 25.60);
+  tl.to("#s2-in", {opacity: 0, duration: .4, ease: "power2.in"}, 40.08);
+  tl.fromTo("#s2-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 26.20);
+  tl.from("#s3-in", {opacity: 0, duration: .45, ease: "power2.out"}, 40.50);
+  tl.from("#s3-shot", {y: 36, duration: .7, ease: "power3.out"}, 40.50);
+  tl.to("#s3-in", {opacity: 0, duration: .4, ease: "power2.in"}, 58.38);
+  tl.fromTo("#s3-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 41.10);
+  tl.to("#s3-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 51.45);
+  tl.fromTo("#s3-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 51.80);
+  tl.from("#s4-in", {opacity: 0, duration: .45, ease: "power2.out"}, 58.80);
+  tl.from("#s4-shot", {y: 36, duration: .7, ease: "power3.out"}, 58.80);
+  tl.to("#s4-in", {opacity: 0, duration: .4, ease: "power2.in"}, 75.68);
+  tl.fromTo("#s4-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 59.40);
+  tl.from("#s5-in", {opacity: 0, duration: .45, ease: "power2.out"}, 76.10);
+  tl.from("#s5-shot", {y: 36, duration: .7, ease: "power3.out"}, 76.10);
+  tl.to("#s5-in", {opacity: 0, duration: .4, ease: "power2.in"}, 88.58);
+  tl.fromTo("#s5-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 76.70);
+  tl.to("#s5-c0", {opacity: 0, duration: .25, ease: "power2.in"}, 81.65);
+  tl.fromTo("#s5-c1", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 82.00);
+  tl.from("#s6-in", {opacity: 0, duration: .45, ease: "power2.out"}, 89.00);
+  tl.from("#s6-shot", {y: 36, duration: .7, ease: "power3.out"}, 89.00);
+  tl.to("#s6-in", {opacity: 0, duration: .4, ease: "power2.in"}, 98.43);
+  tl.fromTo("#s6-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 89.60);
+  tl.from("#s7-in", {opacity: 0, duration: .45, ease: "power2.out"}, 98.85);
+  tl.from("#s7-shot", {y: 36, duration: .7, ease: "power3.out"}, 98.85);
+  tl.to("#s7-in", {opacity: 0, duration: .4, ease: "power2.in"}, 108.73);
+  tl.fromTo("#s7-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 99.45);
+  tl.from("#s8-in", {opacity: 0, duration: .45, ease: "power2.out"}, 109.15);
+  tl.from("#s8-shot", {y: 36, duration: .7, ease: "power3.out"}, 109.15);
+  tl.to("#s8-in", {opacity: 0, duration: .4, ease: "power2.in"}, 126.03);
+  tl.fromTo("#s8-c0", {opacity: 0, y: 14}, {opacity: 1, y: 0, duration: .35, ease: "power2.out"}, 109.75);
+  tl.from(["#end-k","#end-h","#end-s"], {y: 30, opacity: 0, duration: .7, stagger: .18, ease: "power3.out"}, 126.65);
+  tl.to(["#end-k","#end-h","#end-s"], {opacity: 0, duration: .45, ease: "power2.in"}, 130.95);
+  tl.from(["#outro-h","#outro-a","#outro-b","#outro-s","#outro-l","#outro-logo"], {y: 30, opacity: 0, duration: .7, stagger: .14, ease: "power3.out"}, 131.60);
+  window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

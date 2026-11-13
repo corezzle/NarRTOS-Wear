@@ -1,0 +1,9 @@
+# NAR-ESP32S3 (32 MB GD25LQ256), 2026-11-06.
+# Yalnız ilk 16 MB kullanılır. 16 MB üstü denendi (DIO, IDF 5.5): esp_flash okuması hep 0xBB döndü,
+# ROM yükleyici de oraya yazamaz. Sürücü çözülene kadar üst 16 MB tanımsız bırakıldı.
+# Name,   Type, SubType, Offset,   Size
+nvs,      data, nvs,     0x9000,   0x5000
+otadata,  data, ota,     0xe000,   0x2000
+app0,     app,  ota_0,   0x10000,  0x5F0000
+app1,     app,  ota_1,   0x600000, 0x600000
+assets,   data, spiffs,  0xC00000, 0x400000

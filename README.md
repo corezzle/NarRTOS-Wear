@@ -6,12 +6,6 @@
 >
 > 📖 **Before you start:** installation, build, flashing, architecture and troubleshooting are covered step by step in the
 > **[NarRTOS Wear Wiki](https://www.corezzle.com/document-content/narrtos-wear-6)** (Turkish, with English pages under `docs/panel-icerik/en/`).
->
-> Konuya göre doğrudan gidilecek sayfalar:
-> - [VS Code kurulumu](https://www.corezzle.com/document-content/narrtos-wear-vs-code-kurulumu-11) — bilgisayarda hiçbir araç yokken sıfırdan editör, git ve terminal kurulumu (ilk adım)
-> - [Telemetri ve konumlandırma](https://www.corezzle.com/document-content/narrtos-wear-telemetri-ve-konumlandirma-7) — cihaz raporları, WiFi tabanlı konum, sunucuya iletim
-> - [Sunucu kurulumu](https://www.corezzle.com/document-content/narrtos-wear-sunucu-kurulumu-8) — OTA ve telemetri için backend kurulumu
-> - [Corezzle Imager ile yükleme](https://www.corezzle.com/document-content/narrtos-wear-corezzle-imager-ile-yukleme-12) — program kurmadan karta hazır sürüm yazma
 
 **ESP32-S3 için açık kaynak gömülü işletim sistemi.** FreeRTOS çekirdeği üzerinde,
 LVGL 9 grafik kütüphanesiyle dokunmatik ekranlı akıllı cihazlar (giyilebilir cihazlar,

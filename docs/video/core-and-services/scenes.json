@@ -1,0 +1,98 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "Çekirdek ve Servisler",
+  "title": "Çekirdek ve Servisler",
+  "subtitle": "Olay veriyolu, uygulama yaşam döngüsü, buton yönetimi ve servis katmanı.",
+  "end_title": "Servisler isteğe bağlıdır ve genişletilebilir.",
+  "end_subtitle": "Kendi uygulamanızı yazmak için Uygulama Geliştirme dökümanına bakın. corezzle.com",
+  "scenes": [
+    {
+      "step": "1",
+      "title": "event_bus: pub/sub olay veriyolu",
+      "code": "// Olay grupları (event_bus.h):\nEVENT_BATTERY_LEVEL / EVENT_CHARGING_STATE / EVENT_LOW_BATTERY  // güç\nEVENT_STEP_COUNT / EVENT_GESTURE_WRIST_UP / EVENT_SHAKE         // sensör\nEVENT_TOUCH_DOWN / EVENT_BTN_TOP / EVENT_BTN_BOTTOM             // girdi\nEVENT_TIME_UPDATED / EVENT_APP_SWITCH / EVENT_WEATHER_UPDATE    // sistem\n\nvoid event_bus_publish(event_type_t type, uint32_t data);\n\n// Başka görevden uygulama açmanın thread-safe yolu:\nevent_bus_publish(EVENT_APP_SWITCH, APP_ID_WEATHER);",
+      "captions": [
+        "Olay veriyolu, görevler arası iletişimin tek yoludur. Her abonenin kendi FreeRTOS kuyruğu vardır.",
+        "Yayınlanan olay bütün abone kuyruklarına dağıtılır ve her abonenin kendi görev bağlamında işlenir. Yayın, kesme içinden de güvenle yapılabilir.",
+        "Örneğin EVENT_APP_SWITCH yayınlanınca app_manager uygulamayı kendi zamanlayıcısında, LVGL görevinde açar."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "app_manager: uygulama yaşam döngüsü",
+      "code": "typedef struct {\n  void (*on_start)(lv_obj_t* screen); // ilk açılış: UI'yi bu ekrana kur\n  void (*on_resume)(void);            // arka plandan öne gelme\n  void (*on_pause)(void);             // başka uygulama devraldı\n  void (*on_stop)(void);              // tamamen kapat, kaynakları bırak\n  bool (*on_event)(const os_event_t*);// aktif uygulamaya olay teslimi\n  const char* name;                   // log için isim\n} app_interface_t;\n\nvoid app_manager_register(app_id_t id, const app_interface_t* app);\nvoid app_manager_launch(app_id_t id);   // geçiş animasyonlu\nvoid app_manager_back(void);            // önceki uygulamaya dön\napp_id_t app_manager_current_id(void);",
+      "captions": [
+        "Her uygulama bir app_interface_t tablosu uygular. Aynı anda yalnızca bir uygulama aktiftir ve LVGL ekranının sahibi odur.",
+        "on_start ekranı kurar, on_pause ve on_resume geçişleri yönetir, on_stop kaynakları bırakır, on_event olayları alır."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "Olay zamanlayıcısı ve butonlar",
+      "items": [
+        "app_manager 50 milisaniyelik bir olay zamanlayıcısı çalıştırır. Jestleri okur, olay kuyruklarını boşaltır ve aktif uygulamaya iletir.",
+        "button_handler, üst ve alt fiziksel butonların sıçramasını (debounce) giderir. Butonlar aktif LOW çalışır.",
+        "Kısa ve uzun basışları ayırt ederek EVENT_BTN_TOP ve EVENT_BTN_BOTTOM olaylarını yayınlar."
+      ],
+      "captions": [
+        "Butona basmak da bir olaydır. Uygulama isterse on_event içinde yakalar."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Servis katmanı (1/2)",
+      "items": [
+        "ui_service LVGL'i başlatır, çizim döngüsünü yürütür, LVGL kilidinin sahibidir ve dokunmatik girdiyi kaydeder.",
+        "power_service bataryayı izler, ekranın uyku ve uyanma akışını ve aktivite takibini yönetir.",
+        "time_service saati RTC'den okur, WiFi varken NTP ile eşitler ve EVENT_TIME_UPDATED olayını yayınlar.",
+        "wifi_service bağlantıyı yönetir, asenkron ağ taraması yapar ve kullanıcı tercihini NVS'te kalıcı tutar.",
+        "ble_service NimBLE tabanlı GATT sunucusudur; bildirim köprüsünün ve komut arayüzünün temelidir.",
+        "audio_service alarm ve bildirim sesleri için buzzer ve ses çıkışını sürer."
+      ],
+      "captions": [
+        "Her servisin tek bir sorumluluğu vardır ve sonucunu olay veriyoluna yayınlar."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "Servis katmanı (2/2)",
+      "items": [
+        "sensor_service birinci çekirdekte IMU örnekleme görevini çalıştırır; adım ve jest olayları üretir.",
+        "ota_service sürüm manifest'ini sorgular, imajı indirir ve A/B güncellemeyi yapar.",
+        "alarm_service zamanlayıcı ve alarm çekirdeğidir; LVGL zamanlayıcısına dayanır.",
+        "telemetry_service periyodik sağlık ve WiFi tarama raporunu gönderir.",
+        "command_service USB ve Bluetooth komut arayüzünü sağlar."
+      ],
+      "captions": [
+        "Telemetri ve komut arayüzünün ayrıntıları kendi dökümanlarında anlatılıyor."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "ui_service API'si",
+      "code": "void     ui_service_init(void);         // LVGL + display driver + mutex\nvoid     ui_service_register_touch();   // dokunmatiği LVGL'e bağla\nuint32_t ui_service_tick(void);         // UI görev döngüsü\n                                        // (mutex içinde lv_timer_handler)\nvoid     ui_service_lock(void);         // görevler arası UI güncellemesi\nvoid     ui_service_unlock(void);",
+      "captions": [
+        "En sık kullanılan beş fonksiyon: başlatma, dokunmatik kaydı, tick, lock ve unlock.",
+        "Başka bir görevden yapılan arayüz güncellemesi her zaman lock ve unlock arasına alınır."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Yeni servis eklemek",
+      "code": "// services/my_service.cpp\nesp_err_t my_service_init(void) {\n  xTaskCreatePinnedToCore(my_task, \"my_svc\", 4096, NULL,\n                          3, NULL, 1 /* Core 1 */);\n  return ESP_OK;\n}\n// main.cpp boot akışına: my_service_init();\n// Sonucunu event bus'a yayınlar; kimse kimseyi doğrudan çağırmaz.",
+      "captions": [
+        "services klasörüne bir çift dosya ekleyip açılış akışında init fonksiyonunu çağırmak yeter.",
+        "Servis sonucunu olay veriyoluna yayınlar. Kimse kimseyi doğrudan çağırmaz."
+      ]
+    },
+    {
+      "step": "7",
+      "title": "Güç rayları",
+      "image": "assets/power-rails.mp4",
+      "captions": [
+        "power_service, AXP2101 PMIC raylarını çalışma anında tek tek açıp kapatabilir. Ayarlar'daki sayfa dokuz rayı ayrı anahtarlara bağlar.",
+        "Etiketler cihaz üzerinde fiziksel testle doğrulandı: ALDO1 sensör rayıdır; ALDO2 ve DCDC2 ekranı besler.",
+        "DCDC1 listede yer almaz. Sistemin 3,3 volt rayıdır; kapatılması ESP32'yi kapatır. Bunu zaten Soft Power Off yapar."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <title>Watch face selector — GIF</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      /* 410×502 AMOLED ekran görselleri 190×230 olarak kesilmiştir; burada
+         1:1 gösterilir, cihaz gövdesi çevresine çizilir.
+         Hareket yalnızca transform ile — `left` kare-kare yakalamada titriyor. */
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:250px; height:300px; overflow:hidden; background:#00102E; }
+      body { font-family:"Inter",sans-serif; -webkit-font-smoothing:antialiased; }
+      #bg { position:absolute; inset:0; background:linear-gradient(155deg,#00102E 0%,#001B3F 100%); }
+
+      /* cihaz gövdesi */
+      #body { position:absolute; left:22px; top:24px; width:206px; height:246px; border-radius:44px;
+        background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%);
+        box-shadow:0 14px 30px rgba(0,0,0,.55); }
+      #crown { position:absolute; left:226px; top:104px; width:7px; height:34px; border-radius:4px;
+        background:linear-gradient(180deg,#4A4F57,#23262B); }
+      /* ekran penceresi — şerit bunun içinde kayar */
+      #win { position:absolute; left:30px; top:32px; width:190px; height:230px;
+        border-radius:36px; overflow:hidden; background:#000; }
+      #strip { position:absolute; left:0; top:0; height:230px; display:flex; }
+      #strip img { width:190px; height:230px; display:block; flex:0 0 190px; }
+
+      #cap { position:absolute; left:0; right:0; bottom:8px; text-align:center;
+        font-size:12px; color:#93AEC7; letter-spacing:.2px; }
+    </style>
+  </head>
+
+  <body>
+    <div data-hf-id="hf-z8zk" id="root" data-composition-id="main" data-start="0" data-duration="6" data-width="250" data-height="300" data-fps="15">
+      <div data-hf-id="hf-2xc0" id="bg"></div>
+      <div data-hf-id="hf-gw7p" id="body"></div>
+      <div data-hf-id="hf-j012" id="crown"></div>
+
+      <div data-hf-id="hf-7on1" id="win">
+        <div data-hf-id="hf-7js5" id="strip">
+          <img data-hf-id="hf-5pj5" src="assets/a410-watchface-analog.png" alt="Analog face">
+          <img data-hf-id="hf-oo9i" src="assets/a410-watchface-digital.png" alt="Digital face">
+          <img data-hf-id="hf-e14j" src="assets/a410-watchface-activity.png" alt="Activity face">
+          <img data-hf-id="hf-kvzk" src="assets/a410-watchface-io-control.png" alt="Output control">
+          <img data-hf-id="hf-0r46" src="assets/a410-watchface-analog-final.png" alt="Analog face">
+        </div>
+      </div>
+
+      <div data-hf-id="hf-jjxy" id="cap">Watch face selector — horizontal swipe</div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["main"] = tl;
+
+      /* 4 kadran + başa dönüş için 5. kopya → GIF kesintisiz döner.
+         Her kadran 1.1 sn durur, geçiş 0.4 sn. */
+      const HOLD = 1.1, SLIDE = 0.4;
+      for (let i = 1; i <= 4; i++) {
+        tl.to("#strip", { x: -190 * i, duration: SLIDE, ease: "power2.inOut" },
+              i * HOLD + (i - 1) * SLIDE);
+      }
+    </script>
+  </body>
+</html>

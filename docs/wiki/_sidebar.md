@@ -2,24 +2,24 @@
 
 **Başlangıç**
 - [Ana Sayfa](Home)
-- [Başlarken](Başlarken)
+- [Başlarken](getting-started)
 
 **Sistem**
-- [Mimari](Mimari)
-- [Çekirdek ve Servisler](Çekirdek-ve-Servisler)
-- [Donanım ve Board Varyantları](Donanım-ve-Board-Varyantları)
+- [Mimari](architecture)
+- [Çekirdek ve Servisler](core-and-services)
+- [Donanım ve Board Varyantları](hardware-and-board-variants)
 
 **Geliştirme**
-- [Uygulama Geliştirme](Uygulama-Geliştirme)
-- [Kullanıcı Arayüzü](Kullanıcı-Arayüzü)
+- [Uygulama Geliştirme](app-development)
+- [Kullanıcı Arayüzü](user-interface)
 
 **Yetenekler**
-- [Komut Arayüzü](Komut-Arayüzü)
-- [Telemetri ve Konumlandırma](Telemetri-ve-Konumlandırma)
-- [OTA Güncelleme](OTA-Güncelleme)
+- [Komut Arayüzü](command-interface)
+- [Telemetri ve Konumlandırma](telemetry-and-positioning)
+- [OTA Güncelleme](ota-updates)
 
 **Yardım**
-- [Sorun Giderme](Sorun-Giderme)
+- [Sorun Giderme](troubleshooting)
 
 ---
 `v1.4.81` · ESP32-S3 · LVGL 9

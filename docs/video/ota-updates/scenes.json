@@ -1,0 +1,85 @@
+{
+  "brand": "NARRTOS WEAR",
+  "doc": "OTA Güncelleme",
+  "title": "OTA Güncelleme",
+  "subtitle": "Cihaz yeni yazılımı kablosuz olarak indirir ve kendini günceller. Fiziksel müdahale gerekmez.",
+  "end_title": "Üretimde manifest ve imaj HTTPS üzerinden dağıtılır.",
+  "end_subtitle": "Sertifika sabitleme yol haritasında. Sunucu tarafı için Sunucu Kurulumu dökümanına bakın. corezzle.com",
+  "scenes": [
+    {
+      "step": "1",
+      "title": "Akış",
+      "code": "1. Manifest sorgusu   -> sunucudaki güncel sürüm nedir?\n2. Karşılaştırma      -> OS_VERSION_CODE'dan büyük mü?\n3. İndirme            -> yeni imaj WiFi üzerinden yedek bölüme yazılır\n4. Doğrulama          -> bütünlük kontrolü\n5. Yeniden başlatma   -> yeni sürüm aktif olur",
+      "captions": [
+        "Güncelleme beş adımdan oluşur: sunucuya sor, sürümleri karşılaştır, indir, doğrula ve yeniden başla.",
+        "Cihazda bu akış Ayarlar, General ve Software Updates menüsünden başlatılır. Otomatik kontrol açıksa manifest belirli aralıklarla sorgulanır."
+      ]
+    },
+    {
+      "step": "2",
+      "title": "Sürüm karşılaştırması",
+      "code": "#define OS_VERSION_MAJOR 1\n#define OS_VERSION_MINOR 4\n#define OS_VERSION_PATCH 81\n#define OS_VERSION_STR   \"1.4.81\"\n// OS_VERSION_CODE = MAJOR*10000 + MINOR*100 + PATCH -> 10481\n\n// String karşılaştırmada \"0.10\" tuzağı çıkar;\n// integer karşılaştırma bu hatayı önler.",
+      "captions": [
+        "Sürüm bilgisi tek bir tam sayıya indirgenir. Böylece metin karşılaştırmasının tuzaklarına düşülmez."
+      ]
+    },
+    {
+      "step": "3",
+      "title": "Manifest formatı",
+      "code": "{\n  \"version\":      \"1.5.0\",\n  \"version_code\": 10500,\n  \"url\":   \"https://sunucu/firmware/narrtos-1.5.0.bin\",\n  \"size\":  2480000,\n  \"notes\": \"Hata düzeltmeleri ve yeni özellikler\"\n}\n\n// Manifest adresi derleme bayrağıyla verilir:\n// platformio.ini\nbuild_flags = '-DOTA_BACKEND_HOST=\"https://sunucunuz.example.com\"'",
+      "captions": [
+        "Cihaz kimliği ve mevcut sürüm, isteğe sorgu parametresi olarak eklenir. Sunucu uygun sürümü seçer ya da güncelleme yoksa 204 No Content yanıtı döner.",
+        "os_config.h içindeki bütün OTA adresleri #ifndef ile korunur; derleme ortamından farklı bir adres verilebilir."
+      ]
+    },
+    {
+      "step": "4",
+      "title": "A/B partisyon düzeni",
+      "items": [
+        "Çalışan sürüm app0 bölümündedir; yeni imaj app1 bölümüne yazılır.",
+        "Güncelleme başarısız olursa ya da yeni sürüm açılışta çökerse cihaz eski sürüme geri döner. Bu, çökme döngüsüne karşı korumadır.",
+        "Bölüm tablosu partitions_custom.csv dosyasındadır: iki uygulama bölümü, NVS ve varlık (assets) bölümü."
+      ],
+      "captions": [
+        "Yedek bölüm sayesinde başarısız bir güncelleme cihazı hiçbir zaman açılamaz duruma düşürmez."
+      ]
+    },
+    {
+      "step": "5",
+      "title": "Cihazda güncelleme ekranı",
+      "image": "assets/ota.png",
+      "captions": [
+        "Cihaz manifest'i sorgular; yeni bir sürüm varsa boyutuyla birlikte ekranda gösterir.",
+        "İndirilen imaj yedek bölüme yazılır. Doğrulama başarılıysa bir sonraki açılışta yeni sürüm devreye girer."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Panelden sürüm yönetimi",
+      "image": "assets/03-admin-releases.png",
+      "captions": [
+        "Sürümler sekmesinde kanal, boyut, aktiflik ve yayın durumu görünür. Yazılım dosyası panelden yüklenir; sha256 özeti ve boyutu otomatik hesaplanır."
+      ]
+    },
+    {
+      "step": "6",
+      "title": "Cihaza hedef sürüm atama",
+      "image": "assets/02-admin-devices.png",
+      "captions": [
+        "Cihazlar sekmesinde son görülme zamanı, mevcut sürüm ve hedef sürüm yer alır. Push Update ile cihaza zorunlu bir sürüm atanır."
+      ]
+    },
+    {
+      "step": "7",
+      "title": "Yaşam döngüsü telemetrisi ve güvenlik",
+      "items": [
+        "Cihaz, güncellemenin başladığını, başarılı ya da başarısız olduğunu sunucuya raporlar.",
+        "Bu raporlama en iyi çaba ilkesiyle çalışır: sunucuya erişilemezse güncelleme akışı bozulmaz, olay sessizce atlanır.",
+        "Üretimde manifest ve imaj HTTPS üzerinden dağıtılır. Geliştirme ortamında HTTP'ye izin veren bir yapılandırma vardır."
+      ],
+      "captions": [
+        "Sertifika sabitleme (pinning) yol haritasındadır."
+      ]
+    }
+  ]
+}

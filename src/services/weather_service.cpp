@@ -222,7 +222,7 @@ static void cache_save_location_auto(void)
 }
 
 /* Bir şehrin tam snapshot'ını NVS'e yaz. Her başarılı fetch sonrası çağrılır.
- * Endurance: 15 dakikada bir × 3 şehir = 12 yazma/saat → günde 288 → yılda
+ * Endurance: 15 dakikada bir × 3 şehir = 12 yazma/watch → günde 288 → yılda
  * ~105K. NVS partition'ında wear-leveling ile 600K toplam → ~5.7 yıl/key,
  * 3 key birlikte ~1.9 yıl key başına. Kabul edilebilir. */
 static void cache_save_snapshot(int idx)

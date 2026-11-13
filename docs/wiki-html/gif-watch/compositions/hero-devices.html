@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <title>One codebase, two hardware targets — hero GIF</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family:"SFMono-Regular"; src:local("SFMono-Regular"); }
+      /* Ana sayfa açılış görseli: aynı kod tabanının iki farklı panelde
+         çalıştığını tek bakışta gösterir. Ekranlar gerçek arayüz görselleri;
+         geçişler saydamlıkla (transform/opacity — kare-kare yakalama güvenli).
+
+         Telefon ÜÇÜNCÜ BİR DONANIM VARYANTI DEĞİLDİR — kodda ekransız varyant
+         yok, platformio.ini'deki üç ortamın üçü de ekranlı. Telefon burada
+         ble_cmd_service'in kontrol ucu: BLE ile komut yazılır, iki board da
+         aynı komuta yanıt verir. Bu yüzden daha küçük ve daha sönük çizilir. */
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:1100px; height:340px; overflow:hidden; background:#00102E; }
+      body { font-family:"Inter",sans-serif; -webkit-font-smoothing:antialiased; color:#E4F0EE; }
+      #bg { position:absolute; inset:0; background:linear-gradient(140deg,#00102E 0%,#00234E 55%,#001B3F 100%); }
+      #grid { position:absolute; inset:0; opacity:.26;
+        background-image:linear-gradient(#093159 1px,transparent 1px),linear-gradient(90deg,#093159 1px,transparent 1px);
+        background-size:70px 70px; }
+      #glow { position:absolute; left:560px; top:-90px; width:520px; height:520px; border-radius:50%;
+        background:radial-gradient(circle,rgba(0,202,215,.18) 0%,rgba(0,202,215,0) 65%); }
+
+      /* Sütun 320 px; başlık 40 px'te iki satıra sığar (44 px'te üçe düşüp
+         paragrafı tuvalin altından taşırıyordu). */
+      #copy { position:absolute; left:48px; top:70px; width:320px; }
+      #k { font-size:15px; font-weight:800; letter-spacing:2px; color:#00CAD7; }
+      #h { font-size:40px; font-weight:800; line-height:1.12; letter-spacing:-1px; margin-top:14px; }
+      #s { font-size:17px; color:#93AEC7; margin-top:16px; line-height:1.5; }
+
+      /* Telefon — kontrol ucu. Gölgesi ve parlaklığı saatlerinkinden düşük
+         tutuldu ki sahnenin öznesi değil, yardımcı öğesi olduğu okunsun. */
+      #p { position:absolute; left:396px; top:56px; width:148px; height:226px; border-radius:20px;
+        background:linear-gradient(150deg,#2E333A 0%,#14171B 55%,#22262B 100%);
+        box-shadow:0 12px 26px rgba(0,0,0,.45); opacity:.92; }
+      #psp { position:absolute; left:438px; top:63px; width:64px; height:4px; border-radius:2px;
+        background:#3C424A; }
+      #pw { position:absolute; left:404px; top:74px; width:132px; height:198px;
+        border-radius:12px; overflow:hidden; background:#05121F; padding:9px 8px; }
+      #pw .t { font-family:"SFMono-Regular",Menlo,Consolas,monospace; font-size:8.5px;
+        line-height:13px; letter-spacing:-.1px; white-space:pre; }
+      #pw .hd { color:#00CAD7; font-weight:700; margin-bottom:5px; }
+      #pw .cm { color:#E4F0EE; }
+      #pw .ok { color:#7FD6A6; }
+
+      /* BLE bağlantısı: üç nokta, yalnız opacity ile nabız atar. */
+      .ble { position:absolute; top:148px; width:6px; height:6px; border-radius:50%; background:#00CAD7; }
+      #ble1 { left:552px; } #ble2 { left:565px; } #ble3 { left:578px; }
+
+      /* AMOLED gövde — tuval 1100 px; iki cihaz da sağ kenardan en az 20 px
+         içeride kalmalı (yuvarlak gövde önceden 926'ya taşıyordu). */
+      #b1 { position:absolute; left:592px; top:38px; width:224px; height:266px; border-radius:48px;
+        background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%);
+        box-shadow:0 18px 40px rgba(0,0,0,.6); }
+      #c1 { position:absolute; left:816px; top:130px; width:8px; height:38px; border-radius:4px;
+        background:linear-gradient(180deg,#4A4F57,#23262B); }
+      #w1 { position:absolute; left:609px; top:56px; width:190px; height:230px;
+        border-radius:38px; overflow:hidden; background:#000; }
+      #w1 img { position:absolute; left:0; top:0; width:190px; height:230px; }
+
+      /* Yuvarlak gövde: 848 + 214 = 1062 → sağda 38 px pay */
+      #b2 { position:absolute; left:848px; top:64px; width:214px; height:214px; border-radius:50%;
+        background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%);
+        box-shadow:0 18px 40px rgba(0,0,0,.6); }
+      #w2 { position:absolute; left:860px; top:76px; width:190px; height:190px;
+        border-radius:50%; overflow:hidden; background:#000; }
+      #w2 img { position:absolute; left:0; top:0; width:190px; height:190px; }
+
+      .lbl { position:absolute; font-size:14px; font-weight:700; color:#00CAD7; text-align:center; }
+      /* Telefon etiketi sönük: donanım hedefi değil, kontrol yolu. */
+      .lbl.sec { color:#93AEC7; font-size:13px; font-weight:600; }
+    </style>
+  </head>
+
+  <body>
+    <div data-hf-id="hf-oj1y" id="root" data-composition-id="hero" data-start="0" data-duration="8" data-width="1100" data-height="340" data-fps="15">
+      <div data-hf-id="hf-2xc0" id="bg"><div data-hf-id="hf-gs5t" id="grid"></div></div>
+      <div data-hf-id="hf-27c6" id="glow"></div>
+
+      <div data-hf-id="hf-5l42" id="copy">
+        <div data-hf-id="hf-c785" id="k">NARRTOS</div>
+        <div data-hf-id="hf-4oyd" id="h">One codebase,<br data-hf-id="hf-x5px">two hardware targets</div>
+        <div data-hf-id="hf-j449" id="s">Open-source embedded OS for the ESP32-S3. Hardware is chosen at build time; application code never changes.</div>
+      </div>
+
+      <div data-hf-id="hf-hhdb" id="p"></div>
+      <div data-hf-id="hf-hcya" id="psp"></div>
+      <div data-hf-id="hf-cgr6" id="pw">
+        <div data-hf-id="hf-4yzl" class="t hd">NarRTOS CMD</div>
+        <div data-hf-id="hf-np80" class="t cm" id="q1">&gt; app launch launcher</div>
+        <div data-hf-id="hf-i92q" class="t ok" id="v1">[cmd] OK  id=3</div>
+        <div data-hf-id="hf-c56r" class="t cm" id="q2">&gt; app launch weather</div>
+        <div data-hf-id="hf-105i" class="t ok" id="v2">[cmd] OK  id=6</div>
+        <div data-hf-id="hf-nre1" class="t cm" id="q3">&gt; app launch steps</div>
+        <div data-hf-id="hf-kzey" class="t ok" id="v3">[cmd] OK  id=1</div>
+      </div>
+      <div data-hf-id="hf-29mi" class="lbl sec" style="left:396px;top:290px;width:148px">BLE control path</div>
+
+      <div data-hf-id="hf-v46t" class="ble" id="ble1"></div>
+      <div data-hf-id="hf-z2au" class="ble" id="ble2"></div>
+      <div data-hf-id="hf-30ev" class="ble" id="ble3"></div>
+
+      <div data-hf-id="hf-49wu" id="b1"></div>
+      <div data-hf-id="hf-l4ml" id="c1"></div>
+      <div data-hf-id="hf-fttd" id="w1">
+        <img data-hf-id="hf-1jjo" id="a0" src="assets/a410-watchface-analog.png" alt="Analog face">
+        <img data-hf-id="hf-yc2l" id="a1" src="assets/a410-launcher.png" alt="Home screen">
+        <img data-hf-id="hf-9fai" id="a2" src="assets/a410-weather.png" alt="Weather">
+        <img data-hf-id="hf-5jgs" id="a3" src="assets/a410-step-counter.png" alt="Step counter">
+      </div>
+      <div data-hf-id="hf-gbi1" class="lbl" style="left:592px;top:312px;width:224px">410×502 AMOLED</div>
+
+      <div data-hf-id="hf-0bst" id="b2"></div>
+      <div data-hf-id="hf-jrxe" id="w2">
+        <img data-hf-id="hf-l632" id="r0" src="assets/r240-watchface-digital.png" alt="Digital face">
+        <img data-hf-id="hf-py1q" id="r1" src="assets/r240-launcher.png" alt="Home screen">
+        <img data-hf-id="hf-6enb" id="r2" src="assets/r240-weather.png" alt="Weather">
+        <img data-hf-id="hf-8kj7" id="r3" src="assets/r240-step-counter.png" alt="Step counter">
+      </div>
+      <div data-hf-id="hf-ae96" class="lbl" style="left:848px;top:290px;width:214px">240×240 round LCD</div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["hero"] = tl;
+
+      /* Telefonda bir komut yazılır, İKİ BOARD DA aynı ekrana geçer — GIF'in
+         söylediği şey bu: tek kod tabanı, tek komut seti, iki donanım.
+         Yuvarlak cihaz 0.25 sn geriden gelir; sert kesim yerine ardışık
+         okunsun diye, ama komutla bağı kopmayacak kadar yakın.
+
+         Komut adları uydurma değil: command_service.cpp'deki isim→id
+         tablosundan (launcher=3, weather=6, steps=1). */
+      const STEP = 2, FADE = 0.5, LAG = 0.25;
+      for (let i = 1; i < 4; i++) gsap.set("#a" + i, { opacity: 0 });
+      for (let i = 1; i < 4; i++) gsap.set("#r" + i, { opacity: 0 });
+      for (let i = 1; i < 4; i++) gsap.set(["#q" + i, "#v" + i], { opacity: 0 });
+
+      for (let i = 1; i < 4; i++) {
+        const t = i * STEP;
+        // önce komut satırı, sonra yanıt, sonra ekranlar → nedensellik okunur
+        tl.to("#q" + i, { opacity: 1, duration: 0.18 }, t - 0.55);
+        tl.to("#v" + i, { opacity: 1, duration: 0.18 }, t - 0.25);
+        tl.to("#a" + i, { opacity: 1, duration: FADE, ease: "power1.inOut" }, t);
+        tl.to("#r" + i, { opacity: 1, duration: FADE, ease: "power1.inOut" }, t + LAG);
+      }
+
+      /* BLE nabzı: yalnız opacity — kare-kare yakalamada titremez. */
+      [1, 2, 3].forEach(function (n) {
+        tl.to("#ble" + n, { opacity: .25, duration: .35, ease: "sine.inOut",
+                            yoyo: true, repeat: 21 }, (n - 1) * .18);
+      });
+
+      /* başa dönüş */
+      tl.to(["#a1", "#a2", "#a3"], { opacity: 0, duration: FADE, ease: "power1.inOut" }, 7.4);
+      tl.to(["#r1", "#r2", "#r3"], { opacity: 0, duration: FADE, ease: "power1.inOut" }, 7.4);
+      tl.to(["#q1", "#v1", "#q2", "#v2", "#q3", "#v3"],
+            { opacity: 0, duration: FADE, ease: "power1.inOut" }, 7.4);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <title>From home screen to app — GIF</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      /* app_manager uygulama değiştirdiğinde ekranın sahibi tek uygulamadır;
+         geçiş ölçek + saydamlıkla gösterilir. Hareket yalnızca transform ile. */
+      * { margin:0; padding:0; box-sizing:border-box; }
+      html, body { width:250px; height:300px; overflow:hidden; background:#00102E; }
+      body { font-family:"Inter",sans-serif; -webkit-font-smoothing:antialiased; }
+      #bg { position:absolute; inset:0; background:linear-gradient(155deg,#00102E 0%,#001B3F 100%); }
+
+      #body { position:absolute; left:22px; top:24px; width:206px; height:246px; border-radius:44px;
+        background:linear-gradient(150deg,#3A3F46 0%,#171A1F 55%,#2A2E34 100%);
+        box-shadow:0 14px 30px rgba(0,0,0,.55); }
+      #crown { position:absolute; left:226px; top:104px; width:7px; height:34px; border-radius:4px;
+        background:linear-gradient(180deg,#4A4F57,#23262B); }
+      #win { position:absolute; left:30px; top:32px; width:190px; height:230px;
+        border-radius:36px; overflow:hidden; background:#000; }
+      #win img { position:absolute; left:0; top:0; width:190px; height:230px; }
+
+      /* dokunma halkası */
+      #tap { position:absolute; left:0; top:0; width:52px; height:52px; border-radius:50%;
+        border:3px solid rgba(255,255,255,.9); opacity:0; }
+
+      #cap { position:absolute; left:0; right:0; bottom:8px; text-align:center;
+        font-size:12px; color:#93AEC7; }
+    </style>
+  </head>
+
+  <body>
+    <div data-hf-id="hf-u4jz" id="root" data-composition-id="acilis" data-start="0" data-duration="5" data-width="250" data-height="300" data-fps="15">
+      <div data-hf-id="hf-2xc0" id="bg"></div>
+      <div data-hf-id="hf-gw7p" id="body"></div>
+      <div data-hf-id="hf-j012" id="crown"></div>
+
+      <div data-hf-id="hf-7on1" id="win">
+        <img data-hf-id="hf-ab6o" id="home" src="assets/a410-launcher.png" alt="Home screen">
+        <img data-hf-id="hf-mnyo" id="app" src="assets/a410-weather.png" alt="Weather">
+        <div data-hf-id="hf-u8x4" id="tap"></div>
+      </div>
+
+      <div data-hf-id="hf-c16o" id="cap">From home screen to app</div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["acilis"] = tl;
+
+      /* Weather ikonu ana ekranda sağ üstte; dokunma halkası oraya iner,
+         ardından uygulama ölçeklenerek açılır ve geri dönülür. */
+      gsap.set("#app", { scale: .55, opacity: 0, transformOrigin: "72% 30%" });
+      gsap.set("#tap", { x: 120, y: 52, scale: .4, opacity: 0 });
+
+      tl.to("#tap", { opacity: 1, scale: 1, duration: .28, ease: "power2.out" }, 0.7)
+        .to("#tap", { opacity: 0, scale: 1.5, duration: .3, ease: "power2.in" }, 1.0)
+        .to("#home", { scale: 1.35, opacity: 0, duration: .45, ease: "power2.inOut" }, 1.05)
+        .to("#app", { scale: 1, opacity: 1, duration: .45, ease: "power2.out" }, 1.05)
+        /* geri: uygulama küçülüp kaybolur, ana ekran yerine oturur */
+        .to("#app", { scale: .6, opacity: 0, duration: .4, ease: "power2.in" }, 3.5)
+        .to("#home", { scale: 1, opacity: 1, duration: .4, ease: "power2.out" }, 3.5);
+    </script>
+  </body>
+</html>

@@ -13,9 +13,9 @@ W, H, FPS = 1920, 1080, 30
 CARD = 5.0            # başlık ve kapanış kartı süresi
 INTRO, OUTRO = 4.5, 10.0   # logo girişi, YouTube son ekranı (bitiş öğeleri için boş alan)
 LOGO = "assets/logo.png"
-A410 = ["kadran-analog", "launcher", "hava-durumu", "adim-sayar"]   # başlık kartındaki saat ekranları (gif-saat/assets)
-R240 = ["kadran-dijital", "launcher", "hava-durumu", "adim-sayar"]
-GIF_ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "wiki-html", "gif-saat", "assets")
+A410 = ["watchface-analog", "launcher", "weather", "step-counter"]   # başlık kartındaki saat ekranları (gif-watch/assets)
+R240 = ["watchface-digital", "launcher", "weather", "step-counter"]
+GIF_ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "wiki-html", "gif-watch", "assets")
 IN, OUT, GAP = 0.6, 0.7, 0.35
 
 def cap_dur(text):

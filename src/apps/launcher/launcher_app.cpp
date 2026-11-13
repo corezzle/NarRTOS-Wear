@@ -19,7 +19,7 @@
  *   • İsim etiketi yok (Apple Watch'ta da yok); ikona basılı tutulunca
  *     ikonun yanında beyaz bir "pill" içinde uygulama adı belirir.
  *
- * Korunanlar: saat/wifi/batarya üst şeridi, uzun-bas → düzenleme modu,
+ * Korunanlar: watch/wifi/batarya üst şeridi, uzun-bas → düzenleme modu,
  * (-) rozeti + kaldırma onayı, batarya event'i, geri jesti.
  */
 
@@ -157,7 +157,7 @@ static int64_t s_press_start_us = 0;
 
 /* ─── Board-varyant petek sabitleri (Session 23) ──────────────────────────────
  *
- * HC_TOP       : saat/wifi/batarya şeridinin kapladığı üst bant
+ * HC_TOP       : watch/wifi/batarya şeridinin kapladığı üst bant
  * HC_ICON_D    : merkezdeki (tam ölçek) daire çapı
  * HC_PITCH_X   : aynı satırdaki iki ikon merkezi arası
  * HC_PITCH_Y   : satır aralığı ≈ HC_PITCH_X · √3/2 (düzgün altıgen kafes)
